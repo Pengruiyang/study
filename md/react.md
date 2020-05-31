@@ -82,4 +82,6 @@ Redux 是一个状态管理库,简化了单项数据流.
   插入到浏览器中直接展示即可
   ## renderToSting 和 renderToStaticMarkup
   renderToSting 会为组件生成checksum data-react-checksum = "-3123"
-  react 在客户端判断是否需要重新 render 相同则不需要,省略创建 dom 和挂载 dom 的过程,接着触发 componentDidMount
+  react 在客户端判断是否需要重新 render 相同则不需要,省略创建 dom 和挂载 dom 的过程,接着触发 componentDidMount 等事件来处理服务端上的未尽事宜(事件绑定等),从而加快了交互时间.
+# 多个组件之间如何拆分各自的state，每块小的组件有自己的状态，它们之间还有一些公共的状态需要维护，如何思考这块
+  状态提升，找到容器组件和展示组件，保证唯一数据源和单向数据
