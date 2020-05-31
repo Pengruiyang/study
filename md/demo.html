@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input type="text" id="inp" value="" />
+  </body>
+</html>
+<script>
+  // function jump(n,num){
+  //   if(n <= 2){
+  //     return num + n
+  //   }else {
+  //     return jump(n -1, )
+  //   }
+  // }
+  // 尾递归优化斐波那契数列
+  function fibonacci(n, ac1 = 1, ac2 = 1) {
+    if (n <= 2) {
+      return ac2;
+    }
+    return fibonacci(n - 1, ac2, ac1 + ac2);
+  }
+
+  // 尾递归优化跳台阶
+  function jump(n, ac1 = 1, ac2 = 2) {
+    if (n <= 2) {
+      return ac2;
+    }
+    return jump(n - 1, ac2, ac1 + ac2);
+  }
+  console.log(jump(5));
+
+  // 防抖
+  function debounce(fn, time = 500) {
+    let timer = null;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        fn.call(this, ...args);
+      }, 500);
+    };
+  }
+
+  function sayHi() {
+    console.log('防抖成功');
+  }
+
+  // 节流
+  function throttle(fn, time = 500) {
+    let flag = false;
+    return (...args) => {
+      if (flag) return;
+      flag = true;
+      let timer = setTimeout(() => {
+        fn.call(this, ...args);
+        flag = false;
+        clearTimeout(timer);
+      });
+    };
+  }
+  var inp = document.getElementById('inp');
+  inp.addEventListener('input', debounce(sayHi));
+
+  const compose = (...fns) => (...args) =>  fns.reduceRight((v,fn) => fn(v), ...args)
+  // bind
+  // Function.prototype.myBind = function (context) {
+  //   //
+  //   if (typeof this !== 'function') {
+  //     throw new TypeError(this + 'must be a function');
+  //   }
+  //   let _this = this;
+  //   let args = [].slice.call(arguments, 1);
+  //   function bound() {
+  //     let boundArgs = [].slice.call(arguments, 1);
+  //     // return self.call(context,...args,...boundArgs)
+  //     // if(!new.target ){
+  //     //   let prototype =
+  //     // }
+  //   }
+  // }
+  
+</script>

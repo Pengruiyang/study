@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+</html>
+<script>
+  function promiseAll(data) {
+    return new Promise((resolve, reject) => {
+      if (!Array.isArray(data)) {
+        return reject(new TypeError('not array'));
+      }
+      let num = 0;
+      let len = data.length;
+      let allList = [];
+      for (let i of data) {
+        Promise.resolve(i).then(
+          (res) => {
+            num++;
+            allList.push(res);
+            if (num === len) {
+              resolve(allList);
+            }
+          },
+          (rej) => {
+            reject(rej);
+          }
+        );
+      }
+    });
+  }
+  var p1 = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      resolve(1);
+    }, 0);
+  });
+  var p2 = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      resolve(2);
+    }, 200);
+  });
+  var p3 = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      try {
+        console.log(XX.BBB);
+      } catch (exp) {
+        resolve('error');
+      }
+    }, 100);
+  });
+
+  // Promise.all([p1, p2, p3])
+  //   .then(function (results) {
+  //     console.log('success');
+  //     console.log(results);
+  //   })
+  //   .catch(function (r) {
+  //     console.log('err');
+  //     console.log(r);
+  //   });
+
+  var maxProfit = function (prices) {
+    let sum = 0,len = prices.length
+    for(let i = 1; i <len;i++){
+      sum += Math.max(prices[i] - prices[i-1],0)
+    }
+    return sum
+  }; 
+  maxProfit([7,1,5,3,6,4])
+
+  // console.log(a);
+  // let a = 1
+
+
+  // 最长的山脉
+  function longestMountain(A){
+    let len = A.length, base = 0, ans = 0
+    while(base < len){
+      let end = base
+      //  左边开始判断是不是上升
+      if(end + 1 < len && A[end] < A[end + 1]){
+        while (end + 1 < len && A[end] < A[end + 1]) { end++ }
+        if(end + 1 < len && A[end] > A[end + 1]){
+          while(end + 1 < len && A[end] > A[end + 1]) end++
+          ans = Math.max(ans,end - base+1)
+        }
+      }
+
+      base = Math.max(end,base + 1)
+    }
+    return ans
+  }
+  console.log(longestMountain([1, 2, 3, 2, 1, 0, 2, 3, 1]));
+  
+
+  // 两数之和
+  const arr = [2,8,7,5]
+  function sum(arr,target){
+    let newMap = new Map()
+    for(let i of arr){
+      if(!newMap.get(i)){
+        newMap.set(target-i,i)
+      }else{
+        console.log([target-i,i]);
+        
+        return [target-i,i]
+      }
+      
+    }
+    // console.log(newMap);
+    
+    
+  }
+  sum(arr,9)
+
+
+  function _new(fn,...args){
+    let obj = Object.create(fn.prototype)
+    let ret = fn.call(obj,...args)
+    return ret  instanceof Object ? ret : obj 
+  }
+  Function.prototype.myBind = function(fn,...args){
+    return (...innerArgs) => {
+      this.call(fn,...args,...innerArgs)
+    }
+  }
+  function curry(fn){
+    const ctx =this
+    function inner(...args){
+      if(args.length === fn.length){
+        return fn.call(ctx,...args)
+      }
+    }
+  }
+  function init(A,B){
+    let protoType = Object.create(A.protoType)
+    protoType.constructor = B
+    B.protoType = protoType
+  }
+
+  function throttle(fn,time){
+    let flag = true
+    return (...args)=>{
+      if(!flag)return
+      flag = false
+      setTimeout(()=>{
+        fn.call(this,...args)
+        flag = true
+      },time)
+    }
+  }
+
+  // fangdou
+  function debouce(fn,time){
+    let timer = null
+    return (...args)=>{
+      clearTimeout(timer)
+      timer = setTimeout(()=>{
+        fn.call(this,...args)
+      },time)
+    }
+  }
+</script>

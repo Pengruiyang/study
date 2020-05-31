@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+</body>
+</html>
+<script>
+  class EventEmitter {
+    constructor(){
+      this.handleList = {}
+    }
+    on(type,func){
+      let callbacks = this.handleList[type]?this.handleList[type]:[]
+      callbacks.push(func)
+      this.handleList[type] = callbacks
+    }
+    emit(type,...args){
+      // 方法不存在直接返回
+      if(!this.handleList[type])return
+      this.handleList[type].map(fn => fn(...args))
+    }
+    off(type,func){
+      if (!this.handlers[eventName]) return
+      let index = this.handlers[eventName].indexOf(func)
+      this.handlers[eventName].splice(index,1)
+    }
+  }
+
+  // 
+</script>

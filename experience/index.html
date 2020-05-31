@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+</html>
+<script>
+  // var Foo = {
+  //   name: 'aaa',
+  //   display() {
+  //     console.log(this);
+  //   },
+  // };
+  class Foo {
+    constructor(name) {
+      this.name = name;
+      // class 中采用严格模式 不会默认绑定到 window 上 render 中代码为类实例 所以为 undefined
+      // this.display = this.display.bind(this)
+    }
+    display() {
+      console.log(this);
+    }
+  }
+  var foo = new Foo('Saurabh');
+  // foo.display();
+  let display = foo.display;
+  display();
+
+  // var p = /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|[1-9])$/;
+  var p = /^(100|[2-9]\d|1[6-9])$/;
+  // for(let c=1; c<=200; c++){
+  //   console.log(p.test(c),c);
+
+  // }
+
+  function a() {
+    console.log(arguments);
+    let b = Array.prototype.slice.call(arguments[1]);
+    console.log(b);
+  }
+  a(1, 2, 3, 4, 5, 6, 7);
+
+  // String.prototype.valueOf = () => '菜狗';
+  // console.log('我' == '菜鸡')
+  function _new(fn, ...args) {
+    
+    let obj = Object.create(fn.prototype);
+    let ret = fn.call(obj, ...args);
+    return ret instanceof Object ? ret : obj
+  }
+</script>
