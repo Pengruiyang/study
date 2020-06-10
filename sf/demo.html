@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+</html>
+<script>
+  function maxSum(arr) {
+    // 按照开始时间排序
+    let sortArr = arr.sort((a, b) => a[0] - b[0]);
+    console.log(sortArr);
+    let list = sortArr.reduce((peoples, item) => {
+      // 如果 people 不是第一个 并且 最新的结束时间 小于 下一个的开始时间(即在同时运动)
+      if (peoples.length && peoples[peoples.length - 1] <= item[0]) {
+        peoples.pop();
+      }
+      peoples.push(item[1]);
+      console.log(peoples);
+      return peoples;
+    }, []);
+    console.log(list);
+  }
+
+  // console.log(
+  //   maxSum([
+  //     [0, 30],
+  //     [5, 10],
+  //     [8, 10],
+  //     [15, 20],
+  //     [10, 40],
+  //   ])
+  // );
+
+  var decodeString = function (s) {
+    let arr = [],
+      val = '',
+      nums = '';
+    for (let i of s) {
+      // 数字
+      if (i / 1 == i) {
+        nums += i;
+      } else if (i === '[') {
+        arr.push({ nums, val });
+        (nums = ''), (val = '');
+      } else if (i === ']') {
+        let last = arr.pop();
+        val = last.val + val.repeat(last.nums);
+      } else {
+        val += i;
+      }
+    }
+    return val;
+  };
+  // console.log(decodeString("3[a]2[bc]"));
+
+  var isValid = function (s) {
+    let arr = [];
+    if(s.length % 2)return false
+    for (let i of s) {
+      if(['{','[','('].includes(i)){
+        arr.push(i)
+      }else{
+        let last = arr[arr.length - 1] 
+        if(i ==')' && last != '(' || i ==']' && last != '[' || i =='}' && last != '{')return false
+        else{
+          arr.pop()
+        }
+      }
+    }
+    // if(arr.length)return false
+    return true
+  };
+  console.log(isValid('{[]}'));
+  
+</script>

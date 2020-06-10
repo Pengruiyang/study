@@ -4,7 +4,7 @@
   componentWillMount 废弃
   static getDevicedStateFromProps
   render
-  componentDidMount 
+  componentDidMount (commit 阶段)
   ## 更新阶段
   static getDevicedStateFromProps
   shouldComponentUpdate
@@ -30,7 +30,7 @@ vue 设计思想就是简单地使用,而 react 是正确的去应用.
   2.event 不是原生的,使用 SyntheticEvent 中间层合成事件对象.
   
   维护了一个 map 表,跨浏览器包装了所有原生事件,并且提供了和原生事件相同的接口.需要 event.nativeEvent.
-  SyntheticEvent是合并而来.维护了一个事件池,代表这这个对象会被复用.所以为了安全考虑不支持异步访问事件.
+  SyntheticEvent是合并而来.维护了一个事件池,代表这这个对象会被复用.所以为了安全考虑不支持异步访问事件.可以通过event.persist()变成异步访问可以获取到
 # react 为什么要用 key
   react diff 策略
   1.对比新旧节点 只会在同级对比,不会跨层级比较
@@ -53,13 +53,34 @@ vue 设计思想就是简单地使用,而 react 是正确的去应用.
   ## 高阶组件HOC
   将其他组件作为参数生成一个新的组件.Redux connect 就是高阶组件示例
 # redux 工作原理
-Redux 是一个状态管理库,简化了单项数据流.
+Redux 是一个状态管理库,简化了单项数据流,实现了多组件通信.
+  redux 分为四个模块
+    1.view: 组件状态发生改变时,dispatch 一个 action
+    2.action: 描述状态变化的对象,传递给 store
+    3.store: 接受 store 并传递给 reducer,驱动 reducer 执行改变状态,更新后刷新 dom 节点
+    4.reducer: 对 action对象处理,返回全新的 state给 store.
 在 React 中,组件连接 redux.
+  创建一个 store 存储数据,定义改变 store 的 action,有各种 reducer 的映射
   UI 操作发出 action 指令.action 中包含一个 action 对象(有 type 值).action 将其转发给 reducer
   reducer 接收到 action 时,通过 switch...case 找到对应的 type.返回一个全新的 state
   然后组件接受新的状态作为 props,
   核心createStore 有    subscribe, dispatch,getState,replaceReducer
   每一次 listenerList 变更 都会先拷贝一份当前 listenerList 处理,防止解绑之后其中无法被触发
+
+  中间件怎么拿到 store 和 action ?
+    1.createStore 时通过 applyMiddleware 把中间件和 store 关联.中间件将传入的方法参数转成数组,第一次中间件是第一次 dispatch(action,0),后续中间件拿到的是之前中间件处理后的触发dispatch 传入的 action
+  ```js
+    const middle = store => next => action => {
+      console.log('dispatch',dispatch)
+      let result = next(action)
+      console.log('next state',store.getState())
+      return result
+    }
+    // 当我们调用applyMiddleware方法时
+    applyMiddleware(store,[logger])
+    // 会依次middlewares数组中的方法，并且每次执行都重新封装store.dispatch
+    middlewares.forEach(middleware => dispatch = middleware(store)(dispatch))
+  ```
 # react router 
   分为 react-router react-router-dom
   ## react-router
@@ -72,7 +93,7 @@ Redux 是一个状态管理库,简化了单项数据流.
   如果 chunk 未加载,则构造对应的 Promise 并缓存在installedChunks对象中
   然后构建 script 标签 加载完成的话就把installedChunks中当前 chunk 状态变为已加载
   2.代码 (或者使用 react-loadable)
-  ```
+  ```js
     const OtherComponent = React.lazy(() => import(/* webpackChunkName: "OtherComponent" */'./OtherComponent'));
   ```
 # 同构 ssr
@@ -85,3 +106,62 @@ Redux 是一个状态管理库,简化了单项数据流.
   react 在客户端判断是否需要重新 render 相同则不需要,省略创建 dom 和挂载 dom 的过程,接着触发 componentDidMount 等事件来处理服务端上的未尽事宜(事件绑定等),从而加快了交互时间.
 # 多个组件之间如何拆分各自的state，每块小的组件有自己的状态，它们之间还有一些公共的状态需要维护，如何思考这块
   状态提升，找到容器组件和展示组件，保证唯一数据源和单向数据
+  自己的属性自己保管(state),公用的属性放到 redux 中
+# antd 如何按需加载
+最新的 antd 支持 es6 模块的 treeshaking 
+3.x 的版本支持 react-app-rewired,项目根目录下创建一个 config-overrides 用于修改默认配置
+babel-plugin-import
+# react 渲染流程
+react 将整个流程分为 调度器和 渲染器
+  调度阶段:
+  ```js
+    ReactDom.react(APP,document.querySelector('#app'))
+    // 初始化操作已经创建了一个根 Fiber 节点
+  ```
+    1.(beginWork)向下遍历 JSX,为每个子节点生成对应的 Fiber,并赋值.effectTag 字段表示当前 Fiber 需要执行的副作用,最常用的有 插入 删除 更新 DOM 节点三个操作.首屏渲染只会设计插入 dom 节点.
+    2.(completeWork)为每个 Fiber 节点生成对应的 DOM节点.
+  做完这两件事情之后,我们需要通知渲染器
+    1.哪些 Fiber 节点需要执行哪些操作(effectTag)
+    2.执行这些操作的 Fiber 他们对应的节点.
+  通过 workInProcess 这个全局变量表示当前 render 阶段正在处理的 Fiber,首屏渲染初始化时,workInProcess = 根Fiber,接着我们调用 workLoopSync 方法,它内部会循环调用 performUnitOfWork 方法,这个方法接受当前 workInProcess 传入,返回下一个需要处理的 Fiber.
+  ```js
+    function workLoopSync(){
+      while(workInProcess){
+        workInProcess = performUnitOfWork(workInProcess)
+      }
+    }
+    // 当循环结束,意味着所有节点的调度结束了.
+    function performUnitOfWork(unitOfWork){
+      // current 当前 Fiber 上一次 render 的结果,alternate属性就是对之前旧 Fiber 节点的引用
+      //首次渲染为空
+      const current = unitOfWork.alternate
+      let next = beginWork(current, unitOfWork)
+      if(!next){
+        next = compeleteUnitOfWork(unitOfWork)
+      }
+      return next
+    }
+  ```
+  优化渲染阶段:
+   effectList
+    在调度阶段,会提前标记 effectTag Fiber 节点,让他们形成链表的形式.
+   首次渲染优化:
+    调度阶段的时候执行 compeleteWork 创建 Fiber 对应的 DOM 节点时,遍历这个 Fiber 节点所有子节点,将子节点 dom 插入到创建的 dom 节点下.遍历到根节点时,构建好了一课不展示的DOM树,设置根节点 effectTag = 插入就好了.
+  ## react 虚拟dom 到真实 Dom 经历了什么
+    首先会判断是文本节点还是类组件或者函数组件,然后拿到这个虚拟 Dom的属性,判断是 classname 还是 style 或者其子节点\其他属性添加到节点上
+  
+# React挂载的时候有3个组件，textComponent、composeComponent、domComponent，区别和关系，
+他们都接受node 参数,根据node 参数的不同生成对应不同的 reactComponent
+node 为 null 生成 reactDOMEmptyComponent
+node 为数字或者字符串, 生成reactDOMTextComponent
+node 为一个对象,则是 reactElement 对象,则生成 reactDOMComponent,ReactCompositeComponent.
+这三个对象最后都会通过 mountComponent 转换为html 标记挂载到 dom 上.
+# vue 和 reactdiff 不同
+diff 并没有不同,只有更新策略的不同.react 是自上而下的,vue是局部订阅模式.
+# React 中的 setState 为什么需要异步操作？
+在合成事件和钩子函数中,没有办法立即拿到更新后的值.
+setState 的异步整合,批量更新也是建立在钩子函数与合成事件中的.在原生事件和定时器中不会触发批量更新,在这种react 认为异步的情况下对同一个值多次 setState,setState的批量更新策略会对其进行覆盖,取最后一次执行的值.
+# 什么时候使用非受控组件
+文件上传,或者简单的表单,一次上传
+
+

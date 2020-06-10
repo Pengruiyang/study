@@ -19,10 +19,110 @@
       }
     });
   ```
-  ## nodejs 集群模式
-  集群模式会创建一个 master 模块,复制任意多份程序并启动.这就是工作线程.工作线程通过 IPC 频道进行通信并使用了Round-robin algorithm算法
-   Round-robin Scheduling 轮询调度算法
-   把每一次任务轮流分配给内部中工作线程. 
+# nodejs Cluster集群模式
+  入口: 
+    1 会根据当前的 ID 判断环境变量中是子进程还是主进程,然后引用不同的 js 文件.
+    2.NODE_UNIQUE_ID 是唯一表示,cluster 多进程模式,采用默认的算法是 round-robin(轮询)/
+    集群模式会创建一个 master 模块,复制任意多份程序并启动.这就是工作线程.工作线程通过 IPC 频道进行通信并使用了Round-robin algorithm算法
+    Round-robin Scheduling 轮询调度算法
+    把每一次任务轮流分配给内部中工作线程. 
+  ## 监听同一个端口却不会报错
+    所有的 net.Socket 被设置了 SO_REUSEADDR.
+    SO_REUSEADDR是什么?
+    服务端主动断开链后,需要等待 2 个 MSL 以后才能最终释放这个链接,重启以后需要绑定同一个端口,默认情况下,操作系统的实现都会阻止新的监听套接字绑定到这个端口上.
+    TCP 链接只要还有链接在使用这个本地端口,就不能被重用(bind 失败)
+    而启用 SO_REUSEADDR 套接字可以解除这个限制,默认值为 0,表示关闭,1 表示允许端口重用.
+  ## listen 函数源码
+  ```js
+    function listen(self,address,port,addressType,backlog,fd,exclusive){
+      exclusive = !!exclusive
+      if(!cluster) cluster = require(cluster)
+      if(cluster.isMaster || exclusive){
+        self._listen2(address,port,addressType,backlog,fd)
+        return
+      }
+      cluster._getServer(self,{address,port,addressType,fd,flags:0},cb)
+      function cb(err,handle){
+        // 传入的 回调函数中handle 把 listen 方法重新定义为返回 0
+        // 真正监听端口的只有主进程.
+        self._handle = handle
+        self._listen2(address,port,addressType,fd)
+      }
+    }
+  ```
+  *listen 函数会根据是不是主进程做不同的操作.*
+  在 cluster._getServer 函数代码中,向 master 进程注册该 worker,若 master 进程使第一次监听这个端口下的 worker,则内部起一个 tcp 服务器,来负责监听该端口,随后在 master 中记录下 worker.
+  Hack(侵入)掉 worker 进程中的 net.Server 实例 listen 里监听端口的部分,使其不再承担该责任.对于监听同一端口这件事,由于是 master 在接受,传递请求给 worker,会按照一定的负载均衡规则.逻辑被封装在 RoundRobinHandle 中,初始化内部 TCP 服务器操作也在这里
+  ```js
+    function RoundRobinHandle(key,address,port,addressType,backlog,fd){
+      // ...
+      this.handles = []
+      this.handle = null
+      this.server = net.createServer(assert.fail)
+      if(fd >= 0){
+          this.server.listen({fd})
+      }else if(port > 0){
+        this.server.listen(port,address)
+      }else{
+        this.server.listen(address)
+      }
+      // ...
+      var self = this
+      this.server.once('listen',function(){
+        // ...
+        self.server.onconnection = self.distribute.bind(self)
+      })
+    }
+
+    // 分配
+    RoundRobinHandle.prototype.distrubute = function(err,handle){
+      this.handles.push(handle)
+      var worker = this.free.shift()
+      if(worker) this.handoff(worker)
+    }
+    RoundRobinHandle.prototype.handoff = function(worker){
+      var message = {act: 'newconn', key: this.key }
+      var self = this
+      sendHelper(worker.process,message,handle,function(replay){
+        // ...
+      })
+    }
+    // 在子进程中 
+    function listen(backlog){
+      return 0
+    }
+    function close(){}
+    function ref() {}
+    function unref() {}
+    var handle = {
+      close,listen,ref,unref
+    }
+  ```
+    由于 net.Server 实例中 listen 方法,最终会调用自身_handle 属性下 listen 方法完成监听.所以在代码中修改为,此时 listen 方法被修改了,调用只能返回 0,不会再监听端口.
+    ![image.png](https://mmbiz.qpic.cn/mmbiz_png/iawKicic66ubH6AvhIdFzuKzzboL0oXzZPNZJ7yBYb3yHjJU5GCeUL6seomawJTx3FqXegGryrVRzK1EG8JajQQicA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+  ### cluster模式:
+    主进程: 主动监听端口,开启SO_REUSEADDR 设置.允许端口复用.主进程启动统一的内部tcp 服务器.负载均衡,每次取出一个 worker子进程发送客户端消息
+    多个子进程: 重新 net 模块的 createServer每次调用listen 方法,通过参数传入 =>子进程根据主进程发送的客户端消息创建 net.Socket实例,执行具体业务逻辑,返回响应给主进程.
+  ### 负载均衡流程
+  1.所有请求先统一经过内部的 TCP 服务器,真正监听端口的只有主进程.
+  2.在内部 TCP 服务器请求逻辑中,由有负载均衡挑选出一个 worker 进程,将其发送一个 newconn 内部信息,随消息发送客户端句柄(句柄:类似于内存指针的东西)
+  3.Worker 进程接收到内部信息,根据客户端句柄创建net.Socket实例,执行具体的业务逻辑,返回.
+
+# PM2
+pm2:启动你的 node 服务,根据你的电脑去启动相应的进程数,监听错误事件,自动重启子进程,即使更新了代码,需要热更新,也会逐个替换.
+功能:
+1.内建负载均衡
+2.后台运行
+3.0 秒停机重载,维护升级时不需要停机
+4.停止不稳定进程(避免无限循环)
+5.控制台检测
+6.提供 HTTP API
+7.远程控制和实施的 API接口(nodejs 模块允许和pm2 进程管理器交互)
+### 如何检测子进程是否活跃状态?
+采用心跳检测,每隔数秒向子进程发送心跳包,如果子进程不回复,就调用 kill'杀死这个子进程,
+然后再 cluster.fork()一个新进程
+### 子进程发出异常报错,如果保证有一定数量的子进程?
+子进程可以监听错误事件,发送信息给主进程,请求 kill 自己,然后主进程 cluster.fork()一个index 子进程
 # node 链接 mysql 流程
 ```
   // 调用 MySQL 模块

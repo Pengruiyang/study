@@ -39,7 +39,7 @@ vue 选择的是一个,因为对 vue 而言,使用模板有了很大的优化空
   ## Fiber 一个执行单元
    react 每次执行完一个执行单元 检查剩余时间,如果没有时间就将控制权让出.
    执行过程
-  ```
+  ```js
     // 将待更新的任务先让去队列,通过 requestIDCallback 请求浏览器调度
     updateQueue.push(updateTask)
     requestIdleCallback(performWork,{timeout})
@@ -64,6 +64,7 @@ vue 选择的是一个,因为对 vue 而言,使用模板有了很大的优化空
   react16 之前 Reconcilation 是同步递归的去执行.递归其实很契合树形数据结构.但是这种方式不能随意中断\恢复\异步处理. 
   所以需要改变 react 数据结构 模拟函数调用栈 之前递归处理的问题分解成增量的执行单元.
   目前结构是使用链表
+  fiber 使用了双缓冲技术,像 redux nextListener 一样,在当前 currt tree 构建一颗 workInprocess 树,新的 fiber 树上节点有个alternate 属性,创建时会优先查找,没有就新创建一个,这两棵树上的 fiber保持互相引用,把当前 currt tree 指向 workInporcess tree,旧的树作为新的 fiber 树预留空间,达到复用实例的过程.
   type Fiber = {
     // 标记 Fiber 类型 例如函数组件、类组建、宿主组件
     tag:workTag,
@@ -80,12 +81,12 @@ vue 选择的是一个,因为对 vue 而言,使用模板有了很大的优化空
    key: null | string,
   }
   Fiber 和函数调用栈帧一样,保存了节点的上下文信息.迭代方式处理节点
-  ```
+  ```js
   /**
    *fiber 当前需要处理的节点
    *topwork 本次跟新的节点
    *performUnitWork负责对 Fiber 进行操作,按照深度遍历返回下一个 Fiber
-  /
+   */
     function performUnitWork(fiber,topwork){
       // 对当前节点进行处理 根据当前 fiber
       beginWork(fiber)
@@ -126,3 +127,71 @@ vue 选择的是一个,因为对 vue 而言,使用模板有了很大的优化空
     componentWillUnmount
   在协调阶段如果时间片用完 就会让出控制权,而这并不会导致任何用户可见变更.
   但由于协调阶段可能会被中断恢复重来,所以生命周期钩子可能也会被执行多次.componentWillUpdate 可能就会被调用多次.因此建议生命周期钩子不要有副作用,也就废弃了部分 api
+
+
+## Fiber架构
+  1.react 使用 fiber 数据机构存放组件数的附加信息
+  2.第一次渲染执行 render,后面先 diff 再渲染
+  3.fiber渲染树的深度遍历优先, child > silibing > parent.silibing
+  4,reconcilerChildren 根据 children 创建 filber 渲染树,并进行 diff,与 vue 不同的是,vue 考一些假设两端向中间.
+  5.fiber 渲染树,按照优先级顺序,一层一层形成链表结构,rootFiber 在 render 中创建.
+  6.fiber 都执行完毕后进行 commint 阶段,commit 阶段不可打断,一次性更新完 dom.找到父节点,根据 fiber 对象上的effectTag做 对应的 dom 操作
+  7.优先级: 计算过期时间
+  8.数据结构
+   {
+     type, 区分不同 fiber 如 class function host(dom节点) 等
+     props, 属性参数
+     node, 真实 dom 节点,新增时是 null
+     base: 存储就 fiber 用于 diff 新增时为 null
+     parent: workInProgressFiber 父节点
+   }
+  9.简单流程
+    1.render 初始化子任务
+    2.window.requestIdleCallback 执行 performUnitWork.
+      更新当前 fiber,给每个 fiber 打上 effectTag标记
+      返回下一个 fiber
+    3.fiber 渲染树上任务执行完成后 commit ,根据 effectTag 更新 dom
+
+
+  ## diff
+    首先从 reconcileChild 入口函数开始,判断是否首次渲染 currt 字段是否为空,通过就 mountChildFiber 创建节点,不是就 reconcileChildren diff. 
+    mountChildFiber 和 reconcileChildren 都是通过 ChildrenReconciler 创建的,  参数就 true or false/
+    reconcileChildrenFibers 是 diff 主体
+    ```
+      function reconcileChildrenFibers(
+        returnFiber: Fiber, 即将 diff 的这层父节点
+        currentFirstChild: FIber || null, 当前层第一个 fiber 节点
+        newChild: any, 即将更新的 vdom
+        expirationTime: RxpirationTime 过期时间
+      ): Fiber | null
+    ```
+  ###  优先判断 newChild type 是不是 object、string、number ,是的话同级只有一个节点,不是的话同级择则有个节点.
+  是的话 先判断上次更新时 Fiber 节点是否存在对应的 dom => dom 节点是否可以复用 
+  如果可以则将上次更新的 Fiber 节点的副本作为本次新生成的Fiber 节点返回.
+  不可以复用则标记 dom,需要被删除,新生成返回一个 Fiber 节点.
+  react 会先判断 key 是否相同,是的话再判断 type 是否相同,都相同时 dom 节点才可以复用.
+  *react diff 会优先判断是否为更新,再判断是新增还是删除*
+  由于 newChildren 为数组形式,即 newChildren[0]和 oldFiber 对比,newChildren[1]和 oldFiber.sibiling对比
+  所以会进行两次遍历,
+  一次处理更新的节点,第二次处理剩下的不属于更新的节点。
+
+
+    1. diff textNode
+      判断 currentFirstChild 是不是 textNode
+      是:可以复用节点
+      不是:从 currentFirstChild 开始删除剩余的节点(删除不会真的从链表中删除,只是打上一个 delete 的 tag,commit 阶段才会删除)
+    2. diff react Element
+     key 相同 且节点类型也相同的 节点可以复用.
+     不会像 textNode 直接删除,回去子节点中查找可以复用的节点,不能复用的再删除
+    3. diff array
+     首先判断 newChild 是 textNode 情况,判断新老节点的 key 值, 新节点 string 或 number 都是没有 key 的. 老节点有 key 则不能复用.
+     判断是不是 object,是就走 reactElement 和updatePortal 逻辑.
+  ### 判断新老节点遍历完成情况
+  新节点遍历完,直接删除老节点链表.(删除操作)
+  老节点遍历完,直接更新新节点(新增操作)
+  ### 移动情况新老节点复用
+  从所有老数组元素按照 key 或者 index 建立 map,遍历 map,根据 key或者 index 找到 老数组是否有可复用的
+
+
+
+  

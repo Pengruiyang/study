@@ -9,3 +9,11 @@ a();
 console.log(a);
 console.log(c);
 console.log(c.b);
+
+/**
+ *
+ *
+ */
+function a(){
+
+}
