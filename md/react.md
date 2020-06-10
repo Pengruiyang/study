@@ -163,5 +163,7 @@ diff 并没有不同,只有更新策略的不同.react 是自上而下的,vue是
 setState 的异步整合,批量更新也是建立在钩子函数与合成事件中的.在原生事件和定时器中不会触发批量更新,在这种react 认为异步的情况下对同一个值多次 setState,setState的批量更新策略会对其进行覆盖,取最后一次执行的值.
 # 什么时候使用非受控组件
 文件上传,或者简单的表单,一次上传
+# react bind this?
+  react 中使用合成事件.事件会冒泡到 document 上,所以触发 SyntheticEvent 回调中 this 方法时并不是当前组件的 this,
 
 

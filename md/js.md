@@ -173,3 +173,21 @@ state = {
 ```
 # Promise.resolve()作用
   返回一个全新的 promise 对象.
+# co函数实现原理
+  ```js
+    function coSimple(gen,...args) {
+      let ctx = this;
+      gen = gen.apply(ctx, args);
+      return new Promise((resolve, reject) => {
+        onFulfilled();
+        function onFulfilled(res) {
+          const ret = gen.next(res);
+          next(ret);
+        }
+        function next(ret) {
+          const promise = ret.value;
+          promise && promise.then(onFulfilled);
+        }
+    });
+  }
+  ```

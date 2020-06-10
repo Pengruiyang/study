@@ -157,7 +157,8 @@ vue 选择的是一个,因为对 vue 而言,使用模板有了很大的优化空
     首先从 reconcileChild 入口函数开始,判断是否首次渲染 currt 字段是否为空,通过就 mountChildFiber 创建节点,不是就 reconcileChildren diff. 
     mountChildFiber 和 reconcileChildren 都是通过 ChildrenReconciler 创建的,  参数就 true or false/
     reconcileChildrenFibers 是 diff 主体
-    ```
+
+    ```js
       function reconcileChildrenFibers(
         returnFiber: Fiber, 即将 diff 的这层父节点
         currentFirstChild: FIber || null, 当前层第一个 fiber 节点
