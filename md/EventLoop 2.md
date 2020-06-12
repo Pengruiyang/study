@@ -15,7 +15,7 @@
     v8引擎解析js脚本
     解析后的代码，负责调用node API
     libuv库负责node API的执行。他将不同的任务分配给不同的线程，形成一个Event Loop ，以异步的形式将任务的执行结果返回给v8引擎。
-    v8引擎再讲结果返回出来
+    v8引擎再将结果返回出来
 
 
     1. timer阶段 执行timer（setTimeout、setInterval）的回调

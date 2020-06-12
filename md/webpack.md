@@ -41,12 +41,16 @@
   4.优化 resilve.extensions 配置   后缀查询
   5.优化 resolve.mainFields 配置 (mainFields 会根据配置读取 es6/es5语法代码)
   6.优化 module.noParse 配置 忽略部分没有采用模块化的文件递归解析处理(jq.chartJs)
-7.Tree shaking
+7.Tree shaking (webpack-Deep-shaking-Plugin)(purgecss-webpack-plugin)
+*webpack 4.0 默认支持 .babelrc配置 modules:false*
 8.DLL DLLPlugin 进行分包 通过 mainifest.json 对文件的引用 
 9.提取公共资源
-10.Scope hoisting
+10.Scope hoisting module:production 默认开启
 11.动态 polyfill
 12.配置externals,webpack 打包时忽略这些库,并自动在全局变量上挂载相应的全局变量.
+13.splitChunks 根据 common vendor 分开处理
+14.source map:开发环境配置cheap-eval-source-map
+15.mini-css-extract-plugin 抽离 css 文件,tinypng 压缩图片
   常用 loader:
     file-loader
     style-loader
@@ -115,7 +119,11 @@
   ### 动态导入
   ### splitChunks 选项.
    在 CacheGroups,配置对应的vendors 和 common,
-
+  ### css px转换rem
+  px2rem-loader,配合淘宝lib-flexible使用, 设置 option
+  ### 动态polyfill
+  1.babel-polyfill
+  2.polyfill-service
 
 
 

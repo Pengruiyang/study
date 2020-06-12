@@ -6,6 +6,52 @@ js 统一用的是双精度浮点数,小数部分二进制装换成十进制
 
 Es5 继承实质上是先创建子类实例对象,然后再将父类的方法添加到 this 上(Parent.call(this))
 es6 继承是先创建父类实例对象 this,在用子类构造函数修改 this.因为子类没有自己的 this,需要 super()方法.es6不仅继承了类的原型对象,还继承了静态属性和方法.
+```js
+  super()
+  A.prototype.constructor.call(this)
+```
+super当做一个对象使用
+  在子类普通方法（原型对象）中，super指向父类的原型对象,this指向当前子类实例
+  子类的静态方法中调用，那么super指代父类,this指向当前子类
+```js
+class A {
+  constructor() {
+    this.x = 1;
+  }
+}
+class B extends A {
+  constructor() {
+    super();
+    this.x = 2;
+    super.x = 3;
+    console.log(super.x); // undefined
+    // A.prototype.x
+    console.log(this.x); // 3
+  }
+}
+let b = new B();
+```
+```js
+class Parent {
+  static myMethod(msg) {
+    console.log('static', msg);
+  }
+  myMethod(msg) {
+    console.log('instance', msg);
+  }
+}
+class Child extends Parent {
+  static myMethod(msg) {
+    super.myMethod(msg);
+  }
+  myMethod(msg) {
+    super.myMethod(msg);
+  }
+}
+Child.myMethod(1); // static 1
+var child = new Child();
+child.myMethod(2); // instance 2
+```
 
 # 前端路由原理
 
@@ -191,3 +237,5 @@ state = {
     });
   }
   ```
+
+# class 中
