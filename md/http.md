@@ -101,3 +101,11 @@ HTTP 超文本传输协议,一个在计算机世界中两点间传输文字、�
   请求方法是 PUT 或 DELETE,或者 Content-type:application/json
   会在正式通信前,进行一次预检请求
   查询服务器支持的 hpttp 方法,和自定义的 header 属性有哪些
+  # http 协议头Content-Type和Accept的作用
+  Content-Type:发送端发送的数据类型
+  Accept:发送端（客户端）希望接受的数据类型
+  # 如何计算首屏时间和白屏时间
+  白屏时间 = domloading - fetchStart
+  domready可操作时间 = domContentLoadedEventEnd - fetchStart
+  onload总下载时间 = loadEventEnd - fetchStart
+

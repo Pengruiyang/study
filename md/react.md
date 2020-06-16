@@ -165,5 +165,14 @@ setState 的异步整合,批量更新也是建立在钩子函数与合成事件�
 文件上传,或者简单的表单,一次上传
 # react bind this?
   react 中使用合成事件.事件会冒泡到 document 上,所以触发 SyntheticEvent 回调中 this 方法时并不是当前组件的 this,
+# react中函数组件和类组件区别
+  函数组件没有自己的生命周期,this 不会被实例化,渲染性能会有提升
+# render prop是什么?
+  通过定义 render 函数,父组件描叙一个想渲染出来的元素,在子组件中调用.
+# 了解 React 中的 ErrorBoundary 吗，它有那些使用场景?
+  为了避免错误渲染白屏做的异常中间件处理的嵌套组件.通过 v16 版本新增了 2 个生命周期,componentdidcatch 和static getDerivedStateFormError,在 workloop 外面包裹一层 try/catch,报错时遍历父组件找到这两个生命周期并把堆栈信息塞给这两个生命周期进行判断
+# 虚拟 dom,优缺点?
+  抽象了原本的渲染过程,拥有了跨平台的能力,不仅仅局限于浏览器 dom,跨平台开发,组件高度抽象化.
+  一系列的数据结构和数据对象浏览器的真实 dom在内存中映射.
 
 
