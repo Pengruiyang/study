@@ -79,3 +79,8 @@ console.log(greeter2.greet()); // 'hey'
 public: 默认值,定义的类中、类的实例、子类、子类实例都可以访问
 private: 只能在定义的类中访问,类的实例、子类、子类的实例都不能访问
 protected: 只允许定义的类和子类中访问,不允许通过实例访问
+# infer
+infer 关键字常在条件类型中和 extends 关键词一起出现,表示将要推断的类型,作为类型变量可以在三元表达式的 True 部分引用.
+```ts
+  type ReturnType<T> = T extends (...arg:any) => infer R ? R : any
+```
