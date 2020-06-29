@@ -153,6 +153,41 @@ pm2:启动你的 node 服务,根据你的电脑去启动相应的进程数,监�
     if(err)return
   })
 ```
+# commonjs 和 es6 模块导出
+
+CommonJs 规范加载模块是同步的,nodeJs 主要用于服务器变成,模块文件一般已存在本地硬盘,加载比较快.输出的一个值的拷贝.运行时加载模块
+
+### commonJS
+
+```js
+  Module {
+    id: '.', // 如果是 mainModule id 固定为 '.',不是则为模块的绝对路径
+    exports: {}, //模块最终 exports
+    filename: '/absolute/path/to/entry.js', //当前模块的绝对路径
+    loaded: false, // 模块是否加载完毕
+    children: [], //被该模块引用的模块
+    parent: '', //第一个引用该模块的模块
+    path: [ // 模块的搜索路径
+      '/absolute/path/to/node_modules',
+      '/absolute/path/node_modules',
+      '/absolute/node_modules',
+      '/node_modules'
+    ]
+  }
+```
+#### require 哪里来?(module，__filename, __dirname 这些变量，为什么它们不需要引入就能使用？)
+Node 在解析 JS 模块时,会先按文本读取内容,然后将模块内容进行包裹,在外层包裹了一个 function,传入变量.再通过 vm.runInThisContext 将字符串转成 Function 形成作用域,避免全局污染.
+```js
+  let wrap = function(script){
+    return Module.wrapper[0] + script + Module.wrapper[1]
+  }
+  const wrapper = [
+    '(function (exports,require,module,__filename,__dirname){',
+    '\n});'
+  ]
+```
+参数中 module 是当前模块 module 实例,exports 是 module.exports 别名,最终被 require 的时候输出 module.exports 的值.require 最终调用的也是 Module._load 方法.__filename,__dirname 则分别是当前模块在系统中的绝对路径和当前文件夹路径.
+#### MainModule
 # node 加载文件规则
 1.判断是不是相对路径 './' '../'开头的
 2./开头,表示从系统根目录开始寻找该模块文件.

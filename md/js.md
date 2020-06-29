@@ -5,14 +5,17 @@ js 统一用的是双精度浮点数,小数部分二进制装换成十进制
 # ES5 继承和 ES6 继承的区别
 
 Es5 继承实质上是先创建子类实例对象,然后再将父类的方法添加到 this 上(Parent.call(this))
-es6 继承是先创建父类实例对象 this,在用子类构造函数修改 this.因为子类没有自己的 this,需要 super()方法.es6不仅继承了类的原型对象,还继承了静态属性和方法.
+es6 继承是先创建父类实例对象 this,在用子类构造函数修改 this.因为子类没有自己的 this,需要 super()方法.es6 不仅继承了类的原型对象,还继承了静态属性和方法.
+
 ```js
-  super()
-  A.prototype.constructor.call(this)
+super();
+A.prototype.constructor.call(this);
 ```
-super当做一个对象使用
-  在子类普通方法（原型对象）中，super指向父类的原型对象,this指向当前子类实例
-  子类的静态方法中调用，那么super指代父类,this指向当前子类
+
+super 当做一个对象使用
+在子类普通方法（原型对象）中，super 指向父类的原型对象,this 指向当前子类实例
+子类的静态方法中调用，那么 super 指代父类,this 指向当前子类
+
 ```js
 class A {
   constructor() {
@@ -31,6 +34,7 @@ class B extends A {
 }
 let b = new B();
 ```
+
 ```js
 class Parent {
   static myMethod(msg) {
@@ -66,10 +70,6 @@ replaceState
 
 defer: 浏览器异步下载该文件并且不会影响到后续的 DOM 渲染,如果有多个设置 defer 的 script 标签,则会按照顺序执行所有的 script.defer 会在文档渲染完毕后,DOMContentLoaded 事件调用前执行.
 async: 会使 script 脚本异步加载并在允许的情况下执行. async 的执行,并不会按着 script 在页面中的顺序来执行,而是看谁先加载完谁执行.
-
-# commonjs 和 es6 模块导出
-
-CommonJs 规范加载模块是同步的,nodeJs 主要用于服务器变成,模块文件一般已存在本地硬盘,加载比较快.输出的一个值的拷贝.运行时加载模块
 
 
 # 工作中封装组件
@@ -200,10 +200,13 @@ state = {
   count: 0
 };
 ```
-# js new的原理
-1.创建一个新对象,新对象的原型属性指向构造函数的原型对象
-2.将属性和方法添加到新对象上
+
+# js new 的原理
+
+1.创建一个新对象,新对象的原型属性指向构造函数的原型对象 2.将属性和方法添加到新对象上
+
 3. 判断构造函数内部有没有返回对象,如果有,就返回那个对象,没有,则返回我们创建的新对象
+
 ```js
   function _new(fn,...args){
     let ret = Object.create(fn.prototype)
@@ -211,31 +214,37 @@ state = {
     return obj instance Object ? obj : ret;
   }
 ```
+
 # 手写 bind
+
 ```js
-  Function.prototype.myBind = function(fn,...args){
-    return (...innerArgs) => this.call(fn,...args,...innerArgs)
-  }
+Function.prototype.myBind = function (fn, ...args) {
+  return (...innerArgs) => this.call(fn, ...args, ...innerArgs);
+};
 ```
+
 # Promise.resolve()作用
-  返回一个全新的 promise 对象.
-# co函数实现原理
-  ```js
-    function coSimple(gen,...args) {
-      let ctx = this;
-      gen = gen.apply(ctx, args);
-      return new Promise((resolve, reject) => {
-        onFulfilled();
-        function onFulfilled(res) {
-          const ret = gen.next(res);
-          next(ret);
-        }
-        function next(ret) {
-          const promise = ret.value;
-          promise && promise.then(onFulfilled);
-        }
-    });
-  }
-  ```
+
+返回一个全新的 promise 对象.
+
+# co 函数实现原理
+
+```js
+function coSimple(gen, ...args) {
+  let ctx = this;
+  gen = gen.apply(ctx, args);
+  return new Promise((resolve, reject) => {
+    onFulfilled();
+    function onFulfilled(res) {
+      const ret = gen.next(res);
+      next(ret);
+    }
+    function next(ret) {
+      const promise = ret.value;
+      promise && promise.then(onFulfilled);
+    }
+  });
+}
+```
 
 # class 中

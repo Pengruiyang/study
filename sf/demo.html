@@ -58,21 +58,90 @@
 
   var isValid = function (s) {
     let arr = [];
-    if(s.length % 2)return false
+    if (s.length % 2) return false;
     for (let i of s) {
-      if(['{','[','('].includes(i)){
-        arr.push(i)
-      }else{
-        let last = arr[arr.length - 1] 
-        if(i ==')' && last != '(' || i ==']' && last != '[' || i =='}' && last != '{')return false
-        else{
-          arr.pop()
+      if (['{', '[', '('].includes(i)) {
+        arr.push(i);
+      } else {
+        let last = arr[arr.length - 1];
+        if (
+          (i == ')' && last != '(') ||
+          (i == ']' && last != '[') ||
+          (i == '}' && last != '{')
+        )
+          return false;
+        else {
+          arr.pop();
         }
       }
     }
     // if(arr.length)return false
-    return true
+    return true;
   };
-  console.log(isValid('{[]}'));
+  // console.log(isValid('{[]}'));
+  var maxArea = function (height) {
+    let i = 0,
+      j = height.length - 1,
+      max = 0;
+    while (i < j) {
+      max = Math.max(max, getValue(i, j));
+      if (height[i] < height[j]) {
+        let lastI = height[i];
+        i++;
+        // 面积增大必须后面一项大于当前
+        while (height[i] < lastI && i < j) {
+          i++;
+        }
+      } else {
+        let lastJ = height[j];
+        j--;
+        while (height[j] < lastJ && i < j) {
+          j--;
+        }
+      }
+    }
+    return max;
+    function getValue(i, j) {
+      return Math.min(height[i], height[j]) * (j - i);
+    }
+  };
+  // console.log(maxArea([1,8,6,2,5,4,8,3,7]));
+
+  var maxPoints = function (points) {
+    let len = points.length,
+      res = 0;
+    for (let i = 0; i < len; i++) {
+      let same = 1,
+        map = new Map();
+      for (let j = 0; j < len; j++) {
+        if (i != j) {
+          // 计算斜率
+          let x = points[j][0] - points[i][0];
+          let y = points[j][1] - points[i][1];
+          if (x == 0 && y == 0) {
+            same += 1;
+            continue;
+          }
+          let gcd = gcdFunc(x, y);
+          let key = x / gcd + '-' + y / gcd;
+          map.set(key, (map.get(key) || 0) + 1);
+        }
+      }
+      
+      if (map.size == 0) {
+        res = Math.max(res, same);
+      } else {
+        res = Math.max(res, Math.max(...map.values()) + same);
+      }
+    }
+    return res;
+  };
+  function gcdFunc(x, y) {
+    if (y == 0) {
+      return x;
+    }
+    return gcdFunc(y, x % y);
+  }
+  console.log(maxPoints([[1,1],[2,2],[3,3]]));
   
 </script>
