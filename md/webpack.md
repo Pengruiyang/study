@@ -1,5 +1,6 @@
 # webpack 本质
 
+
 # webpack 编译机制
 1.初始化参数: 从配置文件和 shell 语句中合并得到最终参数
 2.开始编译:参数初始化 Compiler 对象,加载所有配置的 Plugin,执行对象的 run 方法开始执行编译
