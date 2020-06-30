@@ -129,7 +129,7 @@ env 核心目的是通过配置得知目标环境的特点,然后只做必要的
 
 ## babel-polyfill(内部集成了 core-js 和 regenerator)
 
-babel 默认置转换 js 语法,而不转换新的 API.例如 Iterator、Genterator、Set、Maps、Proxy、Symbol、promise 等全局对象,以及一些定义在全局对象上的方法(Object.assign)
+babel 默认置转换 js 语法,而不转换新的 API.例如 Iterator、Genterator、Set、Maps、Proxy、Symbol、promise 等全局对象,以及一些定义在全局对象上的方法(Object.assign).这些就需要 polyfill,插入一些帮助函数.
 
 ## babel-runtime 和 babel-plugin-transform-runtime
 

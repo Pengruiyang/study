@@ -3,6 +3,7 @@
     useEffect  本次更新结束后 执行 callback
     uselayoutEffect 类似于 componentDidUpdate 执行,dom 更新完成后立即执行,阻塞浏览器绘制.会有闪一下效果.
     effectHook 可以在 function 组件中执行副作用(side Effect)
+
     ```js
       import { useState, useEffect } from 'react';
       function Example() {

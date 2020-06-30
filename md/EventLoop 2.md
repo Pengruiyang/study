@@ -1,5 +1,5 @@
 ## 浏览器和node环境中事件循环
-    task： setTimeOut、setInterval、script、I/O操作 UI渲染 网络请求 文件读写 setImmedi（）的回调
+    task： setTimeOut、setInterval、script、I/O操作 UI渲染 网络请求 文件读写 setImmediate（）的回调 requestAnimationFrame 
     jobs： promise.then() MutationObserver(异步 + 微任务的实现 )  process.nextTick
 ### 浏览器中事件循环
  1.全局上下文推入执行栈中，同步代码进入主线程依次执行。执行过程中，会判断是同步任务还是异步任务，产生新的 task 和jobs。

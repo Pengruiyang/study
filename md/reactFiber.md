@@ -1,9 +1,9 @@
 # javascript 引擎是单线程运行的,即 JavaScript 引擎和页面渲染引擎在同一个渲染进程上.GUI 渲染和 JavaScript执行互斥.
 同时只能做一件事情,name 一个任务长期霸占 CPU 就会导致后面的事情无法处理,出于卡死状态
 3 个解决方向
-  a.优化每个人物,让他能有多快有多快,挤压 CPU 运算量
+  >a.优化每个人物,让他能有多快有多快,挤压 CPU 运算量
   b.快速响应用户,让用户感受不到卡顿,不阻塞用户交互
-  c.多 worker 进程
+  >c.多 worker 进程
 vue 选择的是一个,因为对 vue 而言,使用模板有了很大的优化空间,配合其响应式机制可以让 vue 精准的进行节点更新.而 react 选择的是让用户感受不到卡顿
 ##  react 更新
   react 会递归的对比virtualDom 树,找到变更的节点,然后一口气同步更新他们.Reconciation(协同)
@@ -17,18 +17,20 @@ vue 选择的是一个,因为对 vue 而言,使用模板有了很大的优化空
     由于浏览器没有类似进程概念,任务之间的界限很模糊,没有上下文,所以不具备中断恢复的条件.二是没有抢占的机制,无法中断正在执行的程序.
     所以只能采用类似协程这样的控制权让出机制.
   2.通过 requestIdleCallback API 确认高优先任务
-    react 中只能通过超市检查机制来让出控制权,
-    ```
+    react 中只能通过超时检查机制来让出控制权,
+
+    ```js
       window.requestIdleCallback(
         callback: (dealine:IdleDeadline) =>void,
         option?: {timeout: number}
       )
-    IdleDeadline 接口如下
-    interface IdleDealine {
-      didTimeout: boolean // 表示任务执行是否超过约定时间
-      timeRemaining(): DOMHighResTimeStamp //任务可供执行的剩余时间
-    }
+      // IdleDeadline 接口如下
+      interface IdleDealine {
+        didTimeout: boolean // 表示任务执行是否超过约定时间
+        timeRemaining(): DOMHighResTimeStamp //任务可供执行的剩余时间
+      }
     ```
+
     requestIdleCallback 让浏览器在有空的时候执行我们的回调,这个回调会传入一个期限,表示浏览器有多少的时间给我执行.第二个参数为超时时间.
      每一帧可能会做的事情
       处理用户输入事件
@@ -40,7 +42,7 @@ vue 选择的是一个,因为对 vue 而言,使用模板有了很大的优化空
    react 每次执行完一个执行单元 检查剩余时间,如果没有时间就将控制权让出.
    执行过程
   ```js
-    // 将待更新的任务先让去队列,通过 requestIDCallback 请求浏览器调度
+    // 将待更新的任务先让去队列,通过 requestIdleCallback 请求浏览器调度
     updateQueue.push(updateTask)
     requestIdleCallback(performWork,{timeout})
     //浏览器空闲或者超时了就会调用 performWork 执行任务
@@ -65,23 +67,24 @@ vue 选择的是一个,因为对 vue 而言,使用模板有了很大的优化空
   所以需要改变 react 数据结构 模拟函数调用栈 之前递归处理的问题分解成增量的执行单元.
   目前结构是使用链表
   fiber 使用了双缓冲技术,像 redux nextListener 一样,在当前 currt tree 构建一颗 workInprocess 树,新的 fiber 树上节点有个alternate 属性,创建时会优先查找,没有就新创建一个,这两棵树上的 fiber保持互相引用,把当前 currt tree 指向 workInporcess tree,旧的树作为新的 fiber 树预留空间,达到复用实例的过程.
+  ```js
   type Fiber = {
     // 标记 Fiber 类型 例如函数组件、类组建、宿主组件
     tag:workTag,
 
     type: any,
    // 链表结构
-   // 指向父节点,或者 return 该节点的组件
-   return: Fiber || null,
-   // 第一个子节点
-   child: Fiber || null,
-    // 指向下一个兄弟节点
-   sibiling: Fiber || null ,
-   // 子节点的唯一键
-   key: null | string,
+    // 指向父节点,或者 return 该节点的组件
+    return: Fiber || null,
+    // 第一个子节点
+    child: Fiber || null,
+      // 指向下一个兄弟节点
+    sibiling: Fiber || null ,
+    // 子节点的唯一键
+    key: null | string,
   }
   Fiber 和函数调用栈帧一样,保存了节点的上下文信息.迭代方式处理节点
-  ```js
+
   /**
    *fiber 当前需要处理的节点
    *topwork 本次跟新的节点

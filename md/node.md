@@ -21,7 +21,7 @@
   ```
 # nodejs Cluster集群模式
   入口: 
-    1 会根据当前的 ID 判断环境变量中是子进程还是主进程,然后引用不同的 js 文件.
+    1 会根据当前的 ID(Master、Worker) 判断环境变量中是子进程还是主进程,然后引用不同的 js 文件.
     2.NODE_UNIQUE_ID 是唯一表示,cluster 多进程模式,采用默认的算法是 round-robin(轮询)/
     集群模式会创建一个 master 模块,复制任意多份程序并启动.这就是工作线程.工作线程通过 IPC 频道进行通信并使用了Round-robin algorithm算法
     Round-robin Scheduling 轮询调度算法
@@ -103,7 +103,7 @@
   ### cluster模式:
     主进程: 主动监听端口,开启SO_REUSEADDR 设置.允许端口复用.主进程启动统一的内部tcp 服务器.负载均衡,每次取出一个 worker子进程发送客户端消息
     多个子进程: 重新 net 模块的 createServer每次调用listen 方法,通过参数传入 =>子进程根据主进程发送的客户端消息创建 net.Socket实例,执行具体业务逻辑,返回响应给主进程.
-  *worker 子进程:创建server 实例,通过 IPC痛到向 master 进程发送消息,master 进程也创建 server 实例,并且在改端口监听请求,有请求时,master 进程将进程转发给 worker 进程的 server 实例*
+  **worker 子进程:创建server 实例,通过 IPC通道向 master 进程发送消息,master 进程也创建 server 实例,并且在该端口监听请求,有请求时,master 进程将进程转发给 worker 进程的 server 实例** 
   ### 如何将请求分发到多个worker
   轮询,当有客户请求到达时,,master会轮询一遍
   ### 负载均衡流程worker 列表,找到第一个空闲的worker,然后将该请求转发给他
@@ -122,7 +122,7 @@ pm2:启动你的 node 服务,根据你的电脑去启动相应的进程数,监�
 6.提供 HTTP API
 7.远程控制和实施的 API接口(nodejs 模块允许和pm2 进程管理器交互)
 ### 如何检测子进程是否活跃状态?
-采用心跳检测,每隔数秒向子进程发送心跳包,如果子进程不回复,就调用 kill'杀死这个子进程,
+采用心跳检测,每隔数秒向子进程发送心跳包,如果子进程不回复,就调用 kill杀死这个子进程,
 然后再 cluster.fork()一个新进程
 ### 子进程发出异常报错,如果保证有一定数量的子进程?
 子进程可以监听错误事件,发送信息给主进程,请求 kill 自己,然后主进程 cluster.fork()一个index 子进程

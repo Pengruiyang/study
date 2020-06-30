@@ -16,42 +16,42 @@
 输出
  将编译后的 Moudle 组合成为 Chunk 再转换成文件,输出
 
-1.分析打包速度
-  通过 speed-measure-webpack-plugin测量webpack构建期间各个阶段花费时间
-2.分析影响打包速度环节
- a. 开始打包,需要获取所有的依赖模块 =>优化搜索时间
- b. 解析所有的依赖模块 => 优化 loader 解析时间
- c. 将所有依赖模块打包到一个文件(webpack 对代码进行优化,js 压缩需要先将代码解析橙 AST 语法树,根据规则去分析处理 AST 再还原成 js) =>优化压缩时间
- d. 二次打包(改动文件是需要重新打包,而其中大部分文件都没有变更) => 优化二次打包时间
-3. 优化解析时间 - 开启多进程打包(项目较小时多进程打包反而会使打包速度变慢)
-  thread-loader
-      把这个 loader 放在其他 loader 之前,就会给其他 loader 在一个单独的 worker 池中运行,就是新开启一个 nodejs 进程 每个单独进程处理时间上限 600ms.为了防止启动高延迟,可以开启预热.
-4.合理运用缓存(增加初始构建时间,降低后续构建时间)
-  1.cache-loader 对于性能开销较大的 loader之前添加 cache-loader 将结果缓存到磁盘中提升二次构件时间
-  2.HardSourceWebpackPlugin
-5. 优化压缩时间
-  webpack4 中使用 terser-webpack-plugin  压缩代码 强烈建议开启
-  可以开启多进程提高构建速度,并发运行默认数量 os.cpus().length - 1
-6.优化搜索时间-缩小文件搜索范围 减少不必要的编译工作
-  a.导入语句查找导入文件
-  b.根据要导入文件后缀使用对应的 loader 处理文件
-  1.优化 Loader 配置
-    通过 test、include、exclude 三个配置项命中 Loader 文件
-  2.优化 resolve.moudle 配置 (优先查找当前目录的node_modules,没有再往上级查找)
-  3.优化 resolve.alias 配置
-  4.优化 resilve.extensions 配置   后缀查询
-  5.优化 resolve.mainFields 配置 (mainFields 会根据配置读取 es6/es5语法代码)
-  6.优化 module.noParse 配置 忽略部分没有采用模块化的文件递归解析处理(jq.chartJs)
-7.Tree shaking (webpack-Deep-shaking-Plugin)(purgecss-webpack-plugin)
-*webpack 4.0 默认支持 .babelrc配置 modules:false*
-8.DLL DLLPlugin 进行分包 通过 mainifest.json 对文件的引用 
-9.提取公共资源
-10.Scope hoisting module:production 默认开启
-11.动态 polyfill
-12.配置externals,webpack 打包时忽略这些库,并自动在全局变量上挂载相应的全局变量.
-13.splitChunks 根据 common vendor 分开处理
-14.source map:开发环境配置cheap-eval-source-map
-15.mini-css-extract-plugin 抽离 css 文件,tinypng 压缩图片
+  1.分析打包速度
+    通过 speed-measure-webpack-plugin测量webpack构建期间各个阶段花费时间
+  2.分析影响打包速度环节
+  a. 开始打包,需要获取所有的依赖模块 =>优化搜索时间
+  b. 解析所有的依赖模块 => 优化 loader 解析时间
+  c. 将所有依赖模块打包到一个文件(webpack 对代码进行优化,js 压缩需要先将代码解析橙 AST 语法树,根据规则去分析处理 AST 再还原成 js) =>优化压缩时间
+  d. 二次打包(改动文件是需要重新打包,而其中大部分文件都没有变更) => 优化二次打包时间
+  3.优化解析时间 - 开启多进程打包(项目较小时多进程打包反而会使打包速度变慢)
+    thread-loader
+        把这个 loader 放在其他 loader 之前,就会给其他 loader 在一个单独的 worker 池中运行,就是新开启一个 nodejs 进程 每个单独进程处理时间上限 600ms.为了防止启动高延迟,可以开启预热.
+  4.合理运用缓存(增加初始构建时间,降低后续构建时间)
+    1.cache-loader 对于性能开销较大的 loader之前添加 cache-loader 将结果缓存到磁盘中提升二次构件时间
+    2.HardSourceWebpackPlugin
+  5. 优化压缩时间
+    webpack4 中使用 terser-webpack-plugin  压缩代码 强烈建议开启
+    可以开启多进程提高构建速度,并发运行默认数量 os.cpus().length - 1
+  6.优化搜索时间-缩小文件搜索范围 减少不必要的编译工作
+    a.导入语句查找导入文件
+    b.根据要导入文件后缀使用对应的 loader 处理文件
+    1.优化 Loader 配置
+      通过 test、include、exclude 三个配置项命中 Loader 文件
+    2.优化 resolve.moudle 配置 (优先查找当前目录的node_modules,没有再往上级查找)
+    3.优化 resolve.alias 配置
+    4.优化 resilve.extensions 配置   后缀查询
+    5.优化 resolve.mainFields 配置 (mainFields 会根据配置读取 es6/es5语法代码)
+    6.优化 module.noParse 配置 忽略部分没有采用模块化的文件递归解析处理(jq.chartJs)
+  7.Tree shaking (webpack-Deep-shaking-Plugin)(purgecss-webpack-plugin)
+  *webpack 4.0 默认支持 .babelrc配置 modules:false*
+  8.DLL DLLPlugin 进行分包 通过 mainifest.json 对文件的引用 
+  9.提取公共资源
+  10.Scope hoisting module:production 默认开启
+  11.动态 polyfill
+  12.配置externals,webpack 打包时忽略这些库,并自动在全局变量上挂载相应的全局变量.
+  13.splitChunks 根据 common vendor 分开处理
+  14.source map:开发环境配置cheap-eval-source-map
+  15.mini-css-extract-plugin 抽离 css 文件,tinypng 压缩图片
   常用 loader:
     file-loader
     style-loader
