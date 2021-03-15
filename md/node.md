@@ -204,5 +204,65 @@ require 目录机制:
 对于无关的进程 socket/message queue
 # Node 中max-old-space-size=4096
 编译时node 内存溢出,需要在 packet.json 配置
+# Buffer
+  如果没有提供编码格式,文件操作以及很多网络操作就会将数据作为 Buffer 类型返回.
+# 流
+  流是基于事件的 API,用于管理和处理数据.
+
+    * 流是能够读写的
+    * 基于事件实现的一个实例,理解流的最好方式就是想象一下没有流的时候怎么处理数据
+    * fs.readFileSync 同步读取文件,程序会阻塞,所有数据被读到内存
+    * fs.readFile 阻止程序阻塞,但仍会将文件所有数据读取到内存中
+    * 希望少内存读取大文件,读取一个数据块到内存处理完再去索引更多的数据
+
+  ## 流的类型
+    * 内置:许多核心模块都实现了流接口,如 fs.createReadStream
+    * http: 处理网络技术的流
+    * 解释器: 第三方模块 XML、JSOn 解释器
+    * 浏览器: Node流可以被拓展使用在浏览器
+    * RPC(远程调试): 通过网络发送流是进程间通信的有效方式
+  ## 流的类型
+  ### 静态服务器
+  ```js
+    // 不使用流
+    const http = require('http')
+    const fs = require('fs')
+    const zlib = require('zlib')
+    http.createServer((req,res) => {
+      fs.readFile(`${__dirname}/index.html`,(err,code) => {
+        if(err){
+          res.statusCode = 500
+          res.end(Sring(err))
+          return
+        }
+        res.end(data)
+      })
+    }).listen(8000);
+
+    //使用流
+    http.createServer((req,res) => {
+      //提供一个缓冲区发送到客户端
+      fs.createReadStream(`${__dirname}/index.html`).pipe(res)
+    }).listen(8000)
+
+    //使用流 + gzip
+    http.createServer((req,res) => {
+      res.writeHead(200,{
+        'content-encoding': 'gzip'
+      })
+      fs.createReadStream(`${__dirname}/index.html`)
+        .pipe(zlib.createGzip())
+        .pipe(res)
+    }).listen(8000)
+  ```
+# nodejs 中间件
+  中间件是介于应用系统和系统软件之间的一类软件,他使用系统软件所提供的基础功能,衔接网络上应用系统的各个部分或者不同的应用,能够达到资源共享、功能共享的目的.
+  在NodeJS中,
+
+
+
+
+  
+
 
 

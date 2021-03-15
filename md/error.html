@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+</html>
+<script>
+  const oldError = Error;
+  Error = function ({ code, message, fileName, lineNumber }) {
+    const error = oldError(message, fileName, lineNumber);
+    error.code = code;
+    return error;
+  };
+  // throw new Error('I wrong');
+  function deviced(a, b) {
+    a = +a;
+    b = +b;
+    if (!b) {
+      return new Error({
+        code: 1,
+        message: 'Invalid dividend ' + b,
+      });
+    }
+    if (Number.isNaN(a)) {
+      return new Error({
+        code: 2,
+        message: 'Invalid divisor ' + a,
+      });
+    }
+    return a / b;
+  }
+  function t() {
+    let res = deviced('a', 'b');
+
+    if (res.code === 1) {
+      return console.log('被除数必须是除0之外的数');
+    }
+    if (res.code === 2) {
+      return console.log('除数必须是数字');
+    }
+    return new Error('不可预知的错误');
+  }
+  // t();
+
+  // 责任链模式
+  function c() {
+    try {
+      b();
+    } catch (error) {
+      if (error.code === 'NETWORK_ERROR') {
+        return console.log('I can handle this');
+      }
+      throw err;
+    }
+  }
+  function b() {
+    try {
+      a();
+    } catch (error) {
+      if (error.code === 'INPUT_ERROR') {
+        return console.log('I can handle this bbbb');
+      }
+      // can't handle, pass it down
+      throw err;
+    }
+  }
+  function a() {
+    throw new Error({
+      code: 'INPUT_ERROR',
+      message: 'an error occured',
+    });
+  }
+  c();
+</script>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+</html>
+<script>
+  // 中序遍历
+  var inorderTraversal = function (root) {
+    let result = [],
+      stack = [],
+      current = root;
+    while (current && stack.length > 0) {
+      while (current) {
+        stack.push(current);
+        current = current.left;
+      }
+      current = stack.pop();
+      result.push(current);
+      current = current.right;
+    }
+    return result;
+  };
+  // 前序遍历
+  var preorderTraversal = function (root) {
+    let result = [],
+      stack = [],
+      current = root;
+    while (current && stack.length > 0) {
+      while (current) {
+        stack.push(current);
+        result.push(current);
+        current = current.left;
+      }
+      current = stack.pop();
+    current = current.right;
+    }
+    return result
+
+  };
+
+
+/**
+  * 有序数组中的单一元素
+  * 方案1 遍历数组,使用异或
+  * 方案2 双指针 头尾同时查找
+  * 
+  * 
+  */
+ const singleNonDuplicate = (arr) => {
+  let left = 0,right = arr.length - 1
+  while( left < right){
+    let mid = left + (right - left) / 2;
+    // >> 运算优先级没有 + 高
+    // let mid = left + ((right - left) >> 1);
+
+    // 因为单一元素仅出现一次 那么len 2x + 1 ,且数组为升序 则 类似 1 1 2 2 3 4 4 
+    // 出现单一元素的必定为 偶数小标 第 arr[0| 2|4]
+    console.log(left + (right - left) / 2,`left:${left}`,`right:${right}`);
+    console.log(left + (right - left) >> 1,`left:${left}`,`right:${right}`);
+    if (mid % 2 == 1) mid--;
+    console.log(mid,'mid2');
+    // 右边剩余的为奇数 向右边继续二分
+    if(arr[mid] === arr[mid+1]){
+      left = mid + 2
+    }else{
+      // 左边剩余的为奇数  向左边继续二分
+      right = mid
+    }
+  }
+  return arr[left]
+ }
+
+
+
+//  var monotoneIncreasingDigits = function(N) {
+//    if(N < 10){
+//      return N
+//    }
+//    const strList = (N + '').split('').map( i => +i)
+//    let i = 1 , len = strList.length
+//    // 判断哪一位开始没有递增
+//    while( i< len && strList[i - 1] <=  strList[i]){
+//      i++
+//    }
+//    if( i< len){
+//      while( i > 0 && strList[i - 1] > strList[i]){
+//        i--
+//        // 可以这样做原因是当前i 一定大于后面那一项 所以一定 > 0
+//        strList[i] -= 1
+//      }
+//      // 后续直接用0填充
+//      for( i+= 1; i < len; i++){
+//        strList[i] = 9
+//      }
+//    }
+//    console.log(+strList.join(''));
+//    return strList.join('')
+//  }
+
+var monotoneIncreasingDigits2 = function(N) {
+    let r = 0, s = 111111111, i = -1
+    while (++i < 9) {
+        while (r + s > N) s = s / 10 | 0
+        if ((r += s) === N) return r
+    }
+    return r
+};
+
+console.log(monotoneIncreasingDigits2(199));
+
+
+var wordPattern = function(pattern, s) {
+  let patternMap = new Map, sMap = new Map ,sList= s.split(" ")
+  if(pattern.length !== sList.length){
+    return false
+  }
+  for(let i =0; i < sList.length; i++){
+    let p = pattern[i],sItem = sList[i]
+    if(patternMap.has(p)){
+      if(patternMap.get(p) != sItem) return false
+    }else{
+      patternMap.set(p,sItem)
+    }
+    if(sMap.has(sItem)){
+      if(sMap.get(sItem) != p) return false
+    }else{
+      sMap.set(sItem,p)
+    }
+  }
+  return true
+};
+console.log(wordPattern('abba',"dog cat cat dog"));
+
+var minCostClimbingStairs = function(cost) {
+  let cur = cost[0],prev = cost[1], i = 1
+  while( ++i < cost.length){
+    let tmp = cost[i] + (cur > prev ? prev : cur)
+    cur = prev
+    prev = tmp
+  }
+  console.log(cur,prev);
+  return Math.min(cur,prev)
+};
+
+cost = [1, 100, 1, 1, 1, 100, 1, 1, 100, 1]
+// console.log(minCostClimbingStairs(cost));
+var candy = function(ratings) {
+  let leftList = Array(ratings.length).fill(1)
+  let rightList = Array(ratings.length).fill(1), count = 0
+  for(let i = 1 ; i < ratings.length; i++){
+    if(ratings[i] > ratings[i - 1]){
+      leftList[i] = leftList[i - 1] + 1
+    }
+  }
+  count = leftList[ratings.length - 1]
+  for( let i = ratings.length - 2 ; i >= 0; i--){
+    if(ratings[i] > ratings[i + 1]){
+      rightList[i] = rightList[i + 1] + 1
+    }
+    count += Math.max(leftList[i],rightList[i])
+  }
+  return count
+};
+candy([1,0,2,0,1,3,2])
+</script>
+
