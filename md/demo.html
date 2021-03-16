@@ -7,6 +7,8 @@
   </head>
   <body>
     <input type="text" id="inp" value="" />
+    <div contentEditable id="elem">Click and <b>edit</b>, please</div>
+
   </body>
 </html>
 <script>
@@ -83,4 +85,12 @@
   //   }
   // }
   
+  let  observer = new MutationObserver(mutationRecords => {
+    console.log(mutationRecords);
+  })
+  observer.observe(document.getElementById('elem'),{
+    childList: true, // 观察直接子节点
+    subtree: true, // 及其更低的后代节点
+    characterDataOldValue: true // 将旧的数据传递给回调
+  })
 </script>

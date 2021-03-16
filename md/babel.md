@@ -127,13 +127,14 @@ env 核心目的是通过配置得知目标环境的特点,然后只做必要的
 }
 ```
 
-## babel-polyfill(内部集成了 core-js 和 regenerator)
+## babel-polyfill(内部集成了 core-js 和 regenerator-runtime)
 
 babel 默认置转换 js 语法,而不转换新的 API.例如 Iterator、Genterator、Set、Maps、Proxy、Symbol、promise 等全局对象,以及一些定义在全局对象上的方法(Object.assign).这些就需要 polyfill,插入一些帮助函数.
-
+regenerator-runtime 是 generator 和 async/await 的运行时依赖.
+单独使用@babel/polyfill会将core-js全量导入,造成项目体积过大,可以通过配合使用**babel/preset-env**解决.
 ## babel-runtime 和 babel-plugin-transform-runtime
 
-babel-plufin-transform-runtime:
+babel-plugin-transform-runtime:
 
 ```js
 // 从直接定义改为引用，这样就不会重复定义了。
@@ -150,7 +151,7 @@ var _ref = _asyncToGenerator3(function* (arg1, arg2) {
 babel-runtime:
 babel-plufin-transform-runtime 将 babel-runtime 作为依赖.
 内部集成了:
-1.core-js:转换一些内置类(symbol、promise 等)和静态方法(Array.from 等).绝大部分转换在这里处理,自动引入
+1.core-js:转换一些内置类(symbol、promise 等)和静态方法(Array.from 等).绝大部分转换在这里处理,自动引入.直接使用会污染全局命名空间和对象原型.
 2.regenerator: core-js 补漏,主要对 generator/yield 和 async/await 支持,有 generator/async 主动引入
 3.helpers,上面的 asyncToGenerator 就是其中之一,还有 jsx、classCallCheck 等.
 

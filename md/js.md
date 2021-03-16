@@ -226,7 +226,7 @@ Function.prototype.myBind = function (fn, ...args) {
 # Promise.resolve()作用
 
 返回一个全新的 promise 对象.
-
+# async/await 函数就是 Generator 函数的语法糖
 # co 函数实现原理
 
 ```js

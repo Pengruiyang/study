@@ -18,3 +18,4 @@ IE|Trident|JScript(IE3.0 ~ IE8.0)
   6. **『JavaScript解释器』** - 用于解析和执行JavaScript代码
   7. **『数据存储』** - 持久层,浏览器需要在硬盘上保存各种数据,例如Cookie.x
 
+

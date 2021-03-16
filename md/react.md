@@ -176,5 +176,45 @@ setState 的异步整合,批量更新也是建立在钩子函数与合成事件�
   一系列的数据结构和数据对象浏览器的真实 dom在内存中映射.
 # hooks 和 class的理解?
   这两者是互补关系,class在某些情况下更便捷,符合直觉.类似于函数式和oop的关系,class是oop,好处是封装状态,hooks是函数式,封装逻辑.
+# react 理念
+  js上构建快速响应的大型web应用程序.而快速响应制约因素主要有2类:
+   * **CPU的瓶颈**: 大计算量的操作或者设备性能不足导致的页面掉帧的卡顿
+   * **IO的瓶颈**: 发送网络请求
+# Suspense 及 useDeferredValue hook
+  Suspense 让组件等待某个异步操作,知道异步操作结束即可渲染.而我们不必等到数据全部返回才开始渲染,实际上,我们是已发送网络请求就马上开始渲染.在渲染中发现读取的数据还没被获取完毕,该组件会出于一个挂起的状态.React会跳过这个组件,继续渲染dom树种其他组件.
+# React16的架构
+  * Scheduler[ˈskedʒuːlər] (调度器) ---- 调度任务的优先级,高优任务优先进入reconciler
+  * Reconciler [ˈrekənsaɪlər] (协调器) ---- 负责找出变化的组件 
+  * Renderer (渲染器) ---- 负责将变化的组件渲染到页面上
 
+  相比React15,新增了Scheduler.
+  ## Scheduler 
+  大部分浏览器实现了requestIdleCallback这个API,但是由于2个问题,React放弃了使用:
+  1. 浏览器兼容性
+  2. 触发概率不稳定,受很多因素影响,比如我们的浏览器切换tab后,之前tab注册的requestIdleCallback触发的频率会变得很低.
+
+  React实现了功能更加完善的requestIdleCallback polyfill.
+  ## Reconciler 
+  在React15中Reconciler是递归处理虚拟dom的.而在16中,更新工作从递归变成了可以中断的循环过程,每次循环都会调用 shouldYield 判断当前是否有剩余时间
+  ```js
+    function workloopConcurrent() {
+      while (workInProcess !== null && !shouldYield()){
+        workInProcess = performUnitOfWork(workInProcess)
+      }  
+    }
+  ```
+  在React16中,Reconciler与Renderer不再是交替工作.当Scheduler将任务交给Reconciler后,Reconciler会为变化的虚拟Dom打上代表增删更新的标记.
+  整个Scheduler与Reconciler的工作都在内存中进行.只有当所有组件都完成Reconciler的工作,才会统一交给Renderer
+  ## Renderer 
+  Renderer根据Reconciler为标记虚拟dom打上标记,同步执行对应dom操作.
+
+  ## 更新流程
+  1. Scheduler: 接收到更新,查询是否存在其他高优先级更新需要执行.如果没有,更新当前操作,交给Reconciler
+  2. Reconciler: 接收到更新,查询更新会造成哪些虚拟dom的变化.如果没有,将打了标记的虚拟dom交给Renderer
+  3. Renderer: 接收到通知,查询打上标记的虚拟dom.执行更新操作
+
+  1.2两个操作步骤随时可能被以下原因中断:
+    * 其他优先级更高任务需要先更新
+    * 当前帧没有剩余时间
+  但由于1,2任务都在内存中工作,不会更新展示到页面上,即使被反复打断,用户也无感知.
 
