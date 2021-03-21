@@ -247,4 +247,13 @@ function coSimple(gen, ...args) {
 }
 ```
 
-# class 中
+# 检测数组的6种方法
+  ```js
+    let arr = []
+    1. arr instanceof Array
+    2. arr.constructor === Array
+    3. Array.prototype.isPrototypeOf(arr)
+    4. Object.getPrototypeOf(arr) === Array.prototype
+    5. Object.prototype.toString.call(arr) === '[object Array]'
+    6. Array.isArray(arr)
+  ```
