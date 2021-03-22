@@ -1,3 +1,4 @@
+
 # 小数精度问题
 
 js 统一用的是双精度浮点数,小数部分二进制装换成十进制
@@ -257,3 +258,28 @@ function coSimple(gen, ...args) {
     5. Object.prototype.toString.call(arr) === '[object Array]'
     6. Array.isArray(arr)
   ```
+
+
+# 手写EventEmitter
+```js
+  class EventEmitter {
+    constructor(){
+      this.handleList = {}
+    }
+    on(type,func){
+      let callbacks = this.handleList[type]?this.handleList[type]:[]
+      callbacks.push(func)
+      this.handleList[type] = callbacks
+    }
+    emit(type,...args){
+      // 方法不存在直接返回
+      if(!this.handleList[type])return
+      this.handleList[type].map(fn => fn(...args))
+    }
+    off(type,func){
+      if (!this.handlers[eventName]) return
+      let index = this.handlers[eventName].indexOf(func)
+      this.handlers[eventName].splice(index,1)
+    }
+  }
+```

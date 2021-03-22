@@ -155,7 +155,68 @@ pm2:启动你的 node 服务,根据你的电脑去启动相应的进程数,监�
 ```
 # commonjs 和 es6 模块导出
 
-CommonJs 规范加载模块是同步的,nodeJs 主要用于服务器变成,模块文件一般已存在本地硬盘,加载比较快.输出的一个值的拷贝.运行时加载模块
+CommonJs 规范加载模块是同步的,nodeJs是commonJS规范的主要实践者,模块文件一般已存在本地硬盘,加载比较快.输出的一个值的拷贝.运行时加载模块.加载的是 module.exports 这个对象.
+ES6 module 异步加载模块.ES6的模块不是对象,import 命令会被JavaScript静态分析,在编译时就引入模块,而不是等到代码运行时加载.
+## ES6 模块与 CommonJS 模块的差异
+  1. CommonJS 模块输出的是一个值的拷贝,意味着一但输出一个值后,模块内部变化就影响不到这个值.ES Module输出的是值的引用.
+  2. CommonJS模块是运行时加载,ES Module模块是编译时输出接口.Es Module是在编译时就会提前加载并解析模块
+  3. CommonJs 是单个值导出，ES6 Module可以导出多个
+  4. CommonJs 是动态语法可以写在判断里，ES6 Module 静态语法只能写在顶层
+  5. CommonJs 的 this 是当前模块，ES6 Module的 this 是 undefined
+
+## 循环加载
+### commonJS 循环加载
+```js
+  /** a.js */
+  exports.done = false;
+  var b = require('./b.js');
+  console.log('在 a.js 之中，b.done = %j', b.done);
+  exports.done = true;
+  console.log('a.js 执行完毕');
+  /** b.js */
+  exports.done = false;
+  // 这时系统会去还没执行完的a.js取回已经执行的部分,而不是最后的值
+  var a = require('./a.js');
+  // b.js之后会继续往下执行,等到全部执行完毕再把执行权还给a.js
+  console.log('在 b.js 之中，a.done = %j', a.done);
+  exports.done = true;
+  console.log('b.js 执行完毕');
+  /** main.js */
+  var a = require('./a.js');
+  var b = require('./b.js');
+  console.log('在 main.js 之中, a.done=%j, b.done=%j', a.done, b.done);
+  /** 
+   * 输出顺序
+   * 在 b.js 之中，a.done = false
+   * b.js 执行完毕
+   * 在 a.js 之中，b.done = true
+   * a.js 执行完毕
+   * 在 main.js 之中, a.done=true, b.done=true
+  */
+```
+
+### ES Module 循环加载
+  ```js
+    // a.mjs
+    import {bar} from './b';
+    console.log('a.mjs');
+    console.log(bar);
+    export let foo = 'foo';
+    改成函数可以解决问题
+    // function foo() { return 'foo' }
+    // export {foo};
+
+    // b.mjs
+    import {foo} from './a';
+    console.log('b.mjs');
+    console.log(foo);
+    export let bar = 'bar';
+    /**
+     * 输出
+     * b.mjs
+     * ReferenceError: foo is not defined
+     */
+  ```
 
 ### commonJS
 

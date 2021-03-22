@@ -1,0 +1,11 @@
+{
+
+  "plugins": [
+    "./plugin.js",
+    {
+      "alias": {
+        "@": "./src"
+      }
+    }
+  ]
+}

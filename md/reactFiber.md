@@ -295,6 +295,11 @@ ReactDOM.unstable_create(rootEl).render(<App />)
 
 网络延迟是我们无法解决的,能解决的事在网络延存在的情况下,减少用户对网络延迟的感知.
 将人机交互研究的结果整合到真实的 UI 中.将同步的更新变为可中断的异步更新.
+# Fiber 更新复用机制
+  1. oldProps === newProps (render返回结果实际上是React.createElement 执行结果是一个全新的props引用,不会复合全等)
+  2. context value 没有变化 (指的是老版本的context)
+  3. workinProgress.type === current.type (更新前后Fiber.type没发生改变)
+  4. !includesSomeLane(renderLanes, updateLanes) (党全面Fiber是否存在更新,如果存在那么更新的优先级是否和本次整跟Fiber树调度的优先级一致.如果一致代表组件需要更新,走render逻辑)
 
 # 工作流程
 

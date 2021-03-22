@@ -46,3 +46,9 @@
   组件之间复用逻辑难
   复杂组件变得难以理解
   难用的类组件
+# useContext怎么优化?
+  react的更新是自上而下的,所以当Context更新时,所有子组件都会跟着更新.而React.memo仅检查props变更.如果函数组件被React.memo包裹,而其实现中拥有useState 和useContext的hook,当context改变是,他仍会重新渲染.useContext可以击穿一切memo
+  ## 通过useMemo包裹子函数判断.
+  缺点,可能随着业务复杂程度上升子函数判断更新条件也上升.
+  ## 拆分Context,使其包裹最近的子组件
+  缺点: 拆分太碎反而会导致应用难以维护
