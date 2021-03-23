@@ -1,3 +1,6 @@
+# 数据类型
+
+Number、String、Boolean、null、undefined、synbol、BigInt 和 Object
 
 # 小数精度问题
 
@@ -9,8 +12,8 @@ Es5 继承实质上是先创建子类实例对象,然后再将父类的方法添
 es6 继承是先创建父类实例对象 this,在用子类构造函数修改 this.因为子类没有自己的 this,需要 super()方法.es6 不仅继承了类的原型对象,还继承了静态属性和方法.
 
 ```js
-super();
-A.prototype.constructor.call(this);
+super()
+A.prototype.constructor.call(this)
 ```
 
 super 当做一个对象使用
@@ -20,44 +23,45 @@ super 当做一个对象使用
 ```js
 class A {
   constructor() {
-    this.x = 1;
+    this.x = 1
   }
 }
 class B extends A {
   constructor() {
-    super();
-    this.x = 2;
-    super.x = 3;
-    console.log(super.x); // undefined
+    super()
+    this.x = 2
+    super.x = 3
+    console.log(super.x) // undefined
     // A.prototype.x
-    console.log(this.x); // 3
+    console.log(this.x) // 3
   }
 }
-let b = new B();
+let b = new B()
 ```
 
 ```js
 class Parent {
   static myMethod(msg) {
-    console.log('static', msg);
+    console.log('static', msg)
   }
   myMethod(msg) {
-    console.log('instance', msg);
+    console.log('instance', msg)
   }
 }
 class Child extends Parent {
   static myMethod(msg) {
-    super.myMethod(msg);
+    super.myMethod(msg)
   }
   myMethod(msg) {
-    super.myMethod(msg);
+    super.myMethod(msg)
   }
 }
-Child.myMethod(1); // static 1
-var child = new Child();
-child.myMethod(2); // instance 2
+Child.myMethod(1) // static 1
+var child = new Child()
+child.myMethod(2) // instance 2
 ```
-
+# 如果一个构造函数，bind了一个对象，用这个构造函数创建出的实例会继承这个对象的属性吗？
+不能,new绑定优先级高于bind.通过new创建的新对象会代替bind的对象绑定,作为这个函数的this.如果此函数没有返回对象的情况下,返回这个新建的函数
 # 前端路由原理
 
 1.通过 Hash 实现前端路由
@@ -69,9 +73,8 @@ replaceState
 
 # script 标签中的 async 和 defer
 
-defer: 浏览器异步下载该文件并且不会影响到后续的 DOM 渲染,如果有多个设置 defer 的 script 标签,则会按照顺序执行所有的 script.defer 会在文档渲染完毕后,DOMContentLoaded 事件调用前执行.
-async: 会使 script 脚本异步加载并在允许的情况下执行. async 的执行,并不会按着 script 在页面中的顺序来执行,而是看谁先加载完谁执行.
-
+defer: **依赖其他脚本和DOM结果**浏览器异步下载该文件并且不会影响到后续的 DOM 渲染,如果有多个设置 defer 的 script 标签,则会按照顺序执行所有的 script.defer 会在文档渲染完毕后,DOMContentLoaded 事件调用前执行.
+async: **DOM和其他脚本依赖不强**会使 script 脚本异步加载并在允许的情况下执行. async 的执行,并不会按着 script 在页面中的顺序来执行,而是看谁先加载完谁执行.
 
 # 工作中封装组件
 
@@ -113,10 +116,10 @@ _重绘不一定导致重排,重排一定导致重绘_ 1.重排: dom 发生了�
 触发方式: 页面首次渲染、浏览器窗口改变、元素位置尺寸改变、新增删除可见元素、内容发生改变、字体变化、伪类激活、设置 style 属性、查询或调用某些方法*即时性与准确性* getComputedStyle | IE 中的 currentStyle 也会触发重排 2.重绘: dom 元素只发生了可见不见,背景颜色之类的变更,没有发生几何元素上的修改.
 
 ```js
-div.style.left = '10px';
-div.style.top = '10px';
-div.style.width = '20px';
-div.style.height = '20px';
+div.style.left = '10px'
+div.style.top = '10px'
+div.style.width = '20px'
+div.style.height = '20px'
 ```
 
 理论上会带来 4 次重排+重绘 但由于浏览器的渲染机制只会触发一次重排:
@@ -125,28 +128,28 @@ _当我修改了元素的几何属性,导致浏览器触发了重排或者重绘
 强制刷新队列：
 
 ```js
-div.style.left = '10px';
-console.log(div.offsetLeft);
-div.style.top = '10px';
-console.log(div.offsetTop);
-div.style.width = '20px';
-console.log(div.offsetWidth);
-div.style.height = '20px';
-console.log(div.offsetHeight);
+div.style.left = '10px'
+console.log(div.offsetLeft)
+div.style.top = '10px'
+console.log(div.offsetTop)
+div.style.width = '20px'
+console.log(div.offsetWidth)
+div.style.height = '20px'
+console.log(div.offsetHeight)
 ```
 
 这段代码却会触发 4 次重排,因为 console 中请求的样式信息.浏览器会为了准确性和即时性,立刻执行渲染队列的任务.
 减少重排重绘的操作 1.使用分离读写操作,
 
 ```js
-div.style.left = '10px';
-div.style.top = '10px';
-div.style.width = '20px';
-div.style.height = '20px';
-console.log(div.offsetLeft);
-console.log(div.offsetTop);
-console.log(div.offsetWidth);
-console.log(div.offsetHeight);
+div.style.left = '10px'
+div.style.top = '10px'
+div.style.width = '20px'
+div.style.height = '20px'
+console.log(div.offsetLeft)
+console.log(div.offsetTop)
+console.log(div.offsetWidth)
+console.log(div.offsetHeight)
 ```
 
       这次只触发了一次重排,在第一次 console 的时候,浏览器就把之前写操作的渲染队列给清空了,剩下的 console,因为渲染队列已经空了,所以不会触发重排,只做拿值操作.
@@ -155,6 +158,15 @@ console.log(div.offsetHeight);
       4.DocumentFragment 创建一个 dom 碎片,操作完成后整体加入 html 中,只触发一次
       5.复制节点,副本上工作,然后替换它
       6.position:absolute或 fixed 的元素,重排开销比较小.也可以开启 GPU 加速
+
+# JS 的隐式转换
+
+1. 布尔值到数字
+2.
+
+# 作用域
+
+管理当前作用域以及子作用域根据标识符进行变量查找
 
 # 函数作用域是在什么时候形成的?
 
@@ -202,11 +214,15 @@ state = {
 };
 ```
 
+# symbol 的用处
+
+1. 独一无二的变量防止命名冲突
+2. 不会被常规方法遍历到模拟私有变量
+3. 听遍历接口,只有存在 symbol.iterator 的对象才可以被遍历到
+
 # js new 的原理
 
-1.创建一个新对象,新对象的原型属性指向构造函数的原型对象 
-2.将属性和方法添加到新对象上
-3. 判断构造函数内部有没有返回对象,如果有,就返回那个对象,没有,则返回我们创建的新对象
+1.创建一个新对象,新对象的原型属性指向构造函数的原型对象 2.将属性和方法添加到新对象上,这个新对象会绑定到函数调用的 this 3. 判断构造函数内部有没有返回对象,如果有,就返回那个对象,没有,则返回我们创建的新对象
 
 ```js
   function _new(fn,...args){
@@ -220,66 +236,110 @@ state = {
 
 ```js
 Function.prototype.myBind = function (fn, ...args) {
-  return (...innerArgs) => this.call(fn, ...args, ...innerArgs);
-};
+  return (...innerArgs) => this.call(fn, ...args, ...innerArgs)
+}
 ```
 
 # Promise.resolve()作用
 
 返回一个全新的 promise 对象.
+
 # async/await 函数就是 Generator 函数的语法糖
+
 # co 函数实现原理
 
 ```js
 function coSimple(gen, ...args) {
-  let ctx = this;
-  gen = gen.apply(ctx, args);
+  let ctx = this
+  gen = gen.apply(ctx, args)
   return new Promise((resolve, reject) => {
-    onFulfilled();
+    onFulfilled()
     function onFulfilled(res) {
-      const ret = gen.next(res);
-      next(ret);
+      const ret = gen.next(res)
+      next(ret)
     }
     function next(ret) {
-      const promise = ret.value;
-      promise && promise.then(onFulfilled);
+      const promise = ret.value
+      promise && promise.then(onFulfilled)
     }
-  });
+  })
 }
 ```
 
-# 检测数组的6种方法
-  ```js
-    let arr = []
-    1. arr instanceof Array
-    2. arr.constructor === Array
-    3. Array.prototype.isPrototypeOf(arr)
-    4. Object.getPrototypeOf(arr) === Array.prototype
-    5. Object.prototype.toString.call(arr) === '[object Array]'
-    6. Array.isArray(arr)
-  ```
+# 手写 bind、apply、call
 
-
-# 手写EventEmitter
 ```js
-  class EventEmitter {
-    constructor(){
-      this.handleList = {}
-    }
-    on(type,func){
-      let callbacks = this.handleList[type]?this.handleList[type]:[]
-      callbacks.push(func)
-      this.handleList[type] = callbacks
-    }
-    emit(type,...args){
-      // 方法不存在直接返回
-      if(!this.handleList[type])return
-      this.handleList[type].map(fn => fn(...args))
-    }
-    off(type,func){
-      if (!this.handlers[eventName]) return
-      let index = this.handlers[eventName].indexOf(func)
-      this.handlers[eventName].splice(index,1)
-    }
+// call
+
+Function.prototype.call = function (context, ...args) {
+  context = context || window
+
+  const fnSymbol = Symbol('fn')
+  context[fnSymbol] = this
+
+  context[fnSymbol](...args)
+  delete context[fnSymbol]
+}
+// apply
+
+Function.prototype.apply = function (context, argsArr) {
+  context = context || window
+
+  const fnSymbol = Symbol('fn')
+  context[fnSymbol] = this
+
+  context[fnSymbol](...argsArr)
+  delete context[fnSymbol]
+}
+// bind
+
+Function.prototype.bind = function (context, ...args) {
+  context = context || window
+  const fnSymbol = Symbol('fn')
+  context[fnSymbol] = this
+
+  return function (..._args) {
+    args = args.concat(_args)
+
+    context[fnSymbol](...args)
+    delete context[fnSymbol]
   }
+}
+```
+
+# 检测数组的 6 种方法
+
+```js
+  let arr = []
+  1. arr instanceof Array
+  2. arr.constructor === Array
+  3. Array.prototype.isPrototypeOf(arr)
+  4. Object.getPrototypeOf(arr) === Array.prototype
+  5. Object.prototype.toString.call(arr) === '[object Array]'
+  6. Array.isArray(arr)
+```
+
+# 手写 EventEmitter
+
+```js
+class EventEmitter {
+  constructor() {
+    this.handleList = {}
+  }
+  on(type, func) {
+    let callbacks = this.handleList[type] ? this.handleList[type] : []
+    callbacks.push(func)
+    this.handleList[type] = callbacks
+  }
+  emit(type, ...args) {
+    // 方法不存在直接返回
+    if (!this.handleList[type]) return
+    this.handleList[type].map((fn) => fn(...args))
+  }
+  off(type, func) {
+    if (!this.handlers[eventName]) return
+    let index = this.handlers[eventName].indexOf(func)
+    this.handlers[eventName].splice(index, 1)
+  }
+}
 ```

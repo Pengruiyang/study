@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body></body>
+</html>
+<script>
+  /**
+   * 
+   * 创建一个空对象，构造函数中的this指向这个空对象
+  这个新对象被执行 [[原型]] 连接
+  执行构造函数方法，属性和方法被添加到this引用的对象中
+  如果构造函数中没有返回其   它对象，那么返回this，即创建的这个的新对象，否则，返回构造函数中返回的对象。
+  */
+  function _new() {
+    let target = {};
+    const [constructor, ...args] = [...arguments];
+    target.__proto__ = constructor.prototype;
+    let result = constructor.call(target, ...args);
+    if (result && (typeof result == "object" || typeof result == "function")) {
+      return result;
+    }
+    return target;
+  }
+
+  //实现一个深拷贝
+  function deepCopy(o) {
+    if (typeof o !== "object") return;
+    if (o instanceof Array) {
+      o.map(item => {
+        o[item] = deepCopy(item);
+      });
+    }
+    if (o instanceof Object) {
+      Object.keys(o).map(key => {
+        o[key] = deepCopy(o[key]);
+      });
+    }
+    return o;
+  }
+
+  //实现call和apply
+  Function.prototype.call1 = function() {
+    const [thisArgs, ...args] = [...arguments];
+    if (!thisArgs) {
+      thisArgs = typeof window === "undefined" ? global : window;
+    }
+    thisArgs.func = this;
+    let result = thisArgs.func(...args);
+    delete thisArgs.func;
+    return result;
+  };
+
+  Function.prototype.apply1 = function(thisArgs, rest) {
+    if (!thisArgs) {
+      thisArgs = typeof window === "undefined" ? global : window;
+    }
+    thisArgs.func = this;
+    let result;
+    if (!rest) {
+      result = thisArgs.func();
+    } else {
+      result = thisArgs.func(...rest);
+    }
+    delete thisArgs.func;
+    return result;
+  };
+
+  function curry(fn) {
+    const ctx = this || window;
+    function inner(...args) {
+      if (args.length == fn.length) {
+        return fn.call(ctx, ...args);
+      } else {
+        return (...innerArgs) => {
+          return inner.call(ctx, ...args, ...innerArgs);
+        };
+      }
+    }
+    return inner;
+  }
+
+  let a = {
+    [Symbol.toPrimitive]: (function(hint) {
+      let i = 1;
+      return function() {
+        return i++;
+      };
+    })()
+  };
+
+  function init(A, B) {
+    let prototype = Object.assign({}, A.prototype);
+    prototype.constructor = B;
+    B.prototype = prototype;
+  }
+
+  //实现一个简单的promise
+  function Promise1(func) {
+    this.fullfilled = false;
+    this.rejected = false;
+    this.pending = true;
+    this.handles = [];
+    this.errorHandles = [];
+    function resolve(...args) {
+      this.handles.forEach(handle => handle(...args));
+    }
+    function reject(...args) {
+      this.errorHandles.forEach(handle => handle(...args));
+    }
+    func.call(this, resolve.bind(this), reject.bind(this));
+  }
+  Promise1.prototype.then = function(func) {
+    this.handles.push(func);
+    return this;
+  };
+  Promise1.prototype.catch = function(func) {
+    this.errorHandles.push(func);
+    return this;
+  };
+  Promise1.all = promises =>
+    new Promise1((reslove, reject) => {
+      let len = promises.length;
+      let res = [];
+      promises.forEach((p, i) => {
+        p.then(r => {
+          if (len == 1) {
+            reslove(res);
+          } else {
+            // res.push(r)
+            res[i] = r;
+          }
+          len--;
+        }, reject);
+      });
+    });
+
+  console.log(flattenDeep([1, [2, [3, [4]], 5]]));
+  //拍平数组
+  function flattenDeep(arr) {
+    return arr.reduce((acc, cur) => {
+      return Array.isArray(cur)
+        ? acc.concat(flattenDeep(cur))
+        : acc.concat(cur);
+    }, []);
+  }
+  //去重
+  console.log(uniq([1, 2, 3, 5, 3, 2]));
+  function uniq(arr) {
+    // return [...new Set(arr)]
+    return arr.reduce((acc, cur) => {
+      return acc.includes(cur) ? acc : acc.concat(cur);
+    }, []);
+  }
+
+  function __new() {
+    let [constructor, ...args] = [...args];
+    let target = {};
+    target.__proto__ = constructor.prototype;
+    let result = constructor.call(target, ...args);
+    result instanceof target ? result : target;
+  }
+
+</script>
