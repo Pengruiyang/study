@@ -1,12 +1,14 @@
 # webpack 本质
 
-
+# Compiler 和 Compilation
+Compiler 对象是一个全局单例,负责把控整个webpack打包的构建流程.
+Compilation 对象是每一次构建的上下文对象,它包含了当次构件所需要的所有信息,每次热更新和重新构建,compiler都会重新生成一个新的compilation对象,负责此次更新的构建过程.
 # webpack 编译机制
 1.初始化参数: 从配置文件和 shell 语句中合并得到最终参数
-2.开始编译:参数初始化 Compiler 对象,加载所有配置的 Plugin,执行对象的 run 方法开始执行编译
+2.开始编译:参数初始化 Compiler 对象,加载所有配置的 Plugin,调用对象的 run 方法开始执行编译
 3.确认入口: 根据配置中的 entry 找到所有的入口文件
-4.编译模块: 从入口文件触发,调用所有配置的 loader 对模块进行编译,再找出该模块依赖的模块,递归直至所有入口依赖文件.得到每个模块被编译后的最终内容以及他们之间的依赖关系.读取入口文件内容,通过@babel/parse将入口内容(code)转换成ast.通过@babel/travelse遍历ast得到模块的哥哥以来.通过@babel/core(实际工作由@babel/parset-env完成)将ast转换为es5code.通过循环尾递归的方式拿到所有模块的所有依赖并都转换成es5.
-5.输出资源:根据入口与模块之间的依赖关系,组装成一个个包含多个模块的 chunk,再把每个 chunk 装换成一个单独的文件加入到输出列表.确定好输出内容后,根据配置的的输入路径与文件名,把文件内容写进文件系统中.
+4.编译模块: 从入口文件出发,调用所有配置的 loader 对模块进行编译,再找出该模块依赖的模块,递归直至所有入口依赖文件.得到每个模块被编译后的最终内容以及他们之间的依赖关系.读取入口文件内容,通过@babel/parse将入口内容(code)转换成ast.通过@babel/travelse遍历ast得到模块的各个依赖.通过@babel/core(实际工作由@babel/parset-env完成)将ast转换为es5code.通过循环尾递归的方式拿到所有模块的所有依赖并都转换成es5.
+5.输出资源:根据入口与模块之间的依赖关系,组装成一个个包含多个模块的 chunk,再把每个 chunk 转换成单独的文件加入到输出列表.确定好输出内容后,根据配置的的输入路径与文件名,把文件内容写进文件系统中.
 
 
 初始化 
@@ -75,6 +77,10 @@
   ### plugins 原理:
     在 Webpack 运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
     在 plugins 中单独配置，类型为数组，每一项是一个 Plugin 的实例，参数都通过构造函数传入
+  ### plugins和loader的区别
+  loader:是一个加载器,用来加载和解析转换非js文件的能力
+  plugin: 意思是插件,在webpack运行生命周期,会广播很多事件出去,plugin可以监听这些事件在合适的时间通过webpack的api输入对应的结果.
+    
   ### webpack 提效插件
     webpack-dashboard 展示更加友好的打包信息
     webpack-merge 提取公共 webpack 配置 减少重复代码
@@ -125,6 +131,12 @@
   ### 动态polyfill
   1.babel-polyfill
   2.polyfill-service
+  # webpack5 打包后代码 
+  1. \__webpack_modules__ 存放了编译后的各个文件模块的js内容
+  2. \__webpack_module_cache__ 用来做模块缓存
+  3. \__webpack_require__ 则是webpack内部实现依赖的引入函数
+  # sourceMap
+  sourceMap是将编译、打包、压缩后代码映射回源的奇数.
 
 
 

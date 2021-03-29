@@ -141,7 +141,7 @@ Fiber节点的属性定义,我们可以按三层含义将他们分类
 
     /** 大部分情况下同type,某些情况不同 例如FunctionComponent使用React.memo包裹时 */
     this.elementType = null
-    
+
     /** Fiber对应的真实dom节点 */
     this.type = null
 
@@ -156,7 +156,7 @@ Fiber节点的属性定义,我们可以按三层含义将他们分类
 
     /** 指向父级Fiber节点 */
     this.return = null
-   
+
     /** 指向子Fiber节点 */
     this.child = null
 
@@ -295,11 +295,13 @@ ReactDOM.unstable_create(rootEl).render(<App />)
 
 网络延迟是我们无法解决的,能解决的事在网络延存在的情况下,减少用户对网络延迟的感知.
 将人机交互研究的结果整合到真实的 UI 中.将同步的更新变为可中断的异步更新.
+
 # Fiber 更新复用机制
-  1. oldProps === newProps (render返回结果实际上是React.createElement 执行结果是一个全新的props引用,不会复合全等)
-  2. context value 没有变化 (指的是老版本的context)
-  3. workinProgress.type === current.type (更新前后Fiber.type没发生改变)
-  4. !includesSomeLane(renderLanes, updateLanes) (党全面Fiber是否存在更新,如果存在那么更新的优先级是否和本次整跟Fiber树调度的优先级一致.如果一致代表组件需要更新,走render逻辑)
+
+1. oldProps === newProps (render 返回结果实际上是 React.createElement 执行结果是一个全新的 props 引用,不会复合全等)
+2. context value 没有变化 (指的是老版本的 context)
+3. workinProgress.type === current.type (更新前后 Fiber.type 没发生改变)
+4. !includesSomeLane(renderLanes, updateLanes) (党全面 Fiber 是否存在更新,如果存在那么更新的优先级是否和本次整跟 Fiber 树调度的优先级一致.如果一致代表组件需要更新,走 render 逻辑)
 
 # 工作流程
 
@@ -320,4 +322,48 @@ ReactDOM.render(<App />, document.getElementById('root'))
 fiberRootNode.current = rootFiber
 ```
 
-2. 进入 render 阶段,根据组件返回的 JSX 在内存中一次创建 Fiber 节点并连接在一起构建 fiber 树,被称为 workInProgress Fiber 树.而构建 workInProgcess Fiber 树时会复用 current Fiber 树,
+2. 进入 render 阶段,根据组件返回的 JSX 在内存中一次创建 Fiber 节点并连接在一起构建 fiber 树,被称为 workInProgress Fiber 树.而构建 workInProgress Fiber 树时会复用 current Fiber 树中已有的 Fiber 节点内的属性,在首屏渲染时只有 rootFiber 存在对应的 current fiber(rootFiber.alternate)
+3. 构建完 workInProgress Fiber 树在 commit 阶段渲染到页面.fiberRootNode 的 current 指向 workInProgress Fiber,将其变为 current Fiber 树.
+
+## update 阶段时
+
+1. 新的 render 阶段构建一颗新的 workInProgress Fiber 树.
+2. workInProgress 在 render 阶段完成构建后进入 commit 阶段渲染到页面上.渲染完毕后 workInProgress 树变为 current 树.
+
+## render 阶段
+
+```js
+// performSyncWorkOnRoot会调用该方法
+function workLoopSync() {
+  while (workInProgress !== null) {
+    preformUnitOfWork(workInProgress)
+  }
+}
+// performConcurrentWorkOnRoot 调用该方法
+function workLoopConcurrent() {
+  while (workInProgress !== null && !shouldYield()) {
+    performUnitOfWork(workInProgress)
+  }
+}
+```
+
+他们之间唯一的区别就是是否调用 shouldYield,如果当前浏览器没有剩余时间,shouldyield 会终止循环,直到浏览器有空闲时间后继续遍历.preformUnitOfWork 会创建下一个 Fiber 节点给 workInProgress.并和已创建的链接构成 Fiber 树.
+
+```js
+function beginWork(
+  current: Fiber | null,
+  workInProgress: Fiber,
+  renderLanes: Lanes //优先级
+): Fiber | null {
+  // ...省略函数体
+}
+/**
+ * 可以通过current === null ? mount阶段 : update阶段
+ * /
+```
+
+rootFiber 开始向下深度优先遍历,为遍历到每个 Fiber 节点调用 beginWork 方法,该方法会根据传入的 Fiber 节点创建子 Fiber 节点,并将其关联起来.遍历到最下层叶子节点(没有子节点的组件)进入下一个阶段.
+
+接着调用 completeWork 处理 Fiber 节点,当某个 Fiber 节点执行完 completeWork,如果存在兄弟节点,进入兄弟节点继续这个阶段,不存在则进入父级 Fiber 开始这个阶段知道 rootFiber.其中appendAllChildren 方法将已生成的子孙DOM节点插入当前生成的DOM节点下.存在effectTag的Fiber节点会被保存在effectList的单向链表中,在commit阶段只需要遍历effectList就可以执行所有的effect.
+
+## commit阶段
