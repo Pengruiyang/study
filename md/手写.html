@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+</html>
+<script>
+  // ## 数据格式转化
+  // const A = [
+  //   { id: 1 },
+  //   { id: 2, parentId: 1 },
+  //   { id: 3, parentId: 1 },
+  //   { id: 4, parentId: 2 },
+  //   { id: 5, parentId: 3 },
+  //   { id: 6, parentId: 3 },
+  // ]
+  // let mapper = {}
+  // let ans = null
+  // function createTree(A) {
+  //   for (const a of A) {
+  //     mapper[a.id] = a
+  //     a.children = []
+  //     if (!a.parentId) {
+  //       ans = a
+  //     } else {
+  //       if (!mapper[a.parentId]) {
+  //         mapper[a.parentId] = {
+  //           id: a.parentId,
+  //           children: [],
+  //         }
+  //       }
+  //       mapper[a.parentId].children.push(a)
+  //     }
+  //   }
+  // }
+  // createTree(A)
+  // console.log(mapper)
+  // console.log(ans)
+
+  // 并发控制器
+  // class Queue {
+  //   constructor() {
+  //     this._queue = []
+  //   }
+  //   push(value) {
+  //     return this._queue.push(value)
+  //   }
+  //   shift() {
+  //     return this._queue.shift()
+  //   }
+  //   isEmpty() {
+  //     return this._queue.length === 0
+  //   }
+  // }
+
+  // class DelayedTask {
+  //   constructor(resolve, fn, args) {
+  //     this.resolve = resolve
+  //     this.fn = fn
+  //     this.args = args
+  //   }
+  // }
+  // class TaskPool {
+  //   constructor(size) {
+  //     this.size = size
+  //     this.queue = new Queue()
+  //   }
+  //   /**
+  //    * 将新任务放入队列中,触发任务池检测机制,如果当前任务池不满的话,则从队列中取出任务放到任务池中执行
+  //    */
+  //   addTask(fn, args) {
+  //     return new Promise((resolve) => {
+  //       this.queue.push(new DelayedTask(resolve, fn, args))
+  //       if (this.size) {
+  //         this.size--
+  //         const { resolve: taskResole, fn, args } = this.queue.shift()
+  //         taskResole(this.runTask(fn, args))
+  //       }
+  //     })
+  //   }
+  //   // 如果当前队列不为空,任务池不满,主动执行任务
+  //   pullTask() {
+  //     if (this.queue.isEmpty()) return
+  //     if (this.size === 0) return
+  //     this.size++
+  //     const { resolve, fn, args } = this.queue.shift()
+  //     resolve(this.runTask(fn, args))
+  //   }
+  //   // 执行当前任务,任务执行后更新状态,主动拉取任务执行
+  //   runTask(fn, args) {
+  //     console.log(args);
+  //     const result = Promise.resolve(fn(...args))
+  //     result
+  //       .then(() => {
+  //         this.size--
+  //         this.pullTask()
+  //       })
+  //       .catch((err) => {
+  //         this.size--
+  //         this.pullTask()
+  //       })
+  //     return result
+  //   }
+  // }
+
+  const taskList = [1000, 3000, 200, 1300, 800, 2000]
+
+  // 需要队列
+  class Queue {
+    constructor() {
+      this._queue = []
+    }
+    push(value) {
+      return this._queue.push(value)
+    }
+    shift() {
+      return this._queue.shift()
+    }
+    isEmpty() {
+      return this._queue.length === 0
+    }
+  }
+  class DelayedTask {
+    constructor(resolve, fn, args) {
+      this.resolve = resolve
+      this.fn = fn
+      this.args = args
+    }
+  }
+  class TaskPool {
+    constructor(size) {
+      this.size = size
+      // 需要一个队列存放任务
+      this.queue = new Queue()
+    }
+    //  添加任务进任务池
+    addTask(fn, args) {
+      // this.queue.push()
+      return new Promise((resolve) => {
+        // this.queue.push({
+        //   resolve,
+        //   fn,
+        //   args,
+        // })
+        this.queue.push(new DelayedTask(resolve, fn, args))
+        if (this.size) {
+          this.size--
+          const { resolve: runResolve, fn, args } = this.queue.shift()
+          // this.runTask(this.queue.shift())
+          runResolve(this.runTask(fn, args))
+        }
+      })
+    }
+    // 主动拉取任务
+    pullTask() {
+      // 没有任务了
+      if (this.queue.isEmpty()) return
+      // 没有空闲执行器
+      if (this.size === 0) return
+
+      this.size++
+      const { resolve: runResolve, fn, args } = this.queue.shift()
+      runResolve(this.runTask(fn, args))
+    }
+    // 执行任务
+    runTask(fn, args) {
+      let result = Promise.resolve(fn(...args))
+      result
+        .then((resolve) => {
+          this.size--
+          this.pullTask()
+        })
+        .catch((err) => {
+          this.size--
+          this.pullTask()
+        })
+      return result
+    }
+  }
+
+  const task = (timeout) =>
+    new Promise((resolve) =>
+      // setTimeout(() => {
+      //   resolve(timeout)
+      // }, timeout)
+      {
+        console.log(timeout)
+        return resolve(timeout)
+      }
+    )
+  const cc = new TaskPool(2)
+  // async function startNoConcurrentControl() {
+  //   await Promise.all(taskList.map((item) => cc.addTask(task, [item])))
+  // }
+  async function start() {
+    await Promise.all(taskList.map((i) => cc.addTask(task, [i])))
+  }
+  start()
+
+  // Promise
+  function Promise1(func) {
+    this.fullfilled = false
+    this.rejected = false
+    this.pending = false
+    this.handles = []
+    this.errHandles = []
+    function resolve(...args) {
+      this.handles.forEach((handle) => handle(...args))
+    }
+    function reject(...args) {
+      this.errHandles.forEach((handle) => handle(...args))
+    }
+    func.call(this, resolve.bind(this), reject.bind(this))
+  }
+  Promise1.prototype.then = function (func) {
+    this.handles.push(func)
+    return this
+  }
+  Promise1.prototype.catch = function (func) {
+    this.errHandles.push(func)
+    return this
+  }
+  Promise1.all = (promises) => {
+    return new Promise1((resolve, reject) => {
+      let len = promises.length
+      let res = []
+      promises.forEach((promise, i) => {
+        promise.then((r) => {
+          if (len === 1) {
+            resolve(res)
+          } else {
+            res[i] = r
+          }
+          len--
+        }, reject)
+      })
+    })
+  }
+  Promise1.race = (promises) => {
+    return new Promise1((resolve, reject) => {
+      promises.forEach((promise) => promise.then(resolve, reject))
+    })
+  }
+
+  // 继承
+  function initPrototype(A, B) {
+    // 复制父节点的原型对象
+    let prototype = Object.create(A.prototype)
+    // 指向新建的子类
+    prototype.constructor = B
+    // 完成prototype的与子类链接
+    B.prototype = B
+  }
+
+  function A(name) {
+    this.name = name
+    this.list = [1, 2, 3]
+  }
+  A.prototype.say = function () {
+    alert(this.name)
+  }
+  function B(name, age) {
+    A.call(this, name)
+    this.age = age
+  }
+  initPrototype(A, B)
+
+  // new
+  function _new(fn, args) {
+    let obj = Object.create(fn.prototype)
+    let ret = fn.call(obj, ...args)
+    return ret instanceof Object ? ret : obj
+  }
+  // bind
+  const myBind = (ctx, ...args) => {
+    return (...nextCtx) => {
+      this.call(ctx, ...args, ...nextCtx)
+    }
+  }
+  // curry
+  function curry(fn) {
+    const inner = (...args) => {
+      console.log(args);
+      if (fn.length === args.length) {
+        return fn.call(this, ...args)
+      }
+
+      return (...innerArgs) => inner.call(this,...args,...innerArgs)
+    }
+    return inner
+  }
+  function test(a, b, c) {
+    console.log(a, b, c);
+  }
+  const f1 = curry(test)(1)(2)(3);
+  console.log(f1);
+  // pipe
+  const pipe = (...args) => x => args.reduce((v,fn)=>fn(v),x)
+  // call 
+  
+</script>
