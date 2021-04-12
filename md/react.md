@@ -13,7 +13,14 @@
   componentDidUpDate
   ## 卸载阶段
   componentWillUnMount
-
+## 新增生命周期
+  ```js
+    componentDidCatch 容错狗子
+    static getDerivedStateFromProps、getSnapshotBeforeUpdate 代替废弃的
+    componentWillMount、componentWillReceiveProps、componentWillUpdate
+    新增的和启用不能混用,另外 React17删除了这三个生命周期
+     
+  ```
 
 可以 setState 的生命周期
 初始化的 constructor

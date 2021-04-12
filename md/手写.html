@@ -221,7 +221,7 @@
   // curry
   function curry(fn) {
     const inner = (...args) => {
-      console.log(args);
+      console.log(args)
       if (fn.length === args.length) {
         return fn.call(this, ...args)
       }
@@ -231,10 +231,10 @@
     return inner
   }
   function test(a, b, c) {
-    console.log(a, b, c);
+    console.log(a, b, c)
   }
-  const f1 = curry(test)(1)(2)(3);
-  console.log(f1);
+  const f1 = curry(test)(1)(2)(3)
+  console.log(f1)
   // pipe
   const pipe = (...args) => x => args.reduce((v, fn) => fn(v), x)
   //实现destructuringArray方法，达到如下效果
@@ -305,10 +305,12 @@
               return false
             }
           }
-          if (typeof oldData[key] !== 'object' && oldData[key] !== newData[key]) {
+          if (
+            typeof oldData[key] !== 'object' &&
+            oldData[key] !== newData[key]
+          ) {
             return false
           }
-
         } else {
           return false
         }
