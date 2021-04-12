@@ -96,6 +96,22 @@ key 值,state 维护消息数组,添加消息和移除消息,设置消息的 key
 # 箭头函数和普通函数的区别
 
 箭头函数都是匿名函数,没有自己的 this,this 在创建是绑定当前的上下文.没有 arguments 对象,不能被 new ,没有自己的原型属性.
+# instanceof 原理
+右边变量的prototype(原型对象 )在左边变量的原型链上能找到即可
+```js
+  function newInstanceof(l,r){
+    let rightProtoType = r.prototype,leftValue = l.__proto__
+    while(true){
+      if(leftValue === null){
+        return false
+      }
+      if(leftValue === rightProtoType){
+        return true 
+      }
+      leftValue = leftValue.__proto__
+    }
+  }
+```
 
 # 项目优化
 
@@ -343,3 +359,5 @@ class EventEmitter {
   }
 }
 ```
+# js bridge原理
+js bridge充当中间这,让js和Android双向通信.Android将事件注入到前端上window中.一种是Android的回调时间,一种是留给前端主动调用Android的事件,

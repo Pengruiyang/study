@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
-</head>
-
-<body></body>
-
+  <body></body>
 </html>
 <script>
   // ## 数据格式转化
@@ -115,13 +113,13 @@
 
   // 需要队列
 
-
   const task = (timeout) =>
-    new Promise((resolve) =>
-      setTimeout(() => {
-        console.log(timeout)
-        resolve(timeout)
-      }, timeout)
+    new Promise(
+      (resolve) =>
+        setTimeout(() => {
+          console.log(timeout)
+          resolve(timeout)
+        }, timeout)
       // {
       //   console.log(timeout)
       //   return resolve(timeout)
@@ -132,9 +130,9 @@
   //   await Promise.all(taskList.map((item) => cc.addTask(task, [item])))
   // }
   async function start() {
-    console.time('aa');
+    console.time('aa')
     await Promise.all(taskList.map((i) => cc.addTask(task, [i])))
-    console.timeEnd('aa');
+    console.timeEnd('aa')
   }
   start()
 
@@ -236,7 +234,7 @@
   const f1 = curry(test)(1)(2)(3)
   console.log(f1)
   // pipe
-  const pipe = (...args) => x => args.reduce((v, fn) => fn(v), x)
+  const pipe = (...args) => (x) => args.reduce((v, fn) => fn(v), x)
   //实现destructuringArray方法，达到如下效果
   function destructuringArray(array, formatter) {
     const parse = (str) => {
@@ -254,7 +252,7 @@
       }
       return {
         ...result,
-        [key]: value
+        [key]: value,
       }
     }
     return fn(array, parse(formatter))
@@ -337,9 +335,116 @@
     // cur 当前项
     // prev 上一项
     while (cur) {
-      [cur.next, prev, cur] = [prev, cur, cur.next]
+      ;[cur.next, prev, cur] = [prev, cur, cur.next]
     }
     return prev
   }
-  
+  // 求数组里面最大连续项的和
+  function getMaxSum(arr) {
+    let dp = Array(arr.length).fill(0)
+    let maxSum = 0
+    dp[0] = arr[0]
+    for (let i = 1; i < arr.length; i++) {
+      dp[i] = Math.max(arr[i], dp[i - 1] + arr[i])
+      if (dp[i] > maxSum) {
+        maxSum = dp[i]
+      }
+    }
+    return maxSum
+  }
+  // console.log(getMaxSum([1, -2, 3, 4, -1, 5]),'getMaxSum');
+
+  //求一个数组最大子项的和，要求这些子项在数组中的位置不是连续的。
+  var rob = function (nums) {
+    if (nums.length === 0) return 0
+    if (nums.length === 1) return nums[0]
+    let dp = Array(nums.length)
+    dp[0] = nums[0]
+    dp[1] = Math.max(dp[0], nums[1])
+    for (let i = 2; i < nums.length; i++) {
+      dp[i] = Math.max(dp[i - 1], dp[i - 2] + nums[i])
+    }
+    return dp[nums.length - 1]
+  }
+
+  // 发布订阅模式
+  class EventEmitter {
+    constructor() {
+      this.events = {}
+    }
+    // 订阅事件方法
+    on(eventName, callback) {
+      if (!this.events[eventName]) {
+        this.events[eventName] = [callback]
+      } else {
+        this.events[eventName].push(callback)
+      }
+    }
+    // 触发事件
+    emit(eventName) {
+      this.events[eventName] && this.events[eventName].forEach((cb) => cb())
+    }
+    once(eventName, callback) {
+      let fn = () => {
+        cb()
+        this.remove(eventName, callback)
+      }
+      this.on(eventName, fn)
+    }
+    //
+    remove(eventName, calllback) {
+      if (this.events[eventName]) {
+        this.events[eventName] = this.events[eventName].filter(
+          (cb) => cb != calllback
+        )
+      }
+    }
+  }
+
+  // 观察者模式
+  class Publish {
+    constructor() {
+      this.observersList = []
+    }
+    addObserver(targetType, observer) {
+      if (!this.observersList[targetType]) {
+        this.observersList[targetType] = [observer]
+      } else {
+        this.observersList[targetType].push(observer)
+      }
+    }
+    removeObserver(targetType, observer) {
+      let observers = this.observersList[targetType]
+      if (!observers) {
+        return false
+      }
+      if (!observer) {
+        observers.length = 0
+      }
+      observers = observers.filter((cb) => cb != observer)
+    }
+    publish() {
+      // let [..._arguments] = arguments
+      let targetType = Array.prototype.slice.call(arguments)
+      let observers = this.observersList[targetType]
+      if (!observers || observers.length === 0) {
+        return
+      }
+      observers.forEach((observer) => {
+        observer.receive(targetType)
+      })
+    }
+  }
+  class Observer {
+    constructor(name) {
+      this.name = name
+    }
+    receive(targerType) {
+      console.log(this.name + '收到' + targerType + '类型更新的消息！')
+    }
+  }
+  let phonePublish01 = new Publisher()
+  // phonePublish01.addObserver('小米12', new Observer('订阅者01'))
+  // phonePublish01.addObserver('红米12', new Observer('订阅者02'))
+  // phonePublish01.publish('小米12', '黑色款小米12')
 </script>
