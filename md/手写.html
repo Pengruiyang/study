@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body></body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body></body>
+
 </html>
 <script>
   // ## 数据格式转化
@@ -42,74 +45,6 @@
   // console.log(ans)
 
   // 并发控制器
-  // class Queue {
-  //   constructor() {
-  //     this._queue = []
-  //   }
-  //   push(value) {
-  //     return this._queue.push(value)
-  //   }
-  //   shift() {
-  //     return this._queue.shift()
-  //   }
-  //   isEmpty() {
-  //     return this._queue.length === 0
-  //   }
-  // }
-
-  // class DelayedTask {
-  //   constructor(resolve, fn, args) {
-  //     this.resolve = resolve
-  //     this.fn = fn
-  //     this.args = args
-  //   }
-  // }
-  // class TaskPool {
-  //   constructor(size) {
-  //     this.size = size
-  //     this.queue = new Queue()
-  //   }
-  //   /**
-  //    * 将新任务放入队列中,触发任务池检测机制,如果当前任务池不满的话,则从队列中取出任务放到任务池中执行
-  //    */
-  //   addTask(fn, args) {
-  //     return new Promise((resolve) => {
-  //       this.queue.push(new DelayedTask(resolve, fn, args))
-  //       if (this.size) {
-  //         this.size--
-  //         const { resolve: taskResole, fn, args } = this.queue.shift()
-  //         taskResole(this.runTask(fn, args))
-  //       }
-  //     })
-  //   }
-  //   // 如果当前队列不为空,任务池不满,主动执行任务
-  //   pullTask() {
-  //     if (this.queue.isEmpty()) return
-  //     if (this.size === 0) return
-  //     this.size++
-  //     const { resolve, fn, args } = this.queue.shift()
-  //     resolve(this.runTask(fn, args))
-  //   }
-  //   // 执行当前任务,任务执行后更新状态,主动拉取任务执行
-  //   runTask(fn, args) {
-  //     console.log(args);
-  //     const result = Promise.resolve(fn(...args))
-  //     result
-  //       .then(() => {
-  //         this.size--
-  //         this.pullTask()
-  //       })
-  //       .catch((err) => {
-  //         this.size--
-  //         this.pullTask()
-  //       })
-  //     return result
-  //   }
-  // }
-
-  const taskList = [1000, 3000, 200, 1300, 800, 2000]
-
-  // 需要队列
   class Queue {
     constructor() {
       this._queue = []
@@ -124,6 +59,7 @@
       return this._queue.length === 0
     }
   }
+
   class DelayedTask {
     constructor(resolve, fn, args) {
       this.resolve = resolve
@@ -133,71 +69,72 @@
   }
   class TaskPool {
     constructor(size) {
+      // 任务池工作状态
       this.size = size
-      // 需要一个队列存放任务
+      // 队列
       this.queue = new Queue()
     }
-    //  添加任务进任务池
+    /**
+     * 将新任务放入队列中,触发任务池检测机制,如果当前任务池不满的话,则从队列中取出任务放到任务池中执行
+     */
     addTask(fn, args) {
-      // this.queue.push()
       return new Promise((resolve) => {
-        // this.queue.push({
-        //   resolve,
-        //   fn,
-        //   args,
-        // })
         this.queue.push(new DelayedTask(resolve, fn, args))
         if (this.size) {
           this.size--
-          const { resolve: runResolve, fn, args } = this.queue.shift()
-          // this.runTask(this.queue.shift())
-          runResolve(this.runTask(fn, args))
+          const { resolve: taskResole, fn, args } = this.queue.shift()
+          taskResole(this.runTask(fn, args))
         }
       })
     }
-    // 主动拉取任务
+    // 如果当前队列不为空,任务池不满,主动执行任务
     pullTask() {
-      // 没有任务了
       if (this.queue.isEmpty()) return
-      // 没有空闲执行器
       if (this.size === 0) return
-
-      this.size++
-      const { resolve: runResolve, fn, args } = this.queue.shift()
-      runResolve(this.runTask(fn, args))
+      this.size--
+      const { resolve, fn, args } = this.queue.shift()
+      resolve(this.runTask(fn, args))
     }
-    // 执行任务
+    // 执行当前任务,任务执行后更新状态,主动拉取任务执行
     runTask(fn, args) {
-      let result = Promise.resolve(fn(...args))
+      const result = Promise.resolve(fn(...args))
       result
-        .then((resolve) => {
-          this.size--
+        .then(() => {
+          this.size++
           this.pullTask()
         })
         .catch((err) => {
-          this.size--
+          this.size++
           this.pullTask()
         })
       return result
     }
   }
 
+  const taskList = [3000, 200, 1000, 1300, 800, 2000]
+
+  // 需要队列
+
+
   const task = (timeout) =>
     new Promise((resolve) =>
-      // setTimeout(() => {
-      //   resolve(timeout)
-      // }, timeout)
-      {
+      setTimeout(() => {
         console.log(timeout)
-        return resolve(timeout)
-      }
+        resolve(timeout)
+      }, timeout)
+      // {
+      //   console.log(timeout)
+      //   return resolve(timeout)
+      // }
     )
   const cc = new TaskPool(2)
   // async function startNoConcurrentControl() {
   //   await Promise.all(taskList.map((item) => cc.addTask(task, [item])))
   // }
   async function start() {
+    console.time('aa');
     await Promise.all(taskList.map((i) => cc.addTask(task, [i])))
+    console.timeEnd('aa');
   }
   start()
 
@@ -289,7 +226,7 @@
         return fn.call(this, ...args)
       }
 
-      return (...innerArgs) => inner.call(this,...args,...innerArgs)
+      return (...innerArgs) => inner.call(this, ...args, ...innerArgs)
     }
     return inner
   }
@@ -299,7 +236,107 @@
   const f1 = curry(test)(1)(2)(3);
   console.log(f1);
   // pipe
-  const pipe = (...args) => x => args.reduce((v,fn)=>fn(v),x)
-  // call 
-  
+  const pipe = (...args) => x => args.reduce((v, fn) => fn(v), x)
+  //实现destructuringArray方法，达到如下效果
+  function destructuringArray(array, formatter) {
+    const parse = (str) => {
+      return JSON.parse(str.replace(/\w+/g, '"$&"'))
+    }
+    const formatterArr = parse(formatter)
+
+    const fn = (value, key, result = {}) => {
+      if (Array.isArray(key)) {
+        let newResult = { ...result }
+        key.forEach((i, index) => {
+          newResult = fn(value ? value[index] : undefined, i, newResult)
+        })
+        return newResult
+      }
+      return {
+        ...result,
+        [key]: value
+      }
+    }
+    return fn(array, parse(formatter))
+  }
+
+  // console.log(destructuringArray([1, [2, 4], 5], "[a ,[b],c,d]"));
+
+  // 深度对比两个对象是否相等
+  // const isEqual = function (oldData, newData) {
+  // const isEqual = (oldData, newData) => {
+  //   // 简单类型直接判断 或者指针一样
+  //   if (oldData === newData) return true
+  //   const args = Array.prototype.slice.call([oldData, newData])
+  //   // const args = Array.prototype.slice.call(arguments)
+  //   const objCall = (obj, string) => Object.prototype.toString.call(obj) === `[object ${string}]`
+  //   if (args.every(obj => objCall(obj, 'Object')) && Object.keys(oldData).length === Object.keys(newData).length) {
+  //     for (const key in oldData) {
+  //       //hasOwnProperty
+  //       if (oldData.hasOwnProperty(key) && !isEqual(oldData[key], newData[key])) {
+  //         return false
+  //       }
+  //     }
+  //   }
+  //   else if (args.every(obj => objCall(obj, 'Array')) && oldData.length === newData.length) {
+  //     for (const key in oldData) {
+  //       if (!isEqual(oldData[key], newData[key])) {
+  //         return false
+  //       }
+  //     }
+  //   } else {
+  //     return false
+  //   }
+  //   return true;
+  // }
+  const isEqual = (oldData, newData) => {
+    const oldKeys = Object.keys(oldData)
+    const newKeys = Object.keys(newData)
+    if (oldKeys.length !== newKeys.length) {
+      return false
+    } else {
+      for (const key in oldData) {
+        if (!newData.hasOwnProperty(key)) return false
+        // 类型相同
+        if (typeof oldData[key] === typeof newData[key]) {
+          // 都是引用类型
+          if (typeof oldData[key] === 'object') {
+            if (!isEqual(oldData[key], newData[key])) {
+              return false
+            }
+          }
+          if (typeof oldData[key] !== 'object' && oldData[key] !== newData[key]) {
+            return false
+          }
+
+        } else {
+          return false
+        }
+      }
+    }
+    return true
+  }
+  // console.log(isEqual({ a: 1, b: [1, 2], c: { d: 1 } }, { a: 1, b: [1, 2], c: { d: 1 } }), 'isEqual322');
+
+  // 合并有效数组
+  const merge = function (num1, m, num2, n) {
+    let len = m + n
+    while (m > 0 && n > 0) {
+      num1[--len] = num1[m - 1] > num2[n - 1] ? num1[--m] : num2[--n]
+    }
+    if (n > 0) {
+      num1.splice(0, n, ...num2.splice(0, n))
+    }
+  }
+  // 反转列表
+  var reverseList = function (head) {
+    let [p, cur] = [null, head]
+    //  链表的交换需要扩展一个指针 即next
+    // cur 当前项
+    // prev 上一项
+    while (cur) {
+      [cur.next, prev, cur] = [prev, cur, cur.next]
+    }
+    return prev
+  }
 </script>
