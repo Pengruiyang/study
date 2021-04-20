@@ -52,3 +52,8 @@
   缺点,可能随着业务复杂程度上升子函数判断更新条件也上升.
   ## 拆分Context,使其包裹最近的子组件
   缺点: 拆分太碎反而会导致应用难以维护
+
+# useState 调用流程
+首次渲染: useState => 通过 resolveDispatcher 获取 dispatcher => 调用 dispatcher.useState => 调用 mountState initState,通过单项链表形式互相串联.
+
+更新过程: useState => 通过 resolveDispatcher 获取 dispatcher => 调用 dispatcher.useState => 调用 updateState,按照之前构建好链表顺序去取出对应数据信息渲染 => updateReducer

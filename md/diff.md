@@ -95,3 +95,19 @@ DOM节点中跨层级移动操作比较少,react updateDepth对Virtual DOM进行
   lastPlacedIndex初始为 0,每遍历一个可复用节点,如果 oldIndex >= lastPlacedIndex,则lastPlacedIndex = oldIndex.
 
 
+```js
+// 之前
+abcd  
+// 之后
+dabc
+===第一轮遍历开始===
+d => a
+key 改变,不能复用
+===第一轮遍历结束===
+
+===第二轮遍历开始===
+newChildren === abcd
+oldFiber === dabc
+将 oldFiber(abcd)保存为
+
+```

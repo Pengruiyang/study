@@ -6,8 +6,10 @@
   render
   componentDidMount (commit 阶段)
   ## 更新阶段
+  componentWillReceiveProps(废弃)
   static getDevicedStateFromProps
   shouldComponentUpdate
+  compoentWillUpdate(废弃)
   render
   getSnapshotBeforeUpdate
   componentDidUpDate
@@ -231,3 +233,15 @@ setState 的异步整合,批量更新也是建立在钩子函数与合成事件�
 
 ## setState 异步
 同步执行,异步更新.但是react优化机制合并多个state.在原生事件和 setTimeout 中会同步更新,会把isBatchingUpdates 状态改为true进行同步更新
+# react 17 的变化
+  1. 重构 JSX 转换逻辑 不需要引入import React from 'react',编译器会自动帮我们引入.
+  2. 事件系统重构. 放弃使用 document 做事件的中心化管控.会挂载到 root 节点上. 放弃是坚持事件池,为每一个合成事件创建新的对象.
+  3. Lane模型(通过二进制数表示优先级)代替 expirationTime 模型(**通过时间长度描述优先级**).
+# 理解 React 中的 Transaction（事务） 机制
+Transaction 是创建一个黑盒,这个黑盒可以封装任何方法.将目标函数用 wrapper(一组 initalize 和 close 方法称为 wrapper)封装起来.同时需要用 Transaction 类暴露的 perform 方法执行他.如上注释所示,在 anyMethod 执行之前,perform 会先执行所有 wrapper 的 initialize 方法,执行完后,再执行 wrapper 中 close 方法.
+# 手写react
+## React.createElement
+  提取type、config、children 数组生成一个 ReactElement
+## ReactDOM.render
+虚拟 DOM转换成为真实 DOM.
+

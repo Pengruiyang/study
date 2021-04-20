@@ -367,3 +367,48 @@ rootFiber 开始向下深度优先遍历,为遍历到每个 Fiber 节点调用 b
 接着调用 completeWork 处理 Fiber 节点,当某个 Fiber 节点执行完 completeWork,如果存在兄弟节点,进入兄弟节点继续这个阶段,不存在则进入父级 Fiber 开始这个阶段知道 rootFiber.其中appendAllChildren 方法将已生成的子孙DOM节点插入当前生成的DOM节点下.存在effectTag的Fiber节点会被保存在effectList的单向链表中,在commit阶段只需要遍历effectList就可以执行所有的effect.
 
 ## commit阶段
+
+
+
+
+# fiber 常用函数
+
+## legacyCreateRootFromDOMContainer 
+创建出对象附加上一个 _internalRoot 属性,用于首次渲染给 fiberRoot
+## unbatchedUpdates
+传入回调函数,执行 updateContainer 方法
+## updataContainer
+请求当前 fiber 节点的优先级,根据优先级去创建 fiber 节点的 update 对象,将其入队列.调度当前节点 fiberRootde 更新.
+## performSyncWorkOnRoot(最新版使用 ReactDOM.createRoot(rootNode).render 则不会触发这个方法)
+执行根节点同步任务.performsSyncWorkOnRoot 是 render 阶段的起点.render 任务就是完成 Fiber 树的构建.在 ReactDOM.render 首次渲染链路中,执行这个方法.同步渲染
+
+## beginWork 负责创建新的 Fiber 节点
+根据 fiber 节点 tag 属性的不同,调用不同的节点创建函数.
+## completeWork 负责将 Fiber 节点映射为 DOM 节点
+
+## createWorkInProgress 传入现有树结构中的 rootFiber 对象
+workInProgress 是 createFiber 方法的返回值,workInProgress 和 current 的 alternate 属性都指向对方
+
+## workLoopSync 
+通过 while 循环反复判断 workInProgress 是否为空,并且在不为空的情况下对他执行 performUnitOfWork 函数.
+## performUnitOfWork
+触发对 beginWork 的调用,如果 beginWork 所创建的 Fiber 节点不为空个,则 performUnitOfWork 就会用这个新节点更新 workInProgress 的值.为下一次循环做准备.当 workInProgress 为空时,表明没有新节点可以创建,也就意味着完成对整颗 Fiber 树的构建.
+不同 Fiber节点通过 child、return、sibling 建立关系
+
+## reconcileChildren 生成当前节点子节点.
+根据 current 是否为 null ? moutChildFibers : reconcileChildFiber
+reconcileChildFibers = ChildReconciler(true)
+moutChildFibers = ChildReconciler(false)
+可见这两个方法实际上都是去调用 ChildReconciler 方法
+## ChildReconciler
+1. 通过入参shouldTrackSideEffects 处理副作用打上 tags (effectTag).渲染器执行时,也就是真实 DOM 渲染时告诉渲染器,**数据获取、订阅或者修改 DOM等操作**
+2. 对 Fiber 节点的创建、增加、删除、修改等操作.直接或间接的被 reconcileChildrenFibers 调用.
+3. ChildReconciler 返回一个 reconcileChildrenFibers 函数,根据入参不同,执行不同的 Fiber 节点操作,最终返回不同的目标 Fiber 节点.
+
+## reconcileChildrenFiber
+将子节点逻辑分发给 reconcileSingleElement,得到 App FiberNode.
+## reconcileSingleElement 
+
+## 调用placeSingleChild 给 App FiberNode 增加 tag 标识.
+App FiberNode 作为 rootFiber 的 child 属性,与现有 workInProgress Fiber 树建立关系.
+

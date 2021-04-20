@@ -2,7 +2,7 @@
 
 # Compiler 和 Compilation
 
-Compiler 对象是一个全局单例,负责把控整个 webpack 打包的构建流程.
+Compiler 对象是一个全局单例,负责把控整个 webpack 打包的构建流程.包含了 webpack 环境所有的配置信息,包括 options,loaders,plugins 这些项,这个对象在 webpack 启动被实例化.
 Compilation 对象是每一次构建的上下文对象,它包含了当次构件所需要的所有信息,每次热更新和重新构建,compiler 都会重新生成一个新的 compilation 对象,负责此次更新的构建过程.
 
 # webpack 编译机制

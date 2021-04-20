@@ -240,7 +240,9 @@ body 数组中存放的每一项都是一个对象,
 ---
 
 语法分析: _解析器_,将词法分析出来的数组转换成数的形式,同时验证语法.语法如果有错就抛出错误.
-
+## webpack 中转换成 AST
+webpack 和 rollup 都是通过 acorn 模块把源代码转换成抽象语法树 AST
+ <!-- acorn.parse -->
 ## AST 解析流程
 
 - esprima: code => ast 代码转 ast
