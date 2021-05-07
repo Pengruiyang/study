@@ -48,16 +48,16 @@ function compose(middlewares){
 const app = new Application()
 app.use(async (ctx, next) => {
   ctx.body = 'hello, one'
-  // await next()
-  // console.log(4);
+  await next()
+  console.log(4);
 })
 
-// app.use(async (ctx, next) => {
-//   ctx.body = 'hello, two'
-//   console.log(2);
-//   await next()
-//   console.log(3);
-// })
+app.use(async (ctx, next) => {
+  ctx.body = 'hello, two'
+  console.log(2);
+  await next()
+  console.log(3);
+})
 app.listen(3001,()=>{
   console.log(`启动了`);
 })

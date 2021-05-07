@@ -94,7 +94,8 @@ protected: 只允许定义的类和子类中访问,不允许通过实例访问
 # infer
 infer 关键字常在条件类型中和 extends 关键词一起出现,表示将要推断的类型,作为类型变量可以在三元表达式的 True 部分引用.
 ```ts
-  type ReturnType<T> = T extends (...arg:any) => infer R ? R : any
+  type ReturnType<T extends (...args:any[])> = T extends (...arg:any[]) => infer R ? R : any
+  type Parameters<T> = T extends (...args:infer P) => any ? P : never
 ```
 # types 和 typesRoots 有啥区别?
   1. typeRoots: 用来指定默认的类型声明文件查找路径,默认为 node_modules/@types

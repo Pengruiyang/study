@@ -108,6 +108,17 @@ key 改变,不能复用
 ===第二轮遍历开始===
 newChildren === abcd
 oldFiber === dabc
-将 oldFiber(abcd)保存为
+将 oldFiber(abcd)保存为map
+遍历 newChildren dabc
 
-```
+// 当前 oldFiber abcd
+// 当前 newFiber dabc
+key === d 在 oldFiber 存在
+oldIndex = d(oldFiber).index 中
+ oldIndex === 3  // oldFiber abcd 
+ lastPlaceIndex === 0;
+ oldIndex > lastPlaceIndex
+ lastPlaceIndex = oldIndex
+ d 节点位置不变
+ 继续剩下的 newChildren
+ ```

@@ -74,7 +74,7 @@ time slice 时间分片
 react16 之前 Reconcilation 是同步递归的去执行.递归其实很契合树形数据结构.但是这种方式不能随意中断\恢复\异步处理.
 所以需要改变 react 数据结构 模拟函数调用栈 之前递归处理的问题分解成增量的执行单元.
 目前结构是使用链表
-fiber 使用了双缓存技术,像 redux nextListener 一样,在当前 currt tree 构建一颗 workInProgress 树,新的 fiber 树上节点有个 alternate 属性,创建时会优先查找,没有就新创建一个,这两棵树上的 fiber 保持互相引用,把当前 currt tree 指向 workInProgress tree,旧的树作为新的 fiber 树预留空间,达到复用实例的过程.
+fiber 使用了双缓冲技术,像 redux nextListener 一样,在当前 currt tree 构建一颗 workInProgress 树,新的 fiber 树上节点有个 alternate 属性,创建时会优先查找,没有就新创建一个,这两棵树上的 fiber 保持互相引用,把当前 currt tree 指向 workInProgress tree,旧的树作为新的 fiber 树预留空间,达到复用实例的过程.
 
 currentFiber.alternate === workInProgressFiber
 workInProgressFiber.alternate === currentFiber;
@@ -370,14 +370,16 @@ rootFiber 开始向下深度优先遍历,为遍历到每个 Fiber 节点调用 b
 
 
 
-
+## workInProgress 和 current 树
+workInProgress 代表正在 render 的树.current 代表已经存在的树.
+组件挂载阶段时,current 树只有一个 rootFiber 节点.
 # fiber 常用函数
 
 ## legacyCreateRootFromDOMContainer 
 创建出对象附加上一个 _internalRoot 属性,用于首次渲染给 fiberRoot
 ## unbatchedUpdates
 传入回调函数,执行 updateContainer 方法
-## updataContainer
+## updateContainer
 请求当前 fiber 节点的优先级,根据优先级去创建 fiber 节点的 update 对象,将其入队列.调度当前节点 fiberRootde 更新.
 ## performSyncWorkOnRoot(最新版使用 ReactDOM.createRoot(rootNode).render 则不会触发这个方法)
 执行根节点同步任务.performsSyncWorkOnRoot 是 render 阶段的起点.render 任务就是完成 Fiber 树的构建.在 ReactDOM.render 首次渲染链路中,执行这个方法.同步渲染
@@ -392,9 +394,24 @@ workInProgress 是 createFiber 方法的返回值,workInProgress 和 current 的
 ## workLoopSync 
 通过 while 循环反复判断 workInProgress 是否为空,并且在不为空的情况下对他执行 performUnitOfWork 函数.
 ## performUnitOfWork
-触发对 beginWork 的调用,如果 beginWork 所创建的 Fiber 节点不为空个,则 performUnitOfWork 就会用这个新节点更新 workInProgress 的值.为下一次循环做准备.当 workInProgress 为空时,表明没有新节点可以创建,也就意味着完成对整颗 Fiber 树的构建.
+触发对 beginWork 的调用,如果 beginWork 所创建的 Fiber 节点不为空,则 performUnitOfWork 就会用这个新节点更新 workInProgress 的值.为下一次循环做准备.当 workInProgress 为空时,表明没有新节点可以创建,也就意味着完成对整颗 Fiber 树的构建.
 不同 Fiber节点通过 child、return、sibling 建立关系
 
+## beginWork
+通过获取 workInProgress 的 lanes(优先级)判断是否为空去判断这个节点是否需要更新.
+通过 current 是否存在判断是否首次挂载还是后续更新.
+能复用 Fiber 节点就是拦截.
+返回当前节点的子节点,以这个子节点作为下一个工作单元继续 beginWork,不断往下生成 fiber 节点,构建 workInProgress 树.返回 null 代表 fiber 子树遍历完成.从当前子节点往回进行 completeWork.
+## completeUnitOfWork
+用于发起 completeWork 的中间人,在 performUnitOfWork 中被调用,performUnitOfWork 会尝试调用 beginWork 来创建当前子节点.如果创建子节点为空(当前节点不存在子 Fiber 节点),说明当前节点是一个叶子节点.遍历到叶子节点时,"递"阶段结束.调用 completeUnitOfWork,执行当前节点对应的 completeWork 工作.
+将当前节点的副作用链.插入其父节点对应的副作用链中.
+### 副作用链 
+  commit 只实现更新,而不负责寻找更新.这个时候就需要副作用链(EffectList)
+  每个 fiber 节点都维护者属于自己的 EffectList,链表内每一个元素都是 Fiber节点.这些 Fiber 节点需要满足 **都是当前 Fiber节点的后代节点和都有待处理的副作用**
+## completeWork
+根据 workInProgress 节点的 tag 属性不同,进入不同的 DOM节点创建、处理逻辑.
+创建 DOM 节点,插入到 DOM 树中,为 DOM 节点设置属性.
+创建好的 DOM 节点会被赋值给 workInProgress 节点的 stateNode 属性.子节点创建好了父节点未创建的情况,会等到父节点进入 appendAllChildren 逻辑后,逐个向下查找并添加自己的后代节点.
 ## reconcileChildren 生成当前节点子节点.
 根据 current 是否为 null ? moutChildFibers : reconcileChildFiber
 reconcileChildFibers = ChildReconciler(true)
@@ -405,10 +422,11 @@ moutChildFibers = ChildReconciler(false)
 2. 对 Fiber 节点的创建、增加、删除、修改等操作.直接或间接的被 reconcileChildrenFibers 调用.
 3. ChildReconciler 返回一个 reconcileChildrenFibers 函数,根据入参不同,执行不同的 Fiber 节点操作,最终返回不同的目标 Fiber 节点.
 
-## reconcileChildrenFiber
+## reconcileChildFibers
 将子节点逻辑分发给 reconcileSingleElement,得到 App FiberNode.
 ## reconcileSingleElement 
-
+reconcileSingleElement 将基于 rootFiber 子节点的 ReactElement 对象信息，创建其对应的 FiberNode。
 ## 调用placeSingleChild 给 App FiberNode 增加 tag 标识.
 App FiberNode 作为 rootFiber 的 child 属性,与现有 workInProgress Fiber 树建立关系.
+
 

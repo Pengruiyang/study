@@ -443,8 +443,146 @@
       console.log(this.name + '收到' + targerType + '类型更新的消息！')
     }
   }
-  let phonePublish01 = new Publisher()
+  let phonePublish01 = new Publish()
   // phonePublish01.addObserver('小米12', new Observer('订阅者01'))
   // phonePublish01.addObserver('红米12', new Observer('订阅者02'))
   // phonePublish01.publish('小米12', '黑色款小米12')
+
+  // sleep 实现
+  function sleep(delay) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve()
+      }, delay * 1000)
+    })
+  }
+  // Parameters
+  // type Parameters<T extends (...args:any)=>any> = T extends (...args: infer P) =>any ? P :never
+
+  var searchRange = function (nums, target) {
+    const binarySearch = (nums, target, isLeft) => {
+      let left = 0,
+        right = nums.length - 1,
+        ans = nums.length
+      while (left <= right) {
+        const mid = Math.floor((left + right) / 2)
+        if (nums[mid] > target || (isLeft && nums[mid] >= target)) {
+          right = mid - 1
+          ans = mid
+        } else {
+          left = mid + 1
+        }
+      }
+      return ans
+    }
+    console.log(nums, 'nums')
+    let ans = [-1, -1]
+    let leftIndex = binarySearch(nums, target, true)
+    let rightIndex = binarySearch(nums, target, false) - 1
+    console.log(leftIndex, 'leftIndex')
+    console.log(rightIndex, 'rightIndex')
+    if (
+      leftIndex <= rightIndex &&
+      rightIndex < nums.length &&
+      nums[leftIndex] === target &&
+      nums[rightIndex] === target
+    ) {
+      ans = [leftIndex, rightIndex]
+    }
+    return ans
+  }
+  // searchRange([5,7,8,8,9],7)
+
+  // 模板字符串实现
+  const strModal = (str) => {
+    let reg = /\$\{(\w+)\}/g
+    str = str.replace(reg, function (x, y) {
+      console.log(x, 'x')
+      console.log(y, 'y')
+      return eval(y)
+    })
+    return str
+  }
+  let name = '长城软件',
+    age = 40
+  let str = 'hello~~${name}风风雨雨走过了${age}载'
+  // strModal(str)
+  // co 函数实现
+  function coSimple(gen, ...args) {
+    gen = gen.apply(this,args)
+    return new Promise((resolve,reject) => {
+      // 初始化入口函数
+      onFulfilled()
+      // 成功状态下回调
+      function onFulfilled(res){
+        // 拿到第一次 yeid
+        const ret = gen.next(res)
+        next(ret)
+      }
+      function onRejected(err){
+        const ret = gen.throw(err)
+        next(ret)
+      }
+      function next(ret){
+        const promise = ret.value
+        promise && promise.then(onFulfilled,onRejected)
+      }
+    })
+  }
+
+
+
+  // 洋葱模型核心 compose
+  function compose(middlewares) {
+    return (ctx) => {
+      const dispatch = (i) => {
+        const middleware = middlewares[i]
+        if (i === middlewares.length) {
+          return
+        }
+        return middleware(ctx, () => dispatch(i + 1))
+      }
+      dispatch(0)
+    }
+  }
+
+
+
+  // 随机的取出 m 个 数
+
+  function getRandomArrayElements(arr, count) {
+    let newArr = arr.slice(0),
+    length = arr.length,
+    min = length - count,
+    temp,
+    index = 0
+    while(length-- > min){
+      index = Math.floor((length + 1) * Math.random())
+      temp = newArr[index]
+      newArr[index] = newArr[length]
+      newArr[length] = temp
+    }
+    return newArr.slice(min)
+  }
+
+  var items = ['1', '2', '4', '5', '6', '7', '8', '9', '10']
+
+  // console.log(getRandomArrayElements(items, 4))
+
+  // 快排
+  function quickSort(arr){
+    if(arr.length < 2) return arr
+    let middleIndex = Math.floor(arr.length / 2)
+    let middle = arr.splice(middleIndex,1)
+    let left = [],right = []
+    for(let i =0;i<arr.length;i++){
+      if(arr[i]<middle){
+        left.push(arr[i])
+      }else{
+        right.push(arr[i])
+      }
+    }
+    return quickSort(left).concat(middle,quickSort(right))
+  }
+  //实现一个 useState
 </script>

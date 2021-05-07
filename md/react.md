@@ -41,13 +41,30 @@ vue 设计思想就是简单地使用,而 react 是正确的去应用.
   维护了一个 map 表,跨浏览器包装了所有原生事件,并且提供了和原生事件相同的接口.需要 event.nativeEvent.
   SyntheticEvent是合并而来.维护了一个事件池,代表这这个对象会被复用.所以为了安全考虑不支持异步访问事件.可以通过event.persist()变成异步访问可以获取到
 
+当事件在具体的 DOM 节点上被出发后,最终都会冒泡到 document 上.document 上所绑定的统一事件处理程序会将事件分发到具体的组件实例上.
+在事件分发前,React 会对事件进行包装,把原生的 DOM 事件包装成合成事件.
+## react 合成事件
+  底层做了不同浏览器的兼容,上层统一面相开发者暴露 接口.
+## react 事件系统工作流拆解
+### 事件的绑定  
+在挂载阶段完成的(**completeWork**).compl 会创建 DOM 节点,插入到 DOM 树种,为 DOM 节点设置属性.在设置属性的环节中,遍历 FiberNode 的 props key 时,发现和事件相关的 api,触发事件的注册链路.
+ensureListeningTo 进入事件监听的注册流程 => legacyListenToTopLevelEvent 分发事件监听的注册逻辑 => 判断捕获还是冒泡 => addTrappedEventListener 将事件注册到 document 上.
+在legacyListenToTopLevelEvent维护了一个 listenerMap 数据结构,缓存当前 document 监听了哪些事件.这样,react 项目中多次调用了对同一个事件的监听,也只会在 document 上注册一次.
+
+### 事件的触发
+通过 dispatchEvent 函数分发事件.
+目标触发,冒泡至 document => 执行 dispatchEvent => 创建时间对应的合成事件对象 SyntheticEvent => 收集事件在捕获阶段的回调和对应的节点实例 =>收集事件在冒泡阶段的回调和对应的节点实例 => 将前两步收集来的回调按顺序执行,执行时 SyntheticEvent 会作为入参传入回调中.
+
+####事件回调的收集和执行
+通过 traverseTwoPhase 函数.以当前触发事件的目标节点为起点,不断向上寻找符合原生 DOM 元素节点的
+父节点,存入 path 数组.
+traverseTwoPhase 模拟事件的冒泡、冒泡顺序.两次循环时对应的回调和实例
 # react中diff算法  
   ## react diff 策略
   1.tree diff: 对比新旧节点 只会在同级对比,不会跨层级比较
   2.component diff: 拥有相同类的组件会生成相似的树结构,拥有不同类的组件会判定为脏组件,直接删除或者创建新组件.
   3.element diff: 对于同一层的子节点,通过唯一 key 去判断.
 
-  ## 算法核心
 
 # 为什么要在componentDidMount阶段请求数据
   这个生命周期会在组件挂载后(插入 dom 树中)立刻调用.这里触发的渲染不会发生在浏览器更新屏幕前,
@@ -239,9 +256,32 @@ setState 的异步整合,批量更新也是建立在钩子函数与合成事件�
   3. Lane模型(通过二进制数表示优先级)代替 expirationTime 模型(**通过时间长度描述优先级**).
 # 理解 React 中的 Transaction（事务） 机制
 Transaction 是创建一个黑盒,这个黑盒可以封装任何方法.将目标函数用 wrapper(一组 initalize 和 close 方法称为 wrapper)封装起来.同时需要用 Transaction 类暴露的 perform 方法执行他.如上注释所示,在 anyMethod 执行之前,perform 会先执行所有 wrapper 的 initialize 方法,执行完后,再执行 wrapper 中 close 方法.
+
+# react 手动批量更新方法
+   unstable_batchedUpdates(()=>{
+
+   }) 
+
+# react 更新链路要素拆解
+  挂载和ReactDOM.render、setState 一样会触发更新.通过 update 对象进入同一套更新工作流.
+  ## update 创建
+  触发 dispatchAction 
+
+# 时间切片的实现
+通过 performance.now 获取当前时间,对比到期时间 deadline.
+react 根据浏览器帧率性能,计算时间切片长度的大小,结合当前时间计算出一个切片到期时间.每次执行函数workLoopConcurrent 时,查询切片时间是否过期,到期 就结束循环,让出主线程控制权.
 # 手写react
 ## React.createElement
-  提取type、config、children 数组生成一个 ReactElement
+  提取type、config、children 数组生成一个 ReactElement.
 ## ReactDOM.render
 虚拟 DOM转换成为真实 DOM.
+### createReactUnit
+根据不同类型生成不同的单元.
+分为文本、原生标签、react 组件
+原生组件需要考虑到事件的绑定.
+react 组件挂载当前生命周期,其中插入 render 方法,转成原生组件
+
+# useRef 和 createRef 的区别 
+useRef 每次都会返回相同的引用
+createRef 每次都会返回一个新的引用
 
