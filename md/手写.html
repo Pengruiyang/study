@@ -211,9 +211,10 @@
     return ret instanceof Object ? ret : obj
   }
   // bind
-  const myBind = (ctx, ...args) => {
-    return (...nextCtx) => {
-      this.call(ctx, ...args, ...nextCtx)
+
+  const myBind = (ctx,...args) => {
+    return (...nextArgs) => {
+      this.call(ctx,...args,...nextArgs)
     }
   }
   // curry
@@ -509,28 +510,26 @@
   // strModal(str)
   // co 函数实现
   function coSimple(gen, ...args) {
-    gen = gen.apply(this,args)
-    return new Promise((resolve,reject) => {
+    gen = gen.apply(this, args)
+    return new Promise((resolve, reject) => {
       // 初始化入口函数
       onFulfilled()
       // 成功状态下回调
-      function onFulfilled(res){
+      function onFulfilled(res) {
         // 拿到第一次 yeid
         const ret = gen.next(res)
         next(ret)
       }
-      function onRejected(err){
+      function onRejected(err) {
         const ret = gen.throw(err)
         next(ret)
       }
-      function next(ret){
+      function next(ret) {
         const promise = ret.value
-        promise && promise.then(onFulfilled,onRejected)
+        promise && promise.then(onFulfilled, onRejected)
       }
     })
   }
-
-
 
   // 洋葱模型核心 compose
   function compose(middlewares) {
@@ -546,17 +545,15 @@
     }
   }
 
-
-
   // 随机的取出 m 个 数
 
   function getRandomArrayElements(arr, count) {
     let newArr = arr.slice(0),
-    length = arr.length,
-    min = length - count,
-    temp,
-    index = 0
-    while(length-- > min){
+      length = arr.length,
+      min = length - count,
+      temp,
+      index = 0
+    while (length-- > min) {
       index = Math.floor((length + 1) * Math.random())
       temp = newArr[index]
       newArr[index] = newArr[length]
@@ -570,19 +567,42 @@
   // console.log(getRandomArrayElements(items, 4))
 
   // 快排
-  function quickSort(arr){
-    if(arr.length < 2) return arr
+  function quickSort(arr) {
+    if (arr.length < 2) return arr
     let middleIndex = Math.floor(arr.length / 2)
-    let middle = arr.splice(middleIndex,1)
-    let left = [],right = []
-    for(let i =0;i<arr.length;i++){
-      if(arr[i]<middle){
+    let middle = arr.splice(middleIndex, 1)
+    let left = [],
+      right = []
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i] < middle) {
         left.push(arr[i])
-      }else{
+      } else {
         right.push(arr[i])
       }
     }
-    return quickSort(left).concat(middle,quickSort(right))
+    return quickSort(left).concat(middle, quickSort(right))
+  }
+  // 节流
+  function throttle(fn, time) {
+    let flag = true,
+      timer = null
+    return (...args) => {
+      if (!flag) return
+      flag = false
+      setTimeout(() => {
+        fn.apply(this, args)
+      }, time)
+    }
+  }
+  // 防抖
+  function debounce(fn, time) {
+    let timer = null
+    return (...args) => {
+      if (timer) clearTimeout(timer)
+      timer = setTimeout(() => {
+        fn.apply(this, args)
+      }, time)
+    }
   }
   //实现一个 useState
 </script>
