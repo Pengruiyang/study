@@ -81,7 +81,7 @@ traverseTwoPhase 模拟事件的冒泡、冒泡顺序.两次循环时对应的�
   ##  容器组件
   用来处理获取数据 订阅 redux 存储等的组件.包含展示组件和其他容器组件,
   ## 高阶组件HOC
-  将其他组件作为参数生成一个新的组件.Redux connect 就是高阶组件示例
+  将其他组件作为参数生成一个新的组件.例如 memo、connect、withRouter
 # redux 工作原理
 Redux 是一个状态管理库,简化了单项数据流,实现了多组件通信.
   redux 分为四个模块
@@ -250,9 +250,13 @@ setState 的异步整合,批量更新也是建立在钩子函数与合成事件�
 
 ## setState 异步
 同步执行,异步更新.但是react优化机制合并多个state.在原生事件和 setTimeout 中会同步更新,会把isBatchingUpdates 状态改为true进行同步更新
+# 事件触发
+1. 通过统一的事件处理函数.dispatchEvent 进行批量更新 batchUpdate.
+2. 执行事件对应的处理插件中 extractEvents,合成事件源对象,每次 react 会从事件源开始,从上遍历类型为 hostComponent 即 fiber 是 dom 类型的,判断 props中是否有当前事件如 onClick,最终形成一个事件执行队列,react 就用这个队列模拟 捕获 => 源 => 冒泡这一阶段.
+3. 最后通过 runEventsInBatch 执行事件队列,发现阻止冒泡,立刻 break 跳出循环,最后重置事件源,放回事件池中,完成整个流程.
 # react 17 的变化
   1. 重构 JSX 转换逻辑 不需要引入import React from 'react',编译器会自动帮我们引入.
-  2. 事件系统重构. 放弃使用 document 做事件的中心化管控.会挂载到 root 节点上. 放弃是坚持事件池,为每一个合成事件创建新的对象.
+  2. 事件系统重构. 放弃使用 document 做事件的中心化管控.会挂载到 root 节点上. 取消事件池复用,为每一个合成事件创建新的对象.
   3. Lane模型(通过二进制数表示优先级)代替 expirationTime 模型(**通过时间长度描述优先级**).
 # 理解 React 中的 Transaction（事务） 机制
 Transaction 是创建一个黑盒,这个黑盒可以封装任何方法.将目标函数用 wrapper(一组 initalize 和 close 方法称为 wrapper)封装起来.同时需要用 Transaction 类暴露的 perform 方法执行他.如上注释所示,在 anyMethod 执行之前,perform 会先执行所有 wrapper 的 initialize 方法,执行完后,再执行 wrapper 中 close 方法.
@@ -281,7 +285,14 @@ react 根据浏览器帧率性能,计算时间切片长度的大小,结合当前
 原生组件需要考虑到事件的绑定.
 react 组件挂载当前生命周期,其中插入 render 方法,转成原生组件
 
+# react常用工具函数
+## cloneElement react-router 中 Switch 组价
 # useRef 和 createRef 的区别 
 useRef 每次都会返回相同的引用
 createRef 每次都会返回一个新的引用
+
+# Profiler
+用于开发阶段新能检测,检测一侧 react 组件渲染用时,性能开销.
+需要两个参数,一个是 id,用于标识唯一的 profile .onRender回调函数,用于渲染完成,接受渲染参数.
+
 

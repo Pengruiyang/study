@@ -60,9 +60,9 @@ awesome-typescript-loader
 
 ### Loader 原理:
 
-    Loader 支持链式调用,所以开发上需要严格遵循"单一职责",每个 loader 只负责自己的事情.
+Loader 支持链式调用,所以开发上需要严格遵循"单一职责",每个 loader 只负责自己的事情.
 
-常用 plugin
+### 常用 plugin
 web-webpack-plugin 单页应用输出
 mini-css-extract-plufin fenlicss 文件
 clean-webpack-plugin 目录清理

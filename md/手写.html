@@ -159,6 +159,15 @@
     this.errHandles.push(func)
     return this
   }
+  Promise.resolve = function (value) {
+    if (value instanceof Promise) {
+      return value
+    }
+    return new Promise((resolve) => resolve(value))
+  }
+  Promise.reject = function (reason) {
+    return new Promise((resolve, reject) => reject(reason))
+  }
   Promise1.all = (promises) => {
     return new Promise1((resolve, reject) => {
       let len = promises.length
@@ -179,6 +188,163 @@
     return new Promise1((resolve, reject) => {
       promises.forEach((promise) => promise.then(resolve, reject))
     })
+  }
+  Promise1.allSettled = function (promises) {
+    let result = []
+    return new Promise((resolve, reject) => {
+      promises.forEach((promise, i) => {
+        Promise.resolve(promise).then((val) => {
+          result.push({
+            status: FULFILLED,
+            value: val,
+          })
+          if(result.length === promises.length){
+            resolve(result)
+          }
+        },err => {
+          result.push({
+            status: REJECTED,
+            reason: err
+          })
+          if(result.length === promises.length){
+            resolve(result)
+          }
+        })
+      })
+    })
+  }
+
+  // 符合Promise A+ 规范
+  const PENDING = 'pengding'
+  const FULFILLED = 'fulfilled'
+  const REJECTED = 'rejected'
+  class Promise {
+    constructor(executor) {
+      this.status = PENDING
+      this.value = undefined
+      this.reason = undefined
+      this.onResolvedCallback = []
+      this.onRejectedCallback = []
+      let resolve = (value) => {
+        if (this.status === PENDING) {
+          this.status = FULFILLED
+          this.value = value
+          this.onResolvedCallback.forEach((fn) => fn())
+        }
+      }
+      let reject = (reason) => {
+        if (this.status === PENDING) {
+          this.status = REJECTED
+          this.reason = reason
+          this.onRejectedCallback.forEach((fn) => fn())
+        }
+      }
+      try {
+        executor(resolve, reject)
+      } catch (error) {
+        reject(error)
+      }
+    }
+    then(onFulfilled, onRejected) {
+      // 处理 onFulfilled onRejected 没有传值问题
+      onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : (v) => v
+      // 错误值传递让后面访问到,抛出错误
+      onRejected =
+        typeof onRejected === 'function'
+          ? onRejected
+          : (err) => {
+              throw err
+            }
+
+      // 每次调用 then 都会返回一个 新的 promise
+      let promise2 = new Promise((resolve, reject) => {
+        if (this.status === FULFILLED) {
+          setTimeout(() => {
+            try {
+              let x = onFulfilled(this.value)
+              // x 可能是一个 promise
+              resolvePromise(promise2, x, resolve, reject)
+            } catch (error) {
+              reject(error)
+            }
+          }, 0)
+        }
+        if (this.status === REJECTED) {
+          setTimeout(() => {
+            try {
+              let x = onRejected(this.reason)
+              resolvePromise(promise2, x, resolve, reject)
+            } catch (error) {
+              reject(error)
+            }
+          }, 0)
+        }
+        if (this.status === PENDING) {
+          this.onResolvedCallback.push(() => {
+            setTimeout(() => {
+              try {
+                let x = onFulfilled(this.value)
+                resolvePromise(promise2, x, resolve, rejected)
+              } catch (error) {
+                reject(error)
+              }
+            }, 0)
+          })
+          this.onRejectedCallback.push(() => {
+            setTimeout(() => {
+              try {
+                let x = onRejected(this.reason)
+                resolvePromise(promise2, x, resolve, rejected)
+              } catch (error) {}
+            }, 0)
+          })
+        }
+      })
+      return promise2
+    }
+  }
+  const resolvePromise = (promise2, x, resolve, reject) => {
+    // 自己等待自己完成是错误的实现，用一个类型错误，结束掉 promise  Promise/A+ 2.3.1
+    if (promise2 === x) {
+      return reject(new TypeError('console.error();'))
+    }
+    // 只调用一次
+    let called
+    // 后续条件严格判断
+    if ((typeof x === 'object' && x != null) || typeof x === 'function') {
+      try {
+        // resolve 之后不再 reject
+        let then = x.then
+        if (typeof then === 'function') {
+          //
+          then.call(
+            x,
+            (y) => {
+              // 根据 promise 状态决定成功还是失败
+              if (called) return
+              called = true
+              // 递归解析值
+              resolvePromise(promise2, y, resolve, reject)
+            },
+            (r) => {
+              // 失败了就失败
+              if (called) return
+              called = true
+              reject(r)
+            }
+          )
+        } else {
+          // 普通值直接返回
+          resolve(x)
+        }
+      } catch (error) {
+        if (called) return
+        called = true
+        reject(error)
+      }
+    } else {
+      resolve(x)
+    }
   }
 
   // 继承
@@ -212,10 +378,60 @@
   }
   // bind
 
-  const myBind = (ctx,...args) => {
+  const myBind = (ctx, ...args) => {
     return (...nextArgs) => {
-      this.call(ctx,...args,...nextArgs)
+      this.call(ctx, ...args, ...nextArgs)
     }
+  }
+  // instanceOf
+
+  function instanceOf(left, right) {
+    let proto = left.__proto__
+    while (true) {
+      if (proto === null) return false
+      if (proto === right.prototype) {
+        return true
+      }
+      proto = proto.__proto__
+    }
+  }
+  // create
+  Object.create2 = function (proto, propertyObject = undefined) {
+    if (typeof proto !== 'object' && typeof proto != 'function') {
+      throw new TypeError('Object prototype may only be an Object or null')
+    }
+    if (propertyObject === null) {
+      new TypeError('Cannot convert undefined or null to object')
+    }
+    function F() {}
+    F.prototype = proto
+    const obj = new F()
+    if (propertyObject != undefined) {
+      Object.defineProperties(obj, propertyObject)
+    }
+    if (proto === null) {
+      // 创建一个没有原型对象的对象 Object.create(null)
+      obj.__proto__ = null
+    }
+    return obj
+  }
+  // assign
+
+  Object.assign2 = function (target, ...source) {
+    if (target === null) {
+      throw new TypeError('Cannot convert undefined or null to object')
+    }
+    let ret = Object(target)
+    source.forEach(function (obj) {
+      if (obj != null) {
+        for (let key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            ret[key] = obj[key]
+          }
+        }
+      }
+    })
+    return ret
   }
   // curry
   function curry(fn) {
@@ -235,7 +451,10 @@
   const f1 = curry(test)(1)(2)(3)
   console.log(f1)
   // pipe
-  const pipe = (...args) => (x) => args.reduce((v, fn) => fn(v), x)
+  const pipe =
+    (...args) =>
+    (x) =>
+      args.reduce((v, fn) => fn(v), x)
   //实现destructuringArray方法，达到如下效果
   function destructuringArray(array, formatter) {
     const parse = (str) => {
@@ -605,4 +824,60 @@
     }
   }
   //实现一个 useState
+  const createUseState = () => {
+    const state = [],
+      index = 0
+    return (initialValue) => {
+      state[index] = state[index] ?? initialValue
+      const currentIndex = index
+      const dispatch = (newState) => {
+        state[currentIndex] = newState
+        index = 0
+        render()
+      }
+      return [state[index++], dispatch]
+    }
+  }
+  // 千分位
+  var thousandSeparator = function (n) {
+    let reg = /(?!^)(?=(\d{3})+$)/g
+    return String(n).replace(reg, ',')
+  }
+  // console.log(thousandSeparator(123456789));
+
+  /**
+   * call方法
+   */
+  Function.prototype.call2 = function (context) {
+    var context = context || window
+    context.fn = this
+    var args = [],
+      len = [...arguments].length
+    for (var i = 1; i < len; i++) {
+      args.push(`arguments[${i}]`)
+    }
+    var result = eval(`context.fn(${args})`)
+    delete context.fn
+    return result
+  }
+  /**
+   * apply
+   */
+
+  Function.prototype.apply2 = function (context, arr) {
+    var context = context || window
+    context.fn = this
+    var result
+    if (!arr) {
+      result = context.fn()
+    } else {
+      let args = []
+      for (var i = 0; i > arr.length; i++) {
+        args.push(`arr[${i}]`)
+      }
+      result = eval(`context.fn(${args})`)
+    }
+    delete context.fn
+    return result
+  }
 </script>

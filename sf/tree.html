@@ -209,8 +209,26 @@
     }
     return result
   };
-  // 重建二叉树
-
+  // 多叉树查找
+  const  traverseTree3 = (node) => {
+    if(!node) return
+    // 用于存放所有待处理的节点
+    let stack = []
+    // 存放遍历后的结果
+    let arr = []
+    // 当前正在处理的节点
+    let temp
+    
+    stack.push(node)
+    while(stack.length){
+      temp = stack.shift()
+      arr.push(temp.name)
+      if(temp.children && temp.children.length){
+        temp.children.map( child => stack.push(child))
+      }
+    }
+    return arr
+  }
 
 
 

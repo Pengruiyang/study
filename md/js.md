@@ -60,8 +60,11 @@ Child.myMethod(1) // static 1
 var child = new Child()
 child.myMethod(2) // instance 2
 ```
-# 如果一个构造函数，bind了一个对象，用这个构造函数创建出的实例会继承这个对象的属性吗？
-不能,new绑定优先级高于bind.通过new创建的新对象会代替bind的对象绑定,作为这个函数的this.如果此函数没有返回对象的情况下,返回这个新建的函数
+
+# 如果一个构造函数，bind 了一个对象，用这个构造函数创建出的实例会继承这个对象的属性吗？
+
+不能,new 绑定优先级高于 bind.通过 new 创建的新对象会代替 bind 的对象绑定,作为这个函数的 this.如果此函数没有返回对象的情况下,返回这个新建的函数
+
 # 前端路由原理
 
 1.通过 Hash 实现前端路由
@@ -73,8 +76,8 @@ replaceState
 
 # script 标签中的 async 和 defer
 
-defer: **依赖其他脚本和DOM结果**浏览器异步下载该文件并且不会影响到后续的 DOM 渲染,如果有多个设置 defer 的 script 标签,则会按照顺序执行所有的 script.defer 会在文档渲染完毕后,DOMContentLoaded 事件调用前执行.
-async: **DOM和其他脚本依赖不强**会使 script 脚本异步加载并在允许的情况下执行. async 的执行,并不会按着 script 在页面中的顺序来执行,而是看谁先加载完谁执行.
+defer: **依赖其他脚本和 DOM 结果**浏览器异步下载该文件并且不会影响到后续的 DOM 渲染,如果有多个设置 defer 的 script 标签,则会按照顺序执行所有的 script.defer 会在文档渲染完毕后,DOMContentLoaded 事件调用前执行.
+async: **DOM 和其他脚本依赖不强**会使 script 脚本异步加载并在允许的情况下执行. async 的执行,并不会按着 script 在页面中的顺序来执行,而是看谁先加载完谁执行.
 
 # 工作中封装组件
 
@@ -98,23 +101,28 @@ key 值,state 维护消息数组,添加消息和移除消息,设置消息的 key
 箭头函数都是匿名函数,没有自己的 this,this 在创建是绑定当前的上下文.没有 arguments 对象,不能被 new ,没有自己的原型属性.
 
 # 原型和原型链
-  js 中引用类型都是对象,每个对象都有原型,而原型也是对象,也有自己的原型,一层一层,组成原型链.
-  原型链存在的意思就是基层,可以在对象中访问其他对象中的属性
+
+js 中引用类型都是对象,每个对象都有原型,而原型也是对象,也有自己的原型,一层一层,组成原型链.
+原型链存在的意思就是基层,可以在对象中访问其他对象中的属性
+
 # instanceof 原理
-右边变量的prototype(原型对象 )在左边变量的原型链上能找到即可
+
+右边变量的 prototype(原型对象 )在左边变量的原型链上能找到即可
+
 ```js
-  function newInstanceof(l,r){
-    let rightProtoType = r.prototype,leftValue = l.__proto__
-    while(true){
-      if(leftValue === null){
-        return false
-      }
-      if(leftValue === rightProtoType){
-        return true 
-      }
-      leftValue = leftValue.__proto__
+function newInstanceof(l, r) {
+  let rightProtoType = r.prototype,
+    leftValue = l.__proto__
+  while (true) {
+    if (leftValue === null) {
+      return false
     }
+    if (leftValue === rightProtoType) {
+      return true
+    }
+    leftValue = leftValue.__proto__
   }
+}
 ```
 
 # 项目优化
@@ -132,10 +140,8 @@ http 请求抛出
 
 # 重绘重排合成之间的区别
 
-_重绘不一定导致重排,重排一定导致重绘_ 
-1.重排: dom 发生了几何元素的修改,整个渲染树需要重新计算.
-触发方式: 页面首次渲染、浏览器窗口改变、元素位置尺寸改变、新增删除可见元素、内容发生改变、字体变化、伪类激活、设置 style 属性、查询或调用某些方法*即时性与准确性* getComputedStyle | IE 中的 currentStyle 也会触发重排 
-2.重绘: dom 元素只发生了可见不见,背景颜色之类的变更,没有发生几何元素上的修改.
+_重绘不一定导致重排,重排一定导致重绘_ 1.重排: dom 发生了几何元素的修改,整个渲染树需要重新计算.
+触发方式: 页面首次渲染、浏览器窗口改变、元素位置尺寸改变、新增删除可见元素、内容发生改变、字体变化、伪类激活、设置 style 属性、查询或调用某些方法*即时性与准确性* getComputedStyle | IE 中的 currentStyle 也会触发重排 2.重绘: dom 元素只发生了可见不见,背景颜色之类的变更,没有发生几何元素上的修改.
 
 ```js
 div.style.left = '10px'
@@ -241,7 +247,43 @@ state = {
 1. 独一无二的变量防止命名冲突
 2. 不会被常规方法遍历到模拟私有变量
 3. 听遍历接口,只有存在 symbol.iterator 的对象才可以被遍历到
-4. 注册和获取全局Symbol
+4. 注册和获取全局 Symbol
+
+# hasOwnProperty 检测一个属性是否是自有属性
+
+```js
+function F() {
+  //自定义数据类型
+  this.name = '自有属性'
+}
+F.prototype.name = '继承属性'
+var d = Date
+console.log(d.hasOwnProperty('toString')) //返回false，说明toString()是Date的自有属性
+var d = Date.prototype
+console.log(d.hasOwnProperty('toString')) //返回true，说明toString()是Date.prototype属性
+var o = {
+  //对象直接量
+  o1: {
+    //子对象直接量
+    o2: {
+      //孙子对象直接量
+      name: 1, //孙子对象直接量的属性
+    },
+  },
+}
+console.log(o.hasOwnProperty('o1')) //返回true，说明o1是o的自有属性
+console.log(o.hasOwnProperty('o2')) //返回false，说明o2不是o的自有属性
+console.log(o.o1.hasOwnProperty('o2')) //返回true，说明o2是o1的自有属性
+console.log(o.o1.hasOwnProperty('name')) //返回false，说明name不是o1的自有属性
+console.log(o.o1.hasOwnProperty('name')) //返回true，说明name不是o2的自有属性
+```
+# Object.create
+Object.create把现有对象的属性,挂到新建对象的原型上,新建对象为空对象
+第二个属性,为添加的可枚举属性(即自身属性,不是原型上的)
+# Object.defineProperty
+enumerable: 可枚举属性.不可枚举属性通过obj.propertyIsEnumerable()判断
+通过 Object.getOwnPropertyDescriptor()获取
+
 # js new 的原理
 
 1.创建一个新对象,新对象的原型属性指向构造函数的原型对象 2.将属性和方法添加到新对象上,这个新对象会绑定到函数调用的 this 3. 判断构造函数内部有没有返回对象,如果有,就返回那个对象,没有,则返回我们创建的新对象
@@ -365,5 +407,11 @@ class EventEmitter {
   }
 }
 ```
-# js bridge原理
-js bridge充当中间这,让js和Android双向通信.Android将事件注入到前端上window中.一种是Android的回调时间,一种是留给前端主动调用Android的事件,
+
+# js bridge 原理
+
+js bridge 充当中间这,让 js 和 Android 双向通信.Android 将事件注入到前端上 window 中.一种是 Android 的回调时间,一种是留给前端主动调用 Android 的事件,
+
+# IntersectionObserver
+
+异步观察目标元素与祖先元素或者根 root 可视区

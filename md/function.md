@@ -44,3 +44,24 @@
 ## 惰性函数
 指第1次根据条件执行函数后,第二次调用函数时就不再检测条件直接执行含税了.
 ## 缓存函数
+
+## forEach
+```js
+  Array.prototype.forEach2 = function(callback,thisArgs){
+    if(this === null){
+      throw new TypeError('this is null')
+    }
+    if(typeof callback !== 'function'){
+
+    }
+
+    const O = Object(this)
+    const len = O.length >>> 0
+    let k = 0
+    while(k < len){
+      if( k in O){
+        callback.call(thisArgs,O[k],k,O)
+      }
+    }
+  }
+```

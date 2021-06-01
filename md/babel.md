@@ -5,6 +5,11 @@ babel 本身分为三个阶段:
 解析 转换 生成
 babel 本身不具备任何转换功能,他把转换的功能都分解到一个个插件中,因此,当我们不配置任何插件时,经过 babel 输出输入的代码是一致的.
 
+## babel的 api
+@babel/parser 将代码转换为 ast, 可以使用 typescript、jsx、flow 等插件解析相关语法.
+@babel/traverse 遍历 ast,调用 visitor 函数
+@babel/generate 打印 ast 成目标代码,生成 sourcemap
+@abbel/types 创建
 ## babel 工作原理
 
 ### 插件和预设的区别
