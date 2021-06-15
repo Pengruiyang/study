@@ -348,13 +348,11 @@
   }
 
   // 继承
-  function initPrototype(A, B) {
+  function initPrototype(Father, Child) {
     // 复制父节点的原型对象
-    let prototype = Object.create(A.prototype)
+    Child.prototype = Object.create(Father.prototype)
     // 指向新建的子类
-    prototype.constructor = B
-    // 完成prototype的与子类链接
-    B.prototype = B
+    Child.prototype.constructor = Child
   }
 
   function A(name) {
@@ -376,8 +374,8 @@
     let ret = fn.call(obj, ...args)
     return ret instanceof Object ? ret : obj
   }
-  // bind
 
+  // bind
   const myBind = (ctx, ...args) => {
     return (...nextArgs) => {
       this.call(ctx, ...args, ...nextArgs)
@@ -848,36 +846,83 @@
   /**
    * call方法
    */
-  Function.prototype.call2 = function (context) {
+  Function.prototype.call2 = function (context,...args) {
     var context = context || window
-    context.fn = this
-    var args = [],
-      len = [...arguments].length
-    for (var i = 1; i < len; i++) {
-      args.push(`arguments[${i}]`)
-    }
-    var result = eval(`context.fn(${args})`)
-    delete context.fn
+    // 新建一个 Symbol 变量避免重复
+    const fn = Symbol()
+    context[fn] = this
+    var args = args ?? []
+    const result = args.length > 0 ? context[fn](...args) : context[fn]()
+
+    delete context[fn]
     return result
   }
   /**
    * apply
    */
 
-  Function.prototype.apply2 = function (context, arr) {
+  Function.prototype.apply2 = function (context, arr=[]) {
     var context = context || window
-    context.fn = this
-    var result
-    if (!arr) {
-      result = context.fn()
-    } else {
-      let args = []
-      for (var i = 0; i > arr.length; i++) {
-        args.push(`arr[${i}]`)
-      }
-      result = eval(`context.fn(${args})`)
-    }
-    delete context.fn
+   // 新建一个 Symbol 变量避免重复
+   const fn = Symbol()
+    context[fn] = this
+    var result = args.length > 0 ? context[fn](...artgs) : context[fn]()
+    delete context[fn]
     return result
+  }
+  /** deepClone */
+  function deepClone(obj,hash = new WeakMap()){
+    if(obj instanceof RegExp) return new RegExp(obj)
+    if(obj instanceof Date) return new  Date(obj)
+    if(obj === null || typeof obj !== 'object')return obj
+    // 处理循环引用的情况
+    if(hash.has(obj)){
+      return hash.get(obj)
+    }
+    // new 一个相应对象 
+    // obj 为 Array,相当于 new Array()
+    // obj 为 Object 相当于 new Object()
+    let counstr = new obj.constructor()
+    hash.set(obj,constr)
+    for(let key in obj){
+      if(obj.hasOwnProperty){
+        constr[key] = deepClone(obj[key],hash)
+      }
+    }
+    // 考虑Symbol 情况
+    let symbolObj = Object.getOwnPropertySymbols(obj)
+    for(let i = 0; i< symbolObj.length;i++){
+      constr[symbolObj[i]] = deepClone(obj[symbolObj[i]],hash)
+    }
+
+    return constr;
+  }
+  // flat
+  function flat(arr){
+    return arr.reduce((pre,cur) => {
+      return pre.concat(Array.isArray(cur)? flat(cur): cur)
+    },[])
+  }
+
+  function parseParam(url){
+    // 将问号后字符串取出来
+    const paramStr = /.+\?(.+)$/.exec(url)[1]
+    const paramArr = paramStr.split('&')
+    let params = {}
+    paramArr.forEach(param => {
+      // 处理有 value 参数的
+      if(/=/.test(param)){
+        let [key,value] = param.split('=')
+        value = decodeURIComponent(value)
+        if(params.hasOwnProperty(key)){
+          params[key] = [].concat(params[key],val)
+        }else{
+          params[key] = value
+        }
+      }else{
+        params[key] = true
+      }
+    })
+    return params
   }
 </script>

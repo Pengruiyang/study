@@ -10,43 +10,43 @@
 <script>
   //  树的基本结构
   function Node(data, left, right) {
-    this.data = data;
-    this.left = left;
-    this.right = right;
+    this.data = data
+    this.left = left
+    this.right = right
   }
   Node.prototype = {
     show() {
-      console.log(this.data);
+      console.log(this.data)
     },
-  };
+  }
   function Tree() {
-    this.root = null;
+    this.root = null
   }
   Tree.prototype = {
     // 插入
     insert(data) {
-      var node = new Node(data, null, null);
+      var node = new Node(data, null, null)
       if (!this.root) {
-        this.root = node;
-        return;
+        this.root = node
+        return
       }
-      var current = this.root;
-      var parent = null;
+      var current = this.root
+      var parent = null
       while (current) {
-        parent = current;
+        parent = current
         // 插入值小于当前值则插入左节点
         if (data < parent.data) {
-          current = current.left;
+          current = current.left
           // 如果没有左节点,那么插入就是左节点
           if (!current) {
-            parent.left = node;
-            return;
+            parent.left = node
+            return
           }
         } else {
-          current = current.right;
+          current = current.right
           if (!current) {
-            parent.right = node;
-            return;
+            parent.right = node
+            return
           }
         }
       }
@@ -54,183 +54,203 @@
     // 前序遍历
     preOrder(node) {
       if (node) {
-        node.show();
-        this.preOrder(node.left);
-        this.preOrder(node.right);
+        node.show()
+        this.preOrder(node.left)
+        this.preOrder(node.right)
       }
     },
     //  中序遍历
     middleOrder(node) {
       if (node) {
-        this.middleOrder(node.left);
-        node.show();
-        this.middleOrder(node.right);
+        this.middleOrder(node.left)
+        node.show()
+        this.middleOrder(node.right)
       }
     },
     //
     laterOrder(node) {
       if (node) {
-        this.laterOrder(node.left);
-        this.laterOrder(node.right);
-        node.show();
+        this.laterOrder(node.left)
+        this.laterOrder(node.right)
+        node.show()
       }
     },
     getMin() {
-      let current = this.root;
+      let current = this.root
       while (current) {
         if (!current.left) {
-          return current;
+          return current
         }
-        current = current.left;
+        current = current.left
       }
     },
     getMax() {
-      let current = this.root;
+      let current = this.root
       while (current) {
         if (!current.right) {
-          return current;
+          return current
         }
-        current = current.right;
+        current = current.right
       }
     },
     getDeep(node, deep = 0) {
       if (node === null) {
-        return deep;
+        return deep
       }
-      deep++;
-      var dLeft = this.getDeep(node.left, deep);
-      var dRight = this.getDeep(node.right, deep);
-      return Math.max(dLeft, dRight);
+      deep++
+      var dLeft = this.getDeep(node.left, deep)
+      var dRight = this.getDeep(node.right, deep)
+      return Math.max(dLeft, dRight)
     },
     // 树查找
     getNode(data, node) {
       if (node) {
         if (data === node.data) {
-          return node;
+          return node
         } else if (data < node.data) {
-          return this.getNode(data, node.left);
+          return this.getNode(data, node.left)
         } else {
-          return this.getNode(data, node.right);
+          return this.getNode(data, node.right)
         }
       }
     },
-  };
-  var t = new Tree();
-  t.insert(3);
-  t.insert(8);
-  t.insert(1);
-  t.insert(2);
-  t.insert(5);
-  t.insert(7);
-  t.insert(6);
-  t.insert(0);
-  console.log(t);
+  }
+  var t = new Tree()
+  t.insert(3)
+  t.insert(8)
+  t.insert(1)
+  t.insert(2)
+  t.insert(5)
+  t.insert(7)
+  t.insert(6)
+  t.insert(0)
+  console.log(t)
   // t.middleOrder(t.root);
-  console.log(t.getMin(), t.getMax());
-  console.log(t.getDeep(t.root, 0));
+  console.log(t.getMin(), t.getMax())
+  console.log(t.getDeep(t.root, 0))
   // console.log(t.getNode(5,t.root));
 
   //二叉树的中序遍历
   // 递归版本
   var inorderTraversalDeep = function (root, array = []) {
     if (root) {
-      inorderTraversalDeep(root.left);
-      array.push(root.val);
-      inorderTraversalDeep(root.right);
+      inorderTraversalDeep(root.left)
+      array.push(root.val)
+      inorderTraversalDeep(root.right)
     }
-    return array;
-  };
+    return array
+  }
   var inorderTraversalDeep = function (root) {
     const result = [],
-      stack = [];
-    let current = root;
+      stack = []
+    let current = root
     while (current || stack.length > 0) {
       while (current) {
-        stack.push(current);
-        current = current.left;
+        stack.push(current)
+        current = current.left
       }
-      current = stack.pop();
-      result.push(current.val);
-      current = current.right;
+      current = stack.pop()
+      result.push(current.val)
+      current = current.right
     }
-  };
+  }
   // 二叉树的前序遍历
   var preorderTraversalDeep = function (root, array = []) {
     if (root) {
-      array.push(root.val);
-      preorderTraversalDeep(root.left, array);
-      preorderTraversalDeep(root.right, array);
+      array.push(root.val)
+      preorderTraversalDeep(root.left, array)
+      preorderTraversalDeep(root.right, array)
     }
-    return array;
-  };
+    return array
+  }
   var preorderTraversal = function (root) {
     const result = [],
-      stack = [];
-    let current = root;
+      stack = []
+    let current = root
     while (current || stack.length > 0) {
       while (current) {
-        result.push(current.val);
-        stack.push(current);
-        current = current.left;
+        result.push(current.val)
+        stack.push(current)
+        current = current.left
       }
-      current = stack.pop();
-      current = current.right;
+      current = stack.pop()
+      current = current.right
     }
-    return result;
-  };
+    return result
+  }
   // 二叉树的后续遍历
   var postorderTraversalDeep = function (root, array) {
     if (root) {
-      postorderTraversalDeep(root.left, array);
-      postorderTraversalDeep(root.right, array);
-      array.push(root.val);
+      postorderTraversalDeep(root.left, array)
+      postorderTraversalDeep(root.right, array)
+      array.push(root.val)
     }
-  };
+  }
   var postorderTraversal = function (root) {
     let stack = [],
       result = [],
       last = null, //标记上一个访问到节点
-      current = root;
+      current = root
     while (current || stack.length > 0) {
       while (current) {
-        stack.push(current);
-        current = current.left;
+        stack.push(current)
+        current = current.left
       }
       current = stack[stack.length - 1]
       // 栈顶右节点为空 或者已经访问过了, 节点出栈 并访问他,将节点标记为已访问
-      if(!current.right || current.right == last){
+      if (!current.right || current.right == last) {
         current = stack.pop()
         result.push(current.val)
         last = current
-        current = null  //继续弹栈
-      }else {
+        current = null //继续弹栈
+      } else {
         current = current.right
       }
     }
     return result
-  };
+  }
   // 多叉树查找
-  const  traverseTree3 = (node) => {
-    if(!node) return
+  const traverseTree3 = (node) => {
+    if (!node) return
     // 用于存放所有待处理的节点
     let stack = []
     // 存放遍历后的结果
     let arr = []
     // 当前正在处理的节点
     let temp
-    
+
     stack.push(node)
-    while(stack.length){
+    while (stack.length) {
       temp = stack.shift()
       arr.push(temp.name)
-      if(temp.children && temp.children.length){
-        temp.children.map( child => stack.push(child))
+      if (temp.children && temp.children.length) {
+        temp.children.map((child) => stack.push(child))
       }
     }
     return arr
   }
 
-
-
-  
+  // 二叉树最小深度
+  var minDepth = function (root) {
+    if (!root) return 0
+    if (root.left && !root.right) {
+      return minDepth(root.left) + 1
+    }
+    if (!root.left && root.right) {
+      return minDepth(root.right) + 1
+    }
+    return Math.min(minDepth(root.left), minDepth(root.right)) + 1
+  }
+  // 层次遍历二叉树
+  var levelOrder = function (root) {
+    if(!root) return []
+    let  queue =[root],result = []
+    while(queue.length){
+      const first = queue.shift()
+      result.push(first.value)
+      first.left && queue.push(first.left)
+      first.right && queue.push(first.right)
+    }
+    return result
+  }
 </script>
