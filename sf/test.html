@@ -12,159 +12,235 @@
   var inorderTraversal = function (root) {
     let result = [],
       stack = [],
-      current = root;
+      current = root
     while (current && stack.length > 0) {
       while (current) {
-        stack.push(current);
-        current = current.left;
+        stack.push(current)
+        current = current.left
       }
-      current = stack.pop();
-      result.push(current);
-      current = current.right;
+      current = stack.pop()
+      result.push(current)
+      current = current.right
     }
-    return result;
-  };
+    return result
+  }
   // 前序遍历
   var preorderTraversal = function (root) {
     let result = [],
       stack = [],
-      current = root;
+      current = root
     while (current && stack.length > 0) {
       while (current) {
-        stack.push(current);
-        result.push(current);
-        current = current.left;
+        stack.push(current)
+        result.push(current)
+        current = current.left
       }
-      current = stack.pop();
-    current = current.right;
+      current = stack.pop()
+      current = current.right
     }
     return result
-
-  };
-
-
-/**
-  * 有序数组中的单一元素
-  * 方案1 遍历数组,使用异或
-  * 方案2 双指针 头尾同时查找
-  * 
-  * 
-  */
- const singleNonDuplicate = (arr) => {
-  let left = 0,right = arr.length - 1
-  while( left < right){
-    let mid = left + (right - left) / 2;
-    // >> 运算优先级没有 + 高
-    // let mid = left + ((right - left) >> 1);
-
-    // 因为单一元素仅出现一次 那么len 2x + 1 ,且数组为升序 则 类似 1 1 2 2 3 4 4 
-    // 出现单一元素的必定为 偶数小标 第 arr[0| 2|4]
-    console.log(left + (right - left) / 2,`left:${left}`,`right:${right}`);
-    console.log(left + (right - left) >> 1,`left:${left}`,`right:${right}`);
-    if (mid % 2 == 1) mid--;
-    console.log(mid,'mid2');
-    // 右边剩余的为奇数 向右边继续二分
-    if(arr[mid] === arr[mid+1]){
-      left = mid + 2
-    }else{
-      // 左边剩余的为奇数  向左边继续二分
-      right = mid
-    }
   }
-  return arr[left]
- }
 
+  /**
+   * 有序数组中的单一元素
+   * 方案1 遍历数组,使用异或
+   * 方案2 双指针 头尾同时查找
+   *
+   *
+   */
+  const singleNonDuplicate = (arr) => {
+    let left = 0,
+      right = arr.length - 1
+    while (left < right) {
+      let mid = left + (right - left) / 2
+      // >> 运算优先级没有 + 高
+      // let mid = left + ((right - left) >> 1);
 
+      // 因为单一元素仅出现一次 那么len 2x + 1 ,且数组为升序 则 类似 1 1 2 2 3 4 4
+      // 出现单一元素的必定为 偶数小标 第 arr[0| 2|4]
+      console.log(left + (right - left) / 2, `left:${left}`, `right:${right}`)
+      console.log(
+        (left + (right - left)) >> 1,
+        `left:${left}`,
+        `right:${right}`
+      )
+      if (mid % 2 == 1) mid--
+      console.log(mid, 'mid2')
+      // 右边剩余的为奇数 向右边继续二分
+      if (arr[mid] === arr[mid + 1]) {
+        left = mid + 2
+      } else {
+        // 左边剩余的为奇数  向左边继续二分
+        right = mid
+      }
+    }
+    return arr[left]
+  }
 
-//  var monotoneIncreasingDigits = function(N) {
-//    if(N < 10){
-//      return N
-//    }
-//    const strList = (N + '').split('').map( i => +i)
-//    let i = 1 , len = strList.length
-//    // 判断哪一位开始没有递增
-//    while( i< len && strList[i - 1] <=  strList[i]){
-//      i++
-//    }
-//    if( i< len){
-//      while( i > 0 && strList[i - 1] > strList[i]){
-//        i--
-//        // 可以这样做原因是当前i 一定大于后面那一项 所以一定 > 0
-//        strList[i] -= 1
-//      }
-//      // 后续直接用0填充
-//      for( i+= 1; i < len; i++){
-//        strList[i] = 9
-//      }
-//    }
-//    console.log(+strList.join(''));
-//    return strList.join('')
-//  }
+  //  var monotoneIncreasingDigits = function(N) {
+  //    if(N < 10){
+  //      return N
+  //    }
+  //    const strList = (N + '').split('').map( i => +i)
+  //    let i = 1 , len = strList.length
+  //    // 判断哪一位开始没有递增
+  //    while( i< len && strList[i - 1] <=  strList[i]){
+  //      i++
+  //    }
+  //    if( i< len){
+  //      while( i > 0 && strList[i - 1] > strList[i]){
+  //        i--
+  //        // 可以这样做原因是当前i 一定大于后面那一项 所以一定 > 0
+  //        strList[i] -= 1
+  //      }
+  //      // 后续直接用0填充
+  //      for( i+= 1; i < len; i++){
+  //        strList[i] = 9
+  //      }
+  //    }
+  //    console.log(+strList.join(''));
+  //    return strList.join('')
+  //  }
 
-var monotoneIncreasingDigits2 = function(N) {
-    let r = 0, s = 111111111, i = -1
+  var monotoneIncreasingDigits2 = function (N) {
+    let r = 0,
+      s = 111111111,
+      i = -1
     while (++i < 9) {
-        while (r + s > N) s = s / 10 | 0
-        if ((r += s) === N) return r
+      while (r + s > N) s = (s / 10) | 0
+      if ((r += s) === N) return r
     }
     return r
-};
-
-console.log(monotoneIncreasingDigits2(199));
-
-
-var wordPattern = function(pattern, s) {
-  let patternMap = new Map, sMap = new Map ,sList= s.split(" ")
-  if(pattern.length !== sList.length){
-    return false
   }
-  for(let i =0; i < sList.length; i++){
-    let p = pattern[i],sItem = sList[i]
-    if(patternMap.has(p)){
-      if(patternMap.get(p) != sItem) return false
-    }else{
-      patternMap.set(p,sItem)
+
+  console.log(monotoneIncreasingDigits2(199))
+
+  var wordPattern = function (pattern, s) {
+    let patternMap = new Map(),
+      sMap = new Map(),
+      sList = s.split(' ')
+    if (pattern.length !== sList.length) {
+      return false
     }
-    if(sMap.has(sItem)){
-      if(sMap.get(sItem) != p) return false
-    }else{
-      sMap.set(sItem,p)
+    for (let i = 0; i < sList.length; i++) {
+      let p = pattern[i],
+        sItem = sList[i]
+      if (patternMap.has(p)) {
+        if (patternMap.get(p) != sItem) return false
+      } else {
+        patternMap.set(p, sItem)
+      }
+      if (sMap.has(sItem)) {
+        if (sMap.get(sItem) != p) return false
+      } else {
+        sMap.set(sItem, p)
+      }
     }
+    return true
   }
-  return true
-};
-console.log(wordPattern('abba',"dog cat cat dog"));
+  console.log(wordPattern('abba', 'dog cat cat dog'))
 
-var minCostClimbingStairs = function(cost) {
-  let cur = cost[0],prev = cost[1], i = 1
-  while( ++i < cost.length){
-    let tmp = cost[i] + (cur > prev ? prev : cur)
-    cur = prev
-    prev = tmp
+  var minCostClimbingStairs = function (cost) {
+    let cur = cost[0],
+      prev = cost[1],
+      i = 1
+    while (++i < cost.length) {
+      let tmp = cost[i] + (cur > prev ? prev : cur)
+      cur = prev
+      prev = tmp
+    }
+    console.log(cur, prev)
+    return Math.min(cur, prev)
   }
-  console.log(cur,prev);
-  return Math.min(cur,prev)
-};
 
-cost = [1, 100, 1, 1, 1, 100, 1, 1, 100, 1]
-// console.log(minCostClimbingStairs(cost));
-var candy = function(ratings) {
-  let leftList = Array(ratings.length).fill(1)
-  let rightList = Array(ratings.length).fill(1), count = 0
-  for(let i = 1 ; i < ratings.length; i++){
-    if(ratings[i] > ratings[i - 1]){
-      leftList[i] = leftList[i - 1] + 1
+  cost = [1, 100, 1, 1, 1, 100, 1, 1, 100, 1]
+  // console.log(minCostClimbingStairs(cost));
+  var candy = function (ratings) {
+    let leftList = Array(ratings.length).fill(1)
+    let rightList = Array(ratings.length).fill(1),
+      count = 0
+    for (let i = 1; i < ratings.length; i++) {
+      if (ratings[i] > ratings[i - 1]) {
+        leftList[i] = leftList[i - 1] + 1
+      }
     }
-  }
-  count = leftList[ratings.length - 1]
-  for( let i = ratings.length - 2 ; i >= 0; i--){
-    if(ratings[i] > ratings[i + 1]){
-      rightList[i] = rightList[i + 1] + 1
+    count = leftList[ratings.length - 1]
+    for (let i = ratings.length - 2; i >= 0; i--) {
+      if (ratings[i] > ratings[i + 1]) {
+        rightList[i] = rightList[i + 1] + 1
+      }
+      count += Math.max(leftList[i], rightList[i])
     }
-    count += Math.max(leftList[i],rightList[i])
+    return count
   }
-  return count
-};
-candy([1,0,2,0,1,3,2])
+  candy([1, 0, 2, 0, 1, 3, 2])
+
+  // 877. 石子游戏
+  // var stoneGame = function(piles) {
+  // let len = piles.length - 1
+
+  //   // 比较 start - end 之间的差值
+  //   function dp(start,end){
+  //     console.log(start,'start');
+  //     // 开始大于结束没有任何意义
+  //     if(start > end) return 0
+  //     return Math.max(piles[start] - dp(start+1,end),piles[end] - dp(start,end-1))
+  //   }
+  //   return dp(0,len) > 0
+  // };
+
+  var stoneGame = function (piles) {
+    let len = piles.length - 1,
+      dp = piles.slice(0)
+    // i start 下标 最大值 len -1 最小值 0
+    // j end 下标   最大值 len    最小值 1
+    // 时间复杂度 n^2   n(n-1)/2
+    // 空间复杂度 n
+    for (let i = len - 1; i > -1; i--) {
+      for (j = i + 1; j <= len; j++) {
+        dp[j] = Math.max(piles[i] - dp[j], piles[j] - dp[j - 1])
+      }
+    }
+    console.log(num)
+    console.log(dp)
+    return dp[len] > 0
+  }
+  console.log(stoneGame([7, 7, 12, 16]), 'stoneGame')
+
+  //
+  //
+  /**
+   * 把M个苹果放在N个盘子里，允许有的盘子空着不放，那么总共有多少种不同的分法呢？
+   * 注：5，1，1和1，5，1是同一种分法，且1<=M，N<=10。
+   * m: 苹果数量
+   * n: 盘子数量
+   */
+  function main(m, n) {
+    let ans = 0,f = []
+    for (let i = 1; i <= n; ++i) {
+      ans += solve(m, i)
+    }
+    // function solve(m, n) {
+    //   if (f[m][n] != -1) return f[m][n]
+    //   if (m < n) {
+    //     f[m][n] = 0
+    //     return f[m][n]
+    //   }
+    //   if ((m === n) | (n === 1)) {
+    //     f[m][n] = 1
+    //     return f[m][n]
+    //   }
+    //   f[m][n] = 0
+    //   for (let i = 1; i <= n; ++i) {
+    //     f[m][n] += solve(m - n, i)
+    //   }
+    //   return f[m][n]
+    // }
+    function solve(m, n) {
+      if(m < 0)return 0
+      if( m === 0 || n === 1)return 1
+      return solve(m-n,n) + solve(m,n - 1)
+    }
+    console.log(ans)
+  }
 </script>
-

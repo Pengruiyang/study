@@ -8,6 +8,11 @@
   <body></body>
 </html>
 <script>
+    function TreeNode(val, left, right) {
+      this.val = (val===undefined ? 0 : val)
+      this.left = (left===undefined ? null : left)
+      this.right = (right===undefined ? null : right)
+  }
   //  树的基本结构
   function Node(data, left, right) {
     this.data = data
@@ -243,9 +248,10 @@
   }
   // 层次遍历二叉树
   var levelOrder = function (root) {
-    if(!root) return []
-    let  queue =[root],result = []
-    while(queue.length){
+    if (!root) return []
+    let queue = [root],
+      result = []
+    while (queue.length) {
       const first = queue.shift()
       result.push(first.value)
       first.left && queue.push(first.left)
@@ -253,4 +259,17 @@
     }
     return result
   }
+  // 平衡二叉树
+  var isBalanced = function (root) {
+    if(!root) return true
+    if(Math.abs(getHeight(root.left) - getHeight(root.right)) > 1){
+      return false
+    }
+    return isBalanced(root.left) && isBalanced(root.right)    
+    function getHeight(root){
+      if(!root) return 0
+      return Math.max(getHeight(root.left),getHeight(root.right)) + 1
+    }
+  }
+  console.log(isBalanced([1,2,2,3,3,null,null,4,4]));
 </script>

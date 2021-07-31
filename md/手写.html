@@ -193,23 +193,26 @@
     let result = []
     return new Promise((resolve, reject) => {
       promises.forEach((promise, i) => {
-        Promise.resolve(promise).then((val) => {
-          result.push({
-            status: FULFILLED,
-            value: val,
-          })
-          if(result.length === promises.length){
-            resolve(result)
+        Promise.resolve(promise).then(
+          (val) => {
+            result.push({
+              status: FULFILLED,
+              value: val,
+            })
+            if (result.length === promises.length) {
+              resolve(result)
+            }
+          },
+          (err) => {
+            result.push({
+              status: REJECTED,
+              reason: err,
+            })
+            if (result.length === promises.length) {
+              resolve(result)
+            }
           }
-        },err => {
-          result.push({
-            status: REJECTED,
-            reason: err
-          })
-          if(result.length === promises.length){
-            resolve(result)
-          }
-        })
+        )
       })
     })
   }
@@ -846,7 +849,7 @@
   /**
    * call方法
    */
-  Function.prototype.call2 = function (context,...args) {
+  Function.prototype.call2 = function (context, ...args) {
     var context = context || window
     // 新建一个 Symbol 变量避免重复
     const fn = Symbol()
@@ -861,68 +864,76 @@
    * apply
    */
 
-  Function.prototype.apply2 = function (context, arr=[]) {
+  Function.prototype.apply2 = function (context, arr = []) {
     var context = context || window
-   // 新建一个 Symbol 变量避免重复
-   const fn = Symbol()
+    // 新建一个 Symbol 变量避免重复
+    const fn = Symbol()
     context[fn] = this
     var result = args.length > 0 ? context[fn](...artgs) : context[fn]()
     delete context[fn]
     return result
   }
   /** deepClone */
-  function deepClone(obj,hash = new WeakMap()){
-    if(obj instanceof RegExp) return new RegExp(obj)
-    if(obj instanceof Date) return new  Date(obj)
-    if(obj === null || typeof obj !== 'object')return obj
+  function deepClone(obj, hash = new WeakMap()) {
+    if (obj instanceof RegExp) return new RegExp(obj)
+    if (obj instanceof Date) return new Date(obj)
+    if (obj === null || typeof obj !== 'object') return obj
     // 处理循环引用的情况
-    if(hash.has(obj)){
+    if (hash.has(obj)) {
       return hash.get(obj)
     }
-    // new 一个相应对象 
+    // new 一个相应对象
     // obj 为 Array,相当于 new Array()
     // obj 为 Object 相当于 new Object()
     let counstr = new obj.constructor()
-    hash.set(obj,constr)
-    for(let key in obj){
-      if(obj.hasOwnProperty){
-        constr[key] = deepClone(obj[key],hash)
+    hash.set(obj, constr)
+    for (let key in obj) {
+      if (obj.hasOwnProperty) {
+        constr[key] = deepClone(obj[key], hash)
       }
     }
     // 考虑Symbol 情况
     let symbolObj = Object.getOwnPropertySymbols(obj)
-    for(let i = 0; i< symbolObj.length;i++){
-      constr[symbolObj[i]] = deepClone(obj[symbolObj[i]],hash)
+    for (let i = 0; i < symbolObj.length; i++) {
+      constr[symbolObj[i]] = deepClone(obj[symbolObj[i]], hash)
     }
 
-    return constr;
+    return constr
   }
   // flat
-  function flat(arr){
-    return arr.reduce((pre,cur) => {
-      return pre.concat(Array.isArray(cur)? flat(cur): cur)
-    },[])
+  function flat(arr) {
+    return arr.reduce((pre, cur) => {
+      return pre.concat(Array.isArray(cur) ? flat(cur) : cur)
+    }, [])
   }
 
-  function parseParam(url){
+  function parseParam(url) {
     // 将问号后字符串取出来
     const paramStr = /.+\?(.+)$/.exec(url)[1]
     const paramArr = paramStr.split('&')
     let params = {}
-    paramArr.forEach(param => {
+    paramArr.forEach((param) => {
       // 处理有 value 参数的
-      if(/=/.test(param)){
-        let [key,value] = param.split('=')
+      if (/=/.test(param)) {
+        let [key, value] = param.split('=')
         value = decodeURIComponent(value)
-        if(params.hasOwnProperty(key)){
-          params[key] = [].concat(params[key],val)
-        }else{
+        if (params.hasOwnProperty(key)) {
+          params[key] = [].concat(params[key], val)
+        } else {
           params[key] = value
         }
-      }else{
+      } else {
         params[key] = true
       }
     })
     return params
+  }
+
+  // promise 顺序执行
+  function runPromises(promiseCreators, initData) {
+    return promiseCreators.reduce(
+      (promise, next) => promise.then((data) => next(data)),
+      Promise.resolve(initData)
+    )
   }
 </script>

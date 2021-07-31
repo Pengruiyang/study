@@ -258,6 +258,8 @@ setState 的异步整合,批量更新也是建立在钩子函数与合成事件�
   1. 重构 JSX 转换逻辑 不需要引入import React from 'react',编译器会自动帮我们引入.
   2. 事件系统重构. 放弃使用 document 做事件的中心化管控.会挂载到 root 节点上. 取消事件池复用,为每一个合成事件创建新的对象.
   3. Lane模型(通过二进制数表示优先级)代替 expirationTime 模型(**通过时间长度描述优先级**).
+  4. 优化useEffect,17 之前 useEffect 清理函数会在 commit 阶段执行.组件卸载时,react 会先执行清理函数,然后才更新屏幕,然后才更新屏幕,类似于 componentWillUnmount.
+  而 17 之后,useEffect 清理函数会延迟到 commit 阶段完成才会执行,变成了异步执行,组件卸载时,会在屏幕更新后执行.
 # 理解 React 中的 Transaction（事务） 机制
 Transaction 是创建一个黑盒,这个黑盒可以封装任何方法.将目标函数用 wrapper(一组 initalize 和 close 方法称为 wrapper)封装起来.同时需要用 Transaction 类暴露的 perform 方法执行他.如上注释所示,在 anyMethod 执行之前,perform 会先执行所有 wrapper 的 initialize 方法,执行完后,再执行 wrapper 中 close 方法.
 

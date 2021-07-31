@@ -437,3 +437,12 @@ js bridge 充当中间这,让 js 和 Android 双向通信.Android 将事件注�
 ## 错误上报方式
 1. img 标签,相当于 get 请求,没有跨域问题,会有 url 长度限制.
 2. ajax 与正常接口请求无异,可以使用 post.
+3. 基于sendBeacon的安全数据上报
+```js
+function report(url,data){
+  if(typeof navigator.sendBeacon !== 'function'){
+    return console.err("sendBeacon不被支持")
+  }
+  navigation.sendBeacon(url,data)
+}
+```

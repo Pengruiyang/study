@@ -17,6 +17,12 @@
 7、 nginx代理跨域
 8、 nodejs中间件代理跨域
 9、 WebSocket协议跨域
+# 跨域请求头设置
+Access-Control-Allow-Origin: * 或者允许的地址
+Access-Control-Allow-Methods: POST,GET(* 严格模式会报错)
+Access-Control-Allow-Headers: Origin,Content-Type,Accept,token,X-Requested-With
+
+
 # 浏览器多进程架构
  1.浏览器进程
  2.渲染进程
