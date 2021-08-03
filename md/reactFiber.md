@@ -430,3 +430,16 @@ reconcileSingleElement 将基于 rootFiber 子节点的 ReactElement 对象信�
 App FiberNode 作为 rootFiber 的 child 属性,与现有 workInProgress Fiber 树建立关系.
 
 
+# effect 对象(updateQueue 链表)
+effect 对象包含 tag 类型,deps 依赖对象,create 首渲或依赖对象变更时执行函数,destroy 卸载时执行函数.通过 useEffect useLayoutEffect 制作的钩子函数都可以转换成为 effect 对象,两者有不同 tag 值.因为都可以转换成 effect 对象.两个共用一套逻辑:
+* 通过 pushEffect 函数将 effect 对象添加到 fiber.updateQueue 链表中
+* 通过 commitHookEffectListMount 执行 fiber.updateQueue 链表中指定 tag 属性的 effect.create,获得 effect.destroy
+* 通过 commitUnmount 或 commitHookEffectListUnmount 执行 effect.updateQueue链表中指定 tag 属性的 effect.destroy.
+## render阶段
+mountEffect、updateEffect、mountLayoutEffect、updateLayoutEffect
+通过 fiber.flags、fiber.subtreeFlags 能快速判断组件或者子树是否包含钩子及某类钩子.不必遍历 updateQueue 链表.useEffect 创建的 effect 对象,flag 值会包含 HookPassive.useLayoutEffect flag 包含 HookLayout类钩子.当 flags 包含 HookHasEffect 时,才意味着有钩子需要执行.这样处理是为了对应 deps 依赖对象未变更的场景.
+
+## commit 阶段
+HookLayout 类钩子,
+
+

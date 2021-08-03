@@ -446,3 +446,11 @@ function report(url,data){
   navigation.sendBeacon(url,data)
 }
 ```
+
+# JSBridge
+## 什么是 JSBridge?
+以js 引擎或者 webview 容器作为没接,通过协定协议进行通信,实现 Native 端和 web 端双向通信的一种机制.
+客户端开启支持 js 交互代码,使用双方规定注册好的名字开始进行交互.
+1. js 调用 native 方法
+2. 拦截 URL_Schema 请求
+3.拦截 prompt alert confirm

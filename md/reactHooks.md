@@ -1,8 +1,9 @@
 # react 内置方法
 
-1.useEffect、uselayoutEffect
+1.useEffect、useLayoutEffect
 useEffect 本次更新结束后 执行 callback
-uselayoutEffect 类似于 componentDidUpdate 执行,dom 更新完成后立即执行,阻塞浏览器绘制.会有闪一下效果.
+useLayoutEffect 类似于 componentDidUpdate 执行,dom 更新完成后立即执行,阻塞浏览器绘制.会有闪一下效果.
+这两个钩子函数会以 effect 对象形式存入 fiber.updateQueue 链表中,在 fiber reconciler 协调渲染流程的过程中,effect 对象会被取出并执行.useLayoutEffect 在渲染前后调用.useEffect 与协调中优先级调度算法有关.
 effectHook 可以在 function 组件中执行副作用(side Effect)
 
     ```js
@@ -42,8 +43,11 @@ effectHook 可以在 function 组件中执行副作用(side Effect)
 
 # react hooks 优缺点
 
-1.更容易复用代码(通过自定义 hooks) 2.清爽的代码风格 函数式组件,状态保存在运行环境, 3.代码更少 取 prop 值更加容易,更改状态更加容易
-
+优点:1.更容易复用代码(通过自定义 hooks) 2.清爽的代码风格 函数式组件,状态保存在运行环境, 3.代码更少 取 prop 值更加容易,更改状态更加容易
+缺点:1.响应式的 useEffect,某个依赖的 useEffect 变更,带来链式的更新.
+2.闭包陷阱状态不同步.每个函数独立运行,拥有自己独立的作用域.异步操作时,异步回调引用的变量是之前的.
+## 避免 hooks 常见问题
+不要在 useEffect 写太多依赖,划分单一功能
 # 为什么需要 hooks
 
 组件之间复用逻辑难

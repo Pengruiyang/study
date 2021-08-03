@@ -82,3 +82,25 @@ function getList(){
   console.log(str);
 }
 getList()
+
+
+// 链表中倒数第k个节点
+/**
+ * 快慢指针 快指针先走 K 步,再和慢指针一起走完
+ * 这样慢指针就是倒数第 K 个节点
+ * @param {ListNode} head
+ * @param {number} k
+ * @return {ListNode}
+ */
+ var getKthFromEnd = function(head, k) {
+  let fast = head,slow = head
+  while(k){
+    k--
+    fast = fast.next
+  } 
+  while(fast){
+    fast = fast.next
+    slow = slow.next
+  }
+  return slow
+};

@@ -6,7 +6,11 @@ ie 盒模型 border-box width = content + padding
 # position 属性 区别
   sticky 粘性布局  在屏幕中 relation ,外 fixed
 # 移动端适配方案
- rem vwvh @media 媒介查询 flex
+ rem vw vh @media 媒介查询 flex
+
+#  align-items 和 align-content 的区别
+align-items 针对每一个 flex 子项起作用
+align-content 将每一行 flex 子项看成一个最小单位.在 flex 子项多行 flex 容器高度固定情况下生效.子项当行需要 flex 容器高度固定且设置了 flex-wrap:wrap
 # flex 主轴
 flex-direction: 主轴方向 row:横轴 column:纵轴
 # 清除浮动原理
@@ -18,3 +22,5 @@ BFC: 一个独立的渲染区域,规定了内部布局,并且与外部毫不相�
   display (table-cell，table-caption，inline-block) 
   position（absolute，fixed） 
   fieldset元素
+
+
