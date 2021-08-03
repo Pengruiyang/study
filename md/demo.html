@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <input type="text" id="inp" value="" />
-    <div contentEditable id="elem">Click and <b>edit</b>, please</div>
 
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <input type="text" id="inp" value="" />
+  <div contentEditable id="elem">Click and <b>edit</b>, please</div>
+
+</body>
+
 </html>
 <script>
   // function jump(n,num){
@@ -67,7 +70,7 @@
   var inp = document.getElementById('inp');
   inp.addEventListener('input', debounce(sayHi));
 
-  const compose = (...fns) => (...args) =>  fns.reduceRight((v,fn) => fn(v), ...args)
+  const compose = (...fns) => (...args) => fns.reduceRight((v, fn) => fn(v), ...args)
   // bind
   // Function.prototype.myBind = function (context) {
   //   //
@@ -84,13 +87,110 @@
   //     // }
   //   }
   // }
-  
-  let  observer = new MutationObserver(mutationRecords => {
+
+  let observer = new MutationObserver(mutationRecords => {
     console.log(mutationRecords);
   })
-  observer.observe(document.getElementById('elem'),{
+  observer.observe(document.getElementById('elem'), {
     childList: true, // 观察直接子节点
     subtree: true, // 及其更低的后代节点
     characterDataOldValue: true // 将旧的数据传递给回调
   })
+
+
+  function add(...args) {
+    if (args.length) {
+      let sum = args.reduce((pre, cur) => pre + cur, 0)
+      console.log(sum);
+      return (...innerArgs) => add(sum, ...innerArgs)
+    }
+  }
+  // add(1)(4,5,6) 
+
+
+  var compareVersion = function (version1, version2) {
+    let pA = 0, pB = 0;
+    /** 寻找当前区间的版本号 */
+    const findDigit = (str, start) => {
+      let i = start;
+      console.log(i, 'i');
+      while (str[i] !== '.' && i < str.length) {
+        i++;
+      }
+      return i;
+    }
+
+    while (pA < version1.length && pB < version2.length) {
+      const nextA = findDigit(version1, pA);
+      const nextB = findDigit(version2, pB);
+      const numA = +version1.substr(pA, nextA - pA);
+      const numB = +version2.substr(pB, nextB - pB);
+      if (numA !== numB) {
+        return numA > numB ? 1 : -1;
+      }
+      pA = nextA + 1;
+      pB = nextB + 1;
+    }
+    // 若arrayA仍有小版本号
+    while (pA < version1.length) {
+      const nextA = findDigit(version1, pA);
+      const numA = +version1.substr(pA, nextA - pA);
+      if (numA > 0) {
+        return 1;
+      }
+      pA = nextA + 1;
+    }
+    // 若arrayB仍有小版本号
+    while (pB < version2.length) {
+      const nextB = findDigit(version2, pB);
+      const numB = +version2.substr(pB, nextB - pB);
+      if (numB > 0) {
+        return -1;
+      }
+      pB = nextB + 1;
+    }
+    // 版本号完全相同
+    return 0;
+  };
+
+
+  // console.log(compareVersion("1.0.1", "1"));
+
+  var calculate = function (s) {
+    let newS = s.replace(/\s/g, '')
+    let ang = [], i = 0, str = '', FH = '+'
+    while (i <= newS.length) {
+      // 是数字
+      if (/\D/.test(newS[i])) {
+        console.log(str);
+        if (FH === '+') {
+          ang.push(str)
+        } else if (FH === '-') {
+          ang.push(-str)
+        } else if (FH === '*') {
+          let last = ang.pop()
+          ang.push(Math.floor(last * str))
+        } else {
+          let last = ang.pop()
+          ang.push(Math.floor(parseInt(last / str )))
+        }
+        FH = newS[i]
+        str = ''
+      } else {
+        // str += newS[i]
+        str = str * 10 + newS[i].charCodeAt() - '0'.charCodeAt();
+      }
+      i++
+    }
+    console.log(ang);
+
+    return ang.reduce((pre, cur) => Number(cur) + pre, 0)
+  };
+  // console.log(  calculate("14-3/2"));
+var str = 'a.f.c',obj = {a:{b:{c:2}}}
+str.split('.').reduce((pre,cur)=> {
+  console.log(pre,cur);
+  return pre ? pre[cur] : undefined
+},obj)
+
 </script>

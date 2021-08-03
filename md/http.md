@@ -22,6 +22,8 @@
 7、 nginx代理跨域
 8、 nodejs中间件代理跨域
 9、 WebSocket协议跨域
+
+
 # 跨域请求头设置
 Access-Control-Allow-Origin: * 或者允许的地址
 Access-Control-Allow-Methods: POST,GET(* 严格模式会报错)
@@ -271,7 +273,19 @@ XSS 基本概念: 跨域脚本攻击.攻击者想尽一切办法将一些可执�
   Last-Modified/if-Modified-since
   文件最后修改时间 判断不了一秒之内的修改
 协商缓存不像强缓存一样有优先级,一般是配合使用,etag 计算复杂度比 last-Modified 更高,而 last-Modified 不如 etag 精准
-
+## 浏览器缓存资源
+webkit资源分为两类:
+主资源: html页面,或者下载想
+派生资源: html中内嵌图片或者脚本类.用于保存原始数据(css,js)解码过的图片数据
+memory cache 和 disk cache
+相同点: 只能储存一些派生类资源文件
+不同点: memory cache退出进程数据会被清除.
+储存资源: 一般脚本、字体、图片会存在内存当中.非内存会存在磁盘中.**css文件加载一次就可以渲染出来,我们不会频繁读取他,所以不适合缓存到内存中.js之类的脚本随时可能会执行,如果脚本在磁盘中,我们执行脚本的时候需要从磁盘渠道内存中,这样IO开销会很大,导致浏览器失去响应**
+## 三级缓存原理(访问缓存优先级)
+1. 优先内存中查找
+2. 硬盘中查找
+3. 网络请求
+4. 请求获取到的资源缓存到硬盘和内存中
 
 # grpc 相比 http 的优势？
 也是使用TCP/IP协议,使用http作为底层传输协议(gRpc使用的是http2.0)

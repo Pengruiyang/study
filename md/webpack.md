@@ -345,4 +345,11 @@ exec(cmdStr, function (err, stdout, stderr) {
 # chunkhash 和 contenthash 区别
 
 chunkhash: 根据不同的入口文件进行依赖文件解析、构建对应的 chunk、生成对应的 hash 值.
-contenthash: 文件内容.
+但是这样又有一个问题，因为我们是将样式作为模块import到JavaScript文件中的，所以它们的chunkhash是一致的，如index.js和index.css.只要对应css或则js改变，与其关联的文件hash值也会改变，但其内容并没有改变呢，所以没有达到缓存意义。固contenthash的用途随之而来。
+
+contenthash: 文件内容.在项目中，通常做法是把项目中css都抽离出对应的css文件来加以引用。
+
+## hash 缓存的问题
+1. hash 计算方式位每次compilation编译的内容计算得到,没有改变的文件也会随着其他文件改变二改变
+2. chunkhash js中引入css,只要修改了css,js也会更着发生改变
+3. contenthash 发生a.css发生改变的时候,以来他的其他文件并没有重新生成新的hash之.需要使用webpackMd5Hash通过模块路径排序chunk的所有以来模块,将排序后的模块源代码拼接chunkhash/

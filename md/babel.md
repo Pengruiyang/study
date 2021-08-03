@@ -9,7 +9,9 @@ babel 本身不具备任何转换功能,他把转换的功能都分解到一个�
 @babel/parser 将代码转换为 ast, 可以使用 typescript、jsx、flow 等插件解析相关语法.
 @babel/traverse 遍历 ast,调用 visitor 函数
 @babel/generate 打印 ast 成目标代码,生成 sourcemap
-@abbel/types 创建
+@babel/types 创建、修改、删除、查找ast节点.
+@babel/generator 将转换好的ast重新生成新的代码.运行在浏览器中
+@babel-core 整合基本核心插件.将底层代码封装,并加入领带的其他功能.简化插件
 ## babel 工作原理
 
 ### 插件和预设的区别
@@ -24,7 +26,8 @@ babel 本身不具备任何转换功能,他把转换的功能都分解到一个�
 
 当我们配置了 presets 中 @babel/preset-env, 那么@babel/core 就会去找 preset-env 预设的插件包.
 babel 核心包不会去转换代码,核心包只会提供一些核心的 api ,真正的代码转换工作由插件或者预设完成.
-presets 就是预设,他是 plugins 的集合,包含了多个 plugin.
+presets 就是预设,预设了几套插件.他是 plugins 的集合,包含了多个 plugin.
+eg: @babel/preset-env、@babel/preset-react、@babel/preset-typescript
 
 ## 编写插件
 
@@ -163,14 +166,27 @@ babel-plufin-transform-runtime 将 babel-runtime 作为依赖.
 ## babel-loader
 
 webpack 中配置
-
+配置和react中可以编写jsx代码
 ```js
 module: {
   rules: [
     {
-      test: /\.js$/,
+      test: /\.jsx?$/,
       exclude: /(node_modules|bower_components)/,
-      loader: 'babel-loader',
+      // loader: 'babel-loader',
+      use: {
+           loader: 'babel-loader',
+           options: {
+             // babel 转义配置项
+             babelrc: false,
+             presets: [
+               // 添加preset-react
+               require.resolve('@babel/preset-react'),
+               [require.resovle('@babel/preset-env'),{modules: false}]
+             ],
+             cacheDirectory:true
+           }
+      }
     },
   ];
 }
@@ -252,7 +268,7 @@ webpack 和 rollup 都是通过 acorn 模块把源代码转换成抽象语法树
 ## AST 解析流程
 
 - esprima: code => ast 代码转 ast
-- estraverse: traverse ast 转换数
+- estraverse: traverse ast 转换树
 - escodegen: ast => code
 
 ```js
