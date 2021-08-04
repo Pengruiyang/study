@@ -38,3 +38,7 @@ Array.prototype.slice.call(objectLikeArray)
 # EventBus 的设计模式是什么?
 1. 首先getDefault 中使用了单例模式,不同线程中只有一个 EventBus 的实例
 2. 观察者模式.事件是被观察者,订阅者类是观察者.当事件出现或发生变更的时候,通过 eventBus通知观察者
+
+# css 对于渲染性能的影响
+1. 浏览器需要等待 css 转换 styleSheets 创建布局树,分层树后才会开始渲染页面
+2. 布局树由 dom 和 styleSheets 计算得到
