@@ -319,6 +319,21 @@ Node 在解析 JS 模块时,会先按文本读取内容,然后将模块内容进
 ```
 #### Module.exports 和 exports 区别
 exports 其实就是 module.exports,但是不能直接对 exports 复制.node 会把整个待加载 js 文件放入 load 函数中,最终导出 module.exports.也就是说,正常情况下,exports 和 module.exports 变量实际是同一个遍历,并且初始化为空对象.给 exports 复制并不会改变实际上 module.exports 复制.仍然是空对象
+
+## require 和 import 的区别
+require 代表的是 commonJs 规范,在运行时才会去加载.运行时确认模块依赖关系及输入/输出的变量.无法静态优化.
+import 则是 esModule 规范,编译时就回去加载,金泰分析,便于 js 类型校验,动态绑定.
+### require 和 import 的混用
+#### export default转译
+babel 将 es6 规范的 export 编译为 commonjs 规范的 module.exports.给对象一个 '__esModule'的标记
+#### require导入export default模块
+export 模块转换成 module.exports
+#### import导入module.exports模块
+用方法_interopRequireDefault包装一层层,判断传入的对象是否存在 __esModule 属性,存在则返回原对象.如果不存在则用 default 包裹对象,并且之后输出的值变成 default 属性.
+**对于 esModule 的 import来说,就是输出目标文件所导出的 default**
+### 在webpack中配置babel-loader时，为什么要排除node_modules这个文件夹呢？
+模块发布到 npm 需要提供源码及编译后 commonjs规范的代码.默认引用编译后的代码.而我们完全没有必要将编译后的代码再编译一遍.
+
 #### MainModule
 
 

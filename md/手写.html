@@ -218,7 +218,7 @@
   }
 
   // 符合Promise A+ 规范
-  const PENDING = 'pengding'
+  const PENDING = 'pending'
   const FULFILLED = 'fulfilled'
   const REJECTED = 'rejected'
   class Promise {
@@ -968,5 +968,13 @@
       index++
     }
   }
+}
+
+// 简洁版 eventEmitter
+class EasyEventEmitter extends EventTarget {
+  on= this.addEventListener
+  off = this.removeEventListener
+  emit = (type,data) => this.dispatchEvent(new CustomEvent(type,{detail:data}))
+  once = (type,callback) => this.on(type,callback,{once:true,capture:true})
 }
 </script>

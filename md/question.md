@@ -40,5 +40,27 @@ Array.prototype.slice.call(objectLikeArray)
 2. 观察者模式.事件是被观察者,订阅者类是观察者.当事件出现或发生变更的时候,通过 eventBus通知观察者
 
 # css 对于渲染性能的影响
+ css是页面渲染关键因素之一(外链 css),浏览器会等待全部的 css 下载及解析完成后再渲染页面.因而我们需要尽快的将 css 传输到用户设备.
+ css 加载过程中不会影响到 dom 树的合成,但会影响到和dom 构建布局树.所以 style link 标签尽量放在 head中,解析 dom 树是自上而下的,css 样式异步加载,使得解析 dom 树和加载 css 样式尽可能并行,加快布局树的生成.
+
 1. 浏览器需要等待 css 转换 styleSheets 创建布局树,分层树后才会开始渲染页面
 2. 布局树由 dom 和 styleSheets 计算得到
+3. dom 是 html 加上(同步)阻塞的 js 操作(dom 后)的结果
+4. styleSheets 是 css 规则应用在dom 树上的
+5. js 非阻塞很简单,加上 async 或者 defer 属性即可
+6. 理想情况: 最慢的样式表下载时间决定了页面渲染时间
+
+一般情况下,dom 构建可以加快.服务器响应的第一个请求是html 文档,css 一般作为 html 的子资源存在.
+## 使用关键 css 
+找出首次渲染所需的样式,内联到 head 标签中,其他样式则异步进行加载.
+## 使用媒介查询拆分代码
+根据媒介查询分优先级
+## 不要将动态插入的 js 放在<link>标签后面
+在浏览器下载完该 css 文件之前,不会执行下面紧接的 js.
+如果<script>中的代码不依赖 css,把它们放在样式表之前.
+# export 和 export default 的区别
+```js
+// export
+export let a= 'a'
+```
+export default 规定模块的默认对外接口,在同一个模块只能出现一次.
