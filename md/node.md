@@ -321,8 +321,8 @@ Node 在解析 JS 模块时,会先按文本读取内容,然后将模块内容进
 exports 其实就是 module.exports,但是不能直接对 exports 复制.node 会把整个待加载 js 文件放入 load 函数中,最终导出 module.exports.也就是说,正常情况下,exports 和 module.exports 变量实际是同一个遍历,并且初始化为空对象.给 exports 复制并不会改变实际上 module.exports 复制.仍然是空对象
 
 ## require 和 import 的区别
-require 代表的是 commonJs 规范,在运行时才会去加载.运行时确认模块依赖关系及输入/输出的变量.无法静态优化.
-import 则是 esModule 规范,编译时就回去加载,金泰分析,便于 js 类型校验,动态绑定.
+require 代表的是 commonJs(AMD) 规范,在运行时才会去加载.运行时确认模块依赖关系及输入/输出的变量.无法静态优化.
+import 则是 esModule 规范,编译时就回去加载,静态分析,便于 js 类型校验,动态绑定.
 ### require 和 import 的混用
 #### export default转译
 babel 将 es6 规范的 export 编译为 commonjs 规范的 module.exports.给对象一个 '__esModule'的标记

@@ -6,9 +6,11 @@
 [...objectLikeArray] array.from(objectLikeArray) 
 Array.prototype.slice.call(objectLikeArray)
 相当于新建了一个数组,从 0 一直取到了最后一项
-# Map 和 weakmap、WeakSet、Set 的区别
-  Map 对象保存键值对,能够记住键的原始插入顺序.任何值都可以作为一个键或者一个值.Map 对对象是强引用.
-  weakmap 只接受对象作为键名,不接受其他类型.键名弱引用,键名可以被垃圾回收,此时键名无效.不能被遍历.
+# Map 和 WeakMap、WeakSet、Set 的区别
+  Set 对象可以存储任何类型的数据,值是唯一的,没有重复的值.
+  Map 对象保存键值对,能够记住键的原始插入顺序.任何值都可以作为一个键或者一个值.Map对对象是强引用.
+  WeakSet 成员只能是对象,不可遍历.
+  WeakMap 只接受对象作为键名,不接受其他类型.键名弱引用,键名可以被垃圾回收,此时键名无效.不能被遍历.
 # 兼容性问题
   1.样式兼容性  
   > a.reset.css 重置默认样式
