@@ -12,3 +12,10 @@
     }
     if (dom) observer.observe(dom, options)
 ```
+
+
+## 脚手架搭建
+1. commander: node.js 解决方案
+2. 声明 program
+3. 使用.option()方法定义选项
+4. Inquirer.js 命令行用户界面的集合

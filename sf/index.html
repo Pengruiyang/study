@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body></body>
+  <body>
+    <div>123</div>
+  </body>
 </html>
 <script>
+  let a = 1
   function maxSum(arr) {
     // 按照开始时间排序
     let sortArr = arr.sort((a, b) => a[0] - b[0])
@@ -339,18 +342,87 @@
     const visited = new Set()
     const length = graph.length
     const dfs = (i) => {
-      if( visited.has(i) ) return false
+      if (visited.has(i)) return false
       visited.add(i)
-      for(const neighbor of graph[i]){
-        if(!dfs(neighbor))return false
+      for (const neighbor of graph[i]) {
+        if (!dfs(neighbor)) return false
       }
       graph[i] = []
       visited.delete(i)
       return true
     }
-    for(let i =0; i< length; i++){
-      if(dfs(i)) ans.push(i)
+    for (let i = 0; i < length; i++) {
+      if (dfs(i)) ans.push(i)
     }
     return ans
   }
+  // 输出最长升序字符串组
+  let words = ['abc', 'ab', 'x', 'xy', 'abcd']
+  let findLongWords = (words) => {
+    let len = words.length
+    dp = Array(len).fill(1)
+    words.sort()
+    for (let i = 0; i < len; i++) {
+      for (let j = i + 1; j < len; j++) {
+        let w = words[j]
+        if (w.slice(0, -1) === words[i]) {
+          dp[j] = Math.max(dp[j], dp[i] + 1)
+        }
+      }
+    }
+    return dp.reduce((pre, cur) => Math.max(pre, cur))
+  }
+  // console.log(findLongWords(words));
+  //设计一个随机抽样的系统，这个系统需要实时的从数据流中读取数据，并提供一个查询接口，这个接口需要从已读取的数据中等概率的选取K个数并返回。
+
+  const entries = [
+    {
+      province: '浙江',
+      city: '杭州',
+      name: '西湖',
+    },
+    {
+      province: '四川',
+      city: '成都',
+      name: '锦里',
+    },
+    {
+      province: '四川',
+      city: '成都',
+      name: '方所',
+    },
+    {
+      province: '四川',
+      city: '阿坝',
+      name: '九寨沟',
+    },
+  ]
+
+  const level = ['province', 'city', 'name']
+  function transform(list, level) {
+    const res = []
+    list.forEach( i => {
+
+    })
+    function pushItem(arr,obj,index){
+      const o = {
+        value: obj[level[index]],
+        children: []
+      }
+      const currentItem = arr.find(el => el.value === obj[level[index]])
+      if(currentItem){
+        newArr = currentItem.children
+      }else{
+        arr.push(o)
+        newArr = o.children
+      }
+      if(i === level.length - 1)delete o.children
+      i++
+      if(i < level.length){
+        // 递归层级遍历
+        pushItem(newArr,obj,i)
+      }
+    }
+  }
+  transform(entries, level);
 </script>

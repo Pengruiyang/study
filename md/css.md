@@ -7,7 +7,7 @@ ie 盒模型 border-box width = content + padding
   sticky 粘性布局  在屏幕中 relation ,外 fixed
 # 移动端适配方案
  rem vw vh @media 媒介查询 flex
-
+flexible: 通过 js 控制 viewport 能力,使用 rem 模拟 vw 特性. 控制 viewport 的 width 和 scale 的值适配高倍屏展示.实现 1 物理像素 = 1 css 像素
 #  align-items 和 align-content 的区别
 align-items 针对每一个 flex 子项起作用
 align-content 将每一行 flex 子项看成一个最小单位.在 flex 子项多行 flex 容器高度固定情况下生效.子项当行需要 flex 容器高度固定且设置了 flex-wrap:wrap

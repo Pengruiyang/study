@@ -82,7 +82,7 @@ terser-webpack-plugin 代替 uglifyJs 压缩代码
 ModuleConCatenationPlugin: scope hoisting 分析模块依赖关系,打入一个模块.减少创建的作用域.减少代码体积
 
 ### plugins 原理:
-在 Webpack 运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
+在 Webpack 运行的生命周期中会广播出许多事件(**run、build-module、program**)，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin 的实例，参数都通过构造函数传入
 
 ### plugins 和 loader 的区别
@@ -102,12 +102,12 @@ plugin: 意思是插件,在 webpack 运行生命周期,会广播很多事件出�
 为每个模块创建了一个可以导入导出的环境,不修改代码执行逻辑,代码执行顺序 模块加载顺序也完全一致
 
 ### webpack 热更新原理
-  1.修改文件后,文件系统接收到并通知 webpack
-  2.webpack 重新编译一个或多个模块
-  3.webpack-dev-server 中间件 webpack-dev-middle 调用 webpack 的 api 对代码变化进行控,将代码打包编译进内存中
-  4.webpack-dev-server 维护了一个 socket 和浏览器进行通信, 本地资源变化时webpack-dev-server会向浏览器推送更新,带上新文件的 hash 值.让客户端与上一次文件进行对比,
-  chunk diff 向 webpack-dev-server 发起 ajax 请求更新内容(文件列表,hash).再由这些信息续向 webpack-dev-server 发起 jsonp 请求获取更新
-  5.HMR 运行时替换更新中模块,如果不能更新则直接刷新.
+  1. 启动本地server,让浏览器可以请求本地的静态资源
+  2. 页面首次打开后,服务端与客户端通过 websocket 建立通信渠道,把下一次的hash 返回前端.
+  3. 客户端获取到 hash,用这个 hash 作为下一次请求服务器 hot-update.js 和 hot-update.json 的 hash
+  4. 修改代码后,webpack 监听到文件修改后开始编译,编译完成后,发送 build 信息给客户端
+  5. 客户端获取到 hash,对比后构造 hot-update.js json 链接,插入主文档
+  6. 插入成功后,执行 hotAPI createRecord 和 reload 方法,重新 render 组件.(如果不能更新则直接刷新页面)
 
 
 ### Babel 原理
@@ -130,12 +130,11 @@ Loader 是无状态的，我们不应该在 Loader 中保留状态
 webpack 在运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在特定的阶段钩入想要添加的自定义功能。Webpack 的 Tapable 事件流机制保证了插件的有序性，使得整个系统扩展性良好。
 compiler 暴露了和 Webpack 整个生命周期相关的钩子
 compilation 暴露了与模块和依赖有关的粒度更小的事件钩子
-插件需要在其原型上绑定 apply 方法，才能访问 compiler 实例
-传给每个插件的 compiler 和 compilation 对象都是同一个引用，若在一个插件中修改了它们身上的属性，会影响后面的插件
-找出合适的事件点去完成想要的功能
-emit 事件发生时，可以读取到最终输出的资源、代码块、模块及其依赖，并进行修改(emit 事件是修改 Webpack 输出资源的最后时机)
-watch-run 当依赖的文件发生变化时会触发
-异步的事件需要在插件处理完任务时调用回调函数通知 Webpack 进入下一个流程，不然会卡住
+* 通过 apply 函数中传入 compiler 对象并插入指定的事件钩子,在钩子回调中取到 compilation 对象. 在compilation 对象中处理 webpack 内部特定实例数据.
+* 异步插件需要插件逻辑编写完后调用 webpack 提供的 callback通知 webpack 进入下一个流程,不然会卡主.
+* 传给每个插件的 compiler 和 compilation 对象都是同一个引用，若在一个插件中修改了它们身上的属性，会影响后面的插件
+* emit 事件发生时，可以读取到最终输出的资源、代码块、模块及其依赖，并进行修改(emit 事件是修改 Webpack 输出资源的最后时机).
+  watch-run 当依赖的文件发生变化时会触发
 
 ### 动态导入/按需加载
 将路由页面/触发性功能单独打包为一个文件，使用时才加载，好处是减轻首屏渲染的负担。因为项目功能越多其打包体积越大，导致首屏渲染速度越慢。

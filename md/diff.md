@@ -34,7 +34,7 @@ DOM节点中跨层级移动操作比较少,react updateDepth对Virtual DOM进行
   1. current Fiber.如果该DOM节点已在页面中,current Fiber代表DOM节点对应的Fiber节点.
   2. workInProgress Fiber.如果该DOM节点将在本次更新中渲染到页面中,workInProgress Fiber代表该DOM节点对应的Fiber节点.
   3. DOM节点本身
-  4. JSX对象,即ClassComponent/FunctionComponent的render方法返回结果,包含DOM节点范湖信息.
+  4. JSX对象,即ClassComponent/FunctionComponent的render方法返回结果,包含DOM节点全部信息.
   Diff算法本质是对比 1 和 4 生成 2.
 
 # Diff是如何实现的
@@ -67,7 +67,7 @@ DOM节点中跨层级移动操作比较少,react updateDepth对Virtual DOM进行
   日常开发中,更新组件发生的频率更高.所以 Diff 会优先判断当前节点是否属于更新.
   Diff 逻辑会有两轮遍历,先处理更新的节点,第二轮去处理剩下不属于更新的节点.
   ### 第一轮遍历
-  1. 遍历 newChildren,将 newChildren 与 oldFiber比较,判断 DOM 节点是否可以.
+  1. let i = 0, 遍历 newChildren,将 newChildren[i] 与 oldFiber比较,判断 DOM 节点是否可以复用.
   2. 如果可以 i++,继续比较 newChildren[i] 和 oldFiber.sibiling,如果可以复用继续遍历.
   3. 如果不可以复用.判断是 key 不同导致的还是 key 相同但 type 不同导致的.如果 key 不同直接跳出整个遍历,第一轮结束.如果 type 导致的会将 oldFiber 标记为 DELETION,并继续遍历.
   4. 如果newChildren 遍历完或者 oldFiber 遍历完,跳出遍历遍历结束.
@@ -114,11 +114,21 @@ oldFiber === dabc
 // 当前 oldFiber abcd
 // 当前 newFiber dabc
 key === d 在 oldFiber 存在
-oldIndex = d(oldFiber).index 中
+oldIndex = d( abcd ).index 中
  oldIndex === 3  // oldFiber abcd 
  lastPlaceIndex === 0;
  oldIndex > lastPlaceIndex
  lastPlaceIndex = oldIndex
  d 节点位置不变
  继续剩下的 newChildren
+
+ // 当前oldFiber: abc
+ // 当前newFiber: abc
+ key === a 在 oldFiber 存在
+ oldIndex = a( abcd ).index
+ oldIndex === 0
+ oldIndex < lastPlaceIndex
+ a 需要向右移动
+ 继续剩下的 newChildren
+
  ```

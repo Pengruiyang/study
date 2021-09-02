@@ -66,3 +66,5 @@ Array.prototype.slice.call(objectLikeArray)
 export let a= 'a'
 ```
 export default 规定模块的默认对外接口,在同一个模块只能出现一次.
+
+# 错误监控

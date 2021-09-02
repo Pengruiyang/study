@@ -469,3 +469,19 @@ function report(url,data){
 2. 注意程序逻辑,不出现死循环
 3. 避免创建过多的对象,原则不用的东西立刻归还
 4. 减少层级过多的引用.
+
+# this 指向
+1. 全局作用与默认指向 window
+2. 函数独立调用指向 window
+3. 被嵌套函数独立调用时 this 指向 window
+4. 自执行函数 this 指向 window
+5. 闭包中 this 指向 window
+6. 函数被当做对象方法被调用的时候 this 指向函数的直接对象(\.前面的对象)
+7. setTimeout this 指向 window
+8. 箭头函数this 对象,定义该函数时所在的作用域指向的对象,而不是使用时所在的对象.作为方法时指向最外层 js 环境 --- window对象
+注意
+```js
+(p.foo = obj.fn)(); //隐试丢失 间接调用 被赋值给了一个变量且立即执行 this指向window
+p.fn = obj.fn;   p.fn() //this 指向p
+
+```

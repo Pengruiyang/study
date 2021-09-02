@@ -6,16 +6,18 @@
   4.Load
   最好的性能指标: 100ms 内响应用户的输入、动画或者滚动需要在 10ms 内产生下一帧、最大化空闲时间、页面加载时长不超过 5 秒
 ## 页面访问速度: 白屏、首屏时间、可交互时间
-  ### 1.first paint(FP) and first contentful paint(FCP) 首次渲染、首次有内容渲染
+  ### 1.FP and FCP 首次渲染、首次有内容渲染
   这两个指标浏览器标准化 从 performance 的 The Paint Timing API 可以获取到
   ```js
     window.performance.getEntriesByType("paint")
   ```
   ### 2.First meaningfulpaint and hero element timing 首次有意义渲染、页面关键元素
   假设当一个网页的 dom 结构发生剧烈变化的时候,就是这个网页主要内容出现的时候,那么在这样一个时间点上,就是首次有意义的渲染.
-  ### 3.Time to interactive 可交互时间
+  ### 3.TTI 可交互时间
   ### 4.长任务
   浏览器 渲染进程使单线程的,如果长任务过多,那必然会影响用户的响应时长.好的应用需要最大化空闲时间,以保证能最快响应用户的输入.
+  ### 5.LCP 最大内容绘制时间
+  ### 6.FPS 每帧传输帧数
 ## 页面稳定性: 页面出错情况
   ### 1.资源加载错误
   ### 2.JS 执行报错

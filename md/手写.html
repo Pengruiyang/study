@@ -159,21 +159,24 @@
     this.errHandles.push(func)
     return this
   }
-  Promise.resolve = function (value) {
+  Promise1.resolve = function (value) {
     if (value instanceof Promise) {
       return value
     }
     return new Promise((resolve) => resolve(value))
   }
-  Promise.reject = function (reason) {
+  Promise1.reject = function (reason) {
     return new Promise((resolve, reject) => reject(reason))
   }
   Promise1.all = (promises) => {
     return new Promise1((resolve, reject) => {
+      if(!promises || promises.length === 0) {
+        return resolve([])
+      }
       let len = promises.length
       let res = []
       promises.forEach((promise, i) => {
-        promise.then((r) => {
+        Promise1.resolve(promise).then((r) => {
           if (len === 1) {
             resolve(res)
           } else {
@@ -221,7 +224,7 @@
   const PENDING = 'pending'
   const FULFILLED = 'fulfilled'
   const REJECTED = 'rejected'
-  class Promise {
+  class Promise2 {
     constructor(executor) {
       this.status = PENDING
       this.value = undefined
@@ -452,7 +455,10 @@
   const f1 = curry(test)(1)(2)(3)
   console.log(f1)
   // pipe
-  const pipe = (...args) => (x) => args.reduce((v, fn) => fn(v), x)
+  const pipe =
+    (...args) =>
+    (x) =>
+      args.reduce((v, fn) => fn(v), x)
   //实现destructuringArray方法，达到如下效果
   function destructuringArray(array, formatter) {
     const parse = (str) => {
@@ -625,6 +631,7 @@
       this.observersList = []
     }
     addObserver(targetType, observer) {
+      console.log(targetType, 'targetType')
       if (!this.observersList[targetType]) {
         this.observersList[targetType] = [observer]
       } else {
@@ -641,15 +648,12 @@
       }
       observers = observers.filter((cb) => cb != observer)
     }
-    publish() {
-      // let [..._arguments] = arguments
-      let targetType = Array.prototype.slice.call(arguments)
+    publish(targetType, ...args) {
+      // let targetType = [...arguments]
       let observers = this.observersList[targetType]
-      if (!observers || observers.length === 0) {
-        return
-      }
+      if (!observers || observers.length === 0) return
       observers.forEach((observer) => {
-        observer.receive(targetType)
+        observer(...args)
       })
     }
   }
@@ -662,9 +666,11 @@
     }
   }
   let phonePublish01 = new Publish()
-  // phonePublish01.addObserver('小米12', new Observer('订阅者01'))
-  // phonePublish01.addObserver('红米12', new Observer('订阅者02'))
-  // phonePublish01.publish('小米12', '黑色款小米12')
+
+  let a1 = new Observer('订阅者01')
+  phonePublish01.addObserver('小米12', (targetType) => a1.receive(targetType))
+  // phonePublish01.addObserver('红米12', new Observer('订阅者02').receive)
+  phonePublish01.publish('小米12', '黑色款小米12')
 
   // sleep 实现
   function sleep(delay) {
@@ -932,49 +938,51 @@
       (promise, next) => promise.then((data) => next(data)),
       Promise.resolve(initData)
     )
-  // react useState
-  function reactState() {
-    let index = 0
-    let currentStateList = []
-    const useState = (initialState) => {
-      currentStateList[index] =
-        currentStateList[currentStateList] || initialState
-      // const state = currentState || initialState
-      const setState = (newState) => {
-        currentStateList[index] = newState
-        render()
-      }
-      index++
-      return [currentStateList[index], setState]
-    }
-  }
-  // react useEffect
-  function reactUseEffect() {
-    let lastDepsList = []
-    let lastClearCallbacks = []
-    let index = 0
-    const useEffect = (callback, deps) => {
-      const lastDeps = lastDepsList[index]
-      //  首次渲染肯定触发 || deps不传,次次触发 || 正常比较值是否发生改变
-      const changed =
-        !lastDeps || !deps || deps.some((dep, i) => dep !== lastDeps[i])
-      if (changed) {
-        lastDepsList[index] = deps
-        if (lastClearCallbacks[index]) {
-          lastClearCallbacks[index]()
+    // react useState
+    function reactState() {
+      let index = 0
+      let currentStateList = []
+      const useState = (initialState) => {
+        currentStateList[index] =
+          currentStateList[currentStateList] || initialState
+        // const state = currentState || initialState
+        const setState = (newState) => {
+          currentStateList[index] = newState
+          render()
         }
-        lastClearCallbacks[index] = callback()
+        index++
+        return [currentStateList[index], setState]
       }
-      index++
+    }
+    // react useEffect
+    function reactUseEffect() {
+      let lastDepsList = []
+      let lastClearCallbacks = []
+      let index = 0
+      const useEffect = (callback, deps) => {
+        const lastDeps = lastDepsList[index]
+        //  首次渲染肯定触发 || deps不传,次次触发 || 正常比较值是否发生改变
+        const changed =
+          !lastDeps || !deps || deps.some((dep, i) => dep !== lastDeps[i])
+        if (changed) {
+          lastDepsList[index] = deps
+          if (lastClearCallbacks[index]) {
+            lastClearCallbacks[index]()
+          }
+          lastClearCallbacks[index] = callback()
+        }
+        index++
+      }
     }
   }
-}
 
-// 简洁版 eventEmitter
-class EasyEventEmitter extends EventTarget {
-  on= this.addEventListener
-  off = this.removeEventListener
-  emit = (type,data) => this.dispatchEvent(new CustomEvent(type,{detail:data}))
-  once = (type,callback) => this.on(type,callback,{once:true,capture:true})
-}
+  // 简洁版 eventEmitter
+  class EasyEventEmitter extends EventTarget {
+    on = this.addEventListener
+    off = this.removeEventListener
+    emit = (type, data) =>
+      this.dispatchEvent(new CustomEvent(type, { detail: data }))
+    once = (type, callback) =>
+      this.on(type, callback, { once: true, capture: true })
+  }
 </script>
