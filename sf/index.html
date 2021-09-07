@@ -5,23 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body></body>
+  <body>
+    <div>123</div>
+  </body>
 </html>
 <script>
+  let a = 1
   function maxSum(arr) {
     // 按照开始时间排序
-    let sortArr = arr.sort((a, b) => a[0] - b[0]);
-    console.log(sortArr);
+    let sortArr = arr.sort((a, b) => a[0] - b[0])
+    console.log(sortArr)
     let list = sortArr.reduce((peoples, item) => {
       // 如果 people 不是第一个 并且 最新的结束时间 小于 下一个的开始时间(即在同时运动)
       if (peoples.length && peoples[peoples.length - 1] <= item[0]) {
-        peoples.pop();
+        peoples.pop()
       }
-      peoples.push(item[1]);
-      console.log(peoples);
-      return peoples;
-    }, []);
-    console.log(list);
+      peoples.push(item[1])
+      console.log(peoples)
+      return peoples
+    }, [])
+    console.log(list)
   }
 
   // console.log(
@@ -37,110 +40,110 @@
   var decodeString = function (s) {
     let arr = [],
       val = '',
-      nums = '';
+      nums = ''
     for (let i of s) {
       // 数字
       if (i / 1 == i) {
-        nums += i;
+        nums += i
       } else if (i === '[') {
-        arr.push({ nums, val });
-        (nums = ''), (val = '');
+        arr.push({ nums, val })
+        ;(nums = ''), (val = '')
       } else if (i === ']') {
-        let last = arr.pop();
-        val = last.val + val.repeat(last.nums);
+        let last = arr.pop()
+        val = last.val + val.repeat(last.nums)
       } else {
-        val += i;
+        val += i
       }
     }
-    return val;
-  };
+    return val
+  }
   // console.log(decodeString("3[a]2[bc]"));
 
   var isValid = function (s) {
-    let arr = [];
-    if (s.length % 2) return false;
+    let arr = []
+    if (s.length % 2) return false
     for (let i of s) {
       if (['{', '[', '('].includes(i)) {
-        arr.push(i);
+        arr.push(i)
       } else {
-        let last = arr[arr.length - 1];
+        let last = arr[arr.length - 1]
         if (
           (i == ')' && last != '(') ||
           (i == ']' && last != '[') ||
           (i == '}' && last != '{')
         )
-          return false;
+          return false
         else {
-          arr.pop();
+          arr.pop()
         }
       }
     }
     // if(arr.length)return false
-    return true;
-  };
+    return true
+  }
   // console.log(isValid('{[]}'));
   var maxArea = function (height) {
     let i = 0,
       j = height.length - 1,
-      max = 0;
+      max = 0
     while (i < j) {
-      max = Math.max(max, getValue(i, j));
+      max = Math.max(max, getValue(i, j))
       if (height[i] < height[j]) {
-        let lastI = height[i];
-        i++;
+        let lastI = height[i]
+        i++
         // 面积增大必须后面一项大于当前
         while (height[i] < lastI && i < j) {
-          i++;
+          i++
         }
       } else {
-        let lastJ = height[j];
-        j--;
+        let lastJ = height[j]
+        j--
         while (height[j] < lastJ && i < j) {
-          j--;
+          j--
         }
       }
     }
-    return max;
+    return max
     function getValue(i, j) {
-      return Math.min(height[i], height[j]) * (j - i);
+      return Math.min(height[i], height[j]) * (j - i)
     }
-  };
+  }
   // console.log(maxArea([1,8,6,2,5,4,8,3,7]));
 
   var maxPoints = function (points) {
     let len = points.length,
-      res = 0;
+      res = 0
     for (let i = 0; i < len; i++) {
       let same = 1,
-        map = new Map();
+        map = new Map()
       for (let j = 0; j < len; j++) {
         if (i != j) {
           // 计算斜率
-          let x = points[j][0] - points[i][0];
-          let y = points[j][1] - points[i][1];
+          let x = points[j][0] - points[i][0]
+          let y = points[j][1] - points[i][1]
           if (x == 0 && y == 0) {
-            same += 1;
-            continue;
+            same += 1
+            continue
           }
-          let gcd = gcdFunc(x, y);
-          let key = x / gcd + '-' + y / gcd;
-          map.set(key, (map.get(key) || 0) + 1);
+          let gcd = gcdFunc(x, y)
+          let key = x / gcd + '-' + y / gcd
+          map.set(key, (map.get(key) || 0) + 1)
         }
       }
 
       if (map.size == 0) {
-        res = Math.max(res, same);
+        res = Math.max(res, same)
       } else {
-        res = Math.max(res, Math.max(...map.values()) + same);
+        res = Math.max(res, Math.max(...map.values()) + same)
       }
     }
-    return res;
-  };
+    return res
+  }
   function gcdFunc(x, y) {
     if (y == 0) {
-      return x;
+      return x
     }
-    return gcdFunc(y, x % y);
+    return gcdFunc(y, x % y)
   }
   // console.log(maxPoints([[1,1],[2,2],[3,3]]));
 
@@ -149,136 +152,277 @@
     let len = words.length,
       left = -len,
       right = len,
-      min = len;
+      min = len
     for (let i = 0; i < len; i++) {
       if (words[i] === word1) {
-        left = i;
+        left = i
       } else if (words[i] === word2) {
-        right = i;
+        right = i
       }
-      min = Math.min(min, Math.abs(left - right));
+      min = Math.min(min, Math.abs(left - right))
     }
-    return min;
-  };
+    return min
+  }
   // console.log(findClosest(["vg","ti","te","yd","ja","vqx","a","rtg","bn","rdg","v","sxz","t","gn","bdc","bp","fk","nl","qr","qh","vo","d","ab","ui","gu","ft","kfr","a","jt","gyq","gmw","jqo","f","iy","pu","kky","cur","qug","z","gb","osn","khg","szd","zhb","g","n","wbv","p","f","h","hka","j","u","n","o","mod","hgc","bev","e","cx","jk","z","in","cua","on","nis","c","qpq","e","rs","ew","ms","d","nh","h","cvu","oup","m","a","yb","v","t","rc","s","hfa","ehn","w","dox","ptt","r","jzm","l","urm","qd","va","emi","sf","dc","h","wh","eh","z","c","mx","pm","bnn","fpk","sky","uyd","cwk","su","xqc","xv","w","ai","dd","zic","qg","vmc","yrd","os","el","ylz","jac","b","mpw","nso","nzx","d","c","nl","qo","vbe","p","lq","u","np","u","keo","gg","myh","emt","to","mfo","zlv","v","m","nm","i","lml","v","wly","rd","bu","ymn","iu","br","r","gwz","nou","qod","ei","gt","ws","j","wgo","e","sn","rem","jmy","hy","dm","qy","gmo","qz","xcm","iy","spz","yr","fc","cqo","pol","ib","u","ldd","fj","vj","v","hu","nr","e","hf","fwv","eu","dd","o","zft","j","uz","j","ce","hwn","dcs","z","xyn","o","b","kx","kg","pjv","ooh","k","r","fgj","wc","v","tjs","cq","aia","z","exs","be","py","zif","b","oy","o","aox","yf","i","tzn","ny","xst","eo","soq","waz","cr","bf","l","yf","bj","p","eez","io","er","xe","w","iqh","as","wmx","pk","ge","iet","xel","acc","yc","ek","bb","qip","igg","ejf","far","wkp","fzl","hhm","r","czh","vpw","z","jei","tmi","m","zdw","obg","cq","ot","h","qj","m","nu","cbu","ffv","u","fc","vb","n","vr","myt","so","g","pkl","gya","f","ahb","sn","ym","gk","i","nfn","e","efr","yu","xr","k","h","esf","uay","kws","czh","fwr","no","trb","wo","ukc","p","dn","me","up","jde","fko","y","ghw","v","g","lnq","ztl","ppr","s","o","wsj","z","rxc","o","b","gmv","kk","nak","i","gy","qv","yl","qn","lhs","r","n","ymy","d","ko","y","nvm","sdu","dru","k","uk","yu","yg","dds","hoh","v","iv","tu","fe","k","d","ggz","d","yw","al","vnu","b","u","f","up","krv","em","slq","cee","sbt","vl","t","tep","fz","db","q","z","m","x","l","ho","bcm","fcy","x","l","ps","e","yld","rou","q","d","ldo","rjn","nb","a","zr","kle","nyz","xu","h","q","fxe","aam","fho","kj","sw","i","jwa","joo","y","zrg","vdy","oc","o","cj","re","qw","wkk","s","of","nnj","or","p","ih","ps","o","u","xsg","hi","w","bof","mvn","lgy","p","m","muq","avm","w","f","vl","ntu","b","b","hbz","iv","qk","ttl","g","v","je","nej","e","s","hnu","pn","ygy","vos","ui","mvj","ae","sz","onr","mo","ar","ffs","oa","v","qf","zi","ou","utq","fx","yb","u","t","jy","oh","jyv","tju","w","vl","qft","s","hlb","hyb","su","ol","hzr","xd","j","kt","x","kzi","d","epx","gf","lxy","pmy","d","not","sbc","h","ial","rz","ypf","yd","p","hp","gck","d","r","hlb","r","zl","jbr","uaw","wz","pjc","v","bs","gh","rqv","msp","f","oaf","zp","mrh","az","br","ro","oj","zfa","ejr","gu","z","po","bc","p","we","yzw","qrg","j","wwv","bh","evz","m","h","m","mv","m","c","qz","b","vnx","hju","r","sdu","qum","m","eq","doo","nbw","lvm","o","kfn","t","z","fpl","yqv","nf","h","gr","i","udm","j","v","sz","w","eef","vy","gow","ro","zmx","ts","dub","g","dvy","ye","gmr","b","b","y","y","hxn","dr","a","pmy","ick","fb","ny","hzb","x","nm","sqr","n","ial","xo","aw","egi","mrm","uh","i","unn","j","kg","tk","lar","o","iy","yh","ag","ss","jx","ory","p","k","o","c","vng","d","wa","ff","fks","v","cz","c","u","rxf","ccv","yx","n","rt","pzn","pih","b","goy","znl","iw","fym","sy","hq","dc","a","bbp","ql","oyx","afi","gry","of","gfg","lys","lz","ky","ssv","k","y","dj","woq","pw","wbz","e","x","o","b","ptl","n","lte","gv","cg","sx","v","q","qm","xs","dip","r","pyr","j","i","w","qot","by","sla","fum","e","jx","s","ws","ntq","xb","sq","t","ky","zzd","ykj","no","sy","zlc","v","cj","f","mzm","n","sh","ao","t","ky","rrh","s","wb","bsx","kko","jxv","j","iwd","vzo","kh","q","ulq","tba","er","oic","ca","qee","e","phs","ew","aj","hm","a","hm","o","nn","w","g","oi","di","urj","nn","dp","di","tu","lll","u","xya","o","e","rz","y","e","ybn","nkb","o","aj","dim","my","xdf","bcb","rf","rbr","b","ip","e","lw","oez","k","zx","hvj","tmh","cb","ghy","qju","hy","d","d","j","qu","zoq","r","z","l","bmz","tb","z","hsw","ctu","yd","wx","pka","b","xrl","ob","gp","e","r","vm","gt","qxo","c","fur","djn","vd","p","zq","xm","a","g","t","c","kh","uh","nsq","vjc","mys","v","q","o","vc","wee","rms","ah","se","fg","uo","fl","n","io","z","ww","e","m","o","kif","yqu","r","fqy","e","yuc","pvf","jni","ss","fi","wn","ct","lrd","dyt","j","kxs","oon","mw","mdk","ejj","m","uv","gid","ldu","ah","d","cxh","bb","lr","c","an","ey","g","sqs","z","zx","x","ejy","qi","c","q","p","nm","fn","v","z","rfz","sus","vh","nxy","oa","xdg","vc","l","fvb","i","z","igu","ay","t","xvp","n","xrl","v","e","cq","qv","or","ff","apj","za","hlx","p","y","tz","hng","d","j","ykt","ta","lp","lc","fhs","xp","gfl","tzi","v","x","tgo","jv","xoj","gux","eyx","adg","gjc","p","gw","hnl","p","jt","mlj","p","nv","trl","tp","dap","mc","lx","g","l","kjg","cax","jct","q","t","d","ww","vwd","zcl","yhr","fft","qq","y","wwz","sek","a","mc","vkq","m","yn","ope","kna","y","ve","w","z","mwm","a","i","d","ta","s","fs","pix","n","lio","xka","wbn","kag","v"],
   // "o",
   // "fk"));
 
   var trap = function (height) {
-    if (height.length < 2) return 0;
+    if (height.length < 2) return 0
     let count = 0,
       left = 0,
       right = height.length - 1,
       leftMax = 0,
-      rightMax = 0;
+      rightMax = 0
     while (left < right) {
       // 当前接水量取决于短的那个方向,比之前最高的矮了多少
       if (height[left] < height[right]) {
         if (height[left] >= leftMax) {
-          leftMax = height[left];
+          leftMax = height[left]
         } else {
-          count += leftMax - height[left];
+          count += leftMax - height[left]
         }
       } else {
         if (height[right] >= rightMax) {
-          rightMax = height[right];
+          rightMax = height[right]
         } else {
-          count += rightMax - height[right];
+          count += rightMax - height[right]
         }
       }
     }
-    return count;
-  };
+    return count
+  }
 
   var minEatingSpeed = function (piles, H) {
     let lo = 1,
-      maxI = Math.max(...piles);
+      maxI = Math.max(...piles)
     // [lo,maxI) 确认好可以直接去 lo
     while (lo <= maxI) {
-      let mid = lo + ((maxI - lo) >> 1);
+      let mid = lo + ((maxI - lo) >> 1)
       if (canEatAll(piles, H, mid)) {
-        maxI = mid - 1;
+        maxI = mid - 1
       } else {
-        lo = mid + 1;
+        lo = mid + 1
       }
     }
-    return lo;
-  };
+    return lo
+  }
   function canEatAll(piles, H, mid) {
-    let h = 0;
+    let h = 0
     for (let p of piles) {
-      h += Math.ceil(p / mid);
+      h += Math.ceil(p / mid)
     }
-    return h <= H;
+    return h <= H
   }
   // console.log(minEatingSpeed([3, 6, 7, 11], 8));
 
   // 二分查找
   function binarySearch(data, arr, start, end) {
     if (start > end) {
-      return -1;
+      return -1
     }
-    let mid = (end + start) >> 1;
+    let mid = (end + start) >> 1
     if (data == arr[mid]) {
-      return mid;
+      return mid
     } else if (data < arr[mid]) {
-      return binarySearch(data, arr, start, mid - 1);
+      return binarySearch(data, arr, start, mid - 1)
     } else {
-      return binarySearch(data, arr, mid + 1, end);
+      return binarySearch(data, arr, mid + 1, end)
     }
   }
-  var arr = [0, 1, 1, 1, 1, 1, 4, 6, 7, 8];
+  var arr = [0, 1, 1, 1, 1, 1, 4, 6, 7, 8]
   // console.log(binarySearch(1, arr, 0, arr.length - 1));
 
   var uniquePaths = function (m, n) {
-    let arr = [];
+    let arr = []
     for (let i = 0; i < m; i++) {
-      if (!arr[i]) arr[i] = [];
+      if (!arr[i]) arr[i] = []
       for (let j = 0; j < n; j++) {
-        if (i < 1 || j < 1) arr[i][j] = 1;
+        if (i < 1 || j < 1) arr[i][j] = 1
         else {
-          arr[i][j] = arr[i - 1][j] + arr[i][j - 1];
+          arr[i][j] = arr[i - 1][j] + arr[i][j - 1]
         }
       }
     }
-    return arr[m - 1][n - 1];
-  };
+    return arr[m - 1][n - 1]
+  }
   // console.log(uniquePaths(7,3));
   var findNumberIn2DArray = function (matrix, target) {
-    let len = matrix.length;
-    if(!len) return false
-    let i = 0, j = matrix[0].length - 1;
-    while( i < len && j >= 0){
+    let len = matrix.length
+    if (!len) return false
+    let i = 0,
+      j = matrix[0].length - 1
+    while (i < len && j >= 0) {
       let val = matrix[i][j]
       // 判断当前值和 target 关系 小于的话只在下面排 大于就在右边列
-      if(target < val){
+      if (target < val) {
         j--
-      }else if(target > val){
+      } else if (target > val) {
         i++
-      }else{
+      } else {
         return true
       }
     }
     return false
-  };
+  }
 
-  console.log(  findNumberIn2DArray(
-    [
-      [1, 4, 7, 11, 15],
-      [2, 5, 8, 12, 19],
-      [3, 6, 9, 16, 22],
-      [10, 13, 14, 17, 24],
-      [18, 21, 23, 26, 30],
-    ],
-    5
-  ));
-  var reversePrint = function(head) {
+  console.log(
+    findNumberIn2DArray(
+      [
+        [1, 4, 7, 11, 15],
+        [2, 5, 8, 12, 19],
+        [3, 6, 9, 16, 22],
+        [10, 13, 14, 17, 24],
+        [18, 21, 23, 26, 30],
+      ],
+      5
+    )
+  )
+  var reversePrint = function (head) {
     const result = []
-    while(head){
-      result.push(b.shift())
+    while (head) {
+      result.push(head.shift())
       head = head.next
     }
     return result
-  };
-  reversePrint([1,3,2])
+  }
+  reversePrint([1, 3, 2])
+
+  /**
+   * 1898 可移除字符的最大数目
+   * 移除前 k + 1个下标后 p 仍然是 s的子序列的话,那么移除前 K 个下标 有依然成立
+   * eg: 第一次  'abccb' 'ab' [1,0]
+   *     第二次   'accb'  'ab' [0]
+   *
+   */
+  var maximumRemovals = function (s, p, r) {
+    let left = 0,
+      right = r.length,
+      pp = p.split('')
+    while (left < right) {
+      const mid = Math.floor((left + right) / 2),
+        arr = s.split('')
+      // 移除数字后的 s 的内容
+      for (let i = 0; i <= mid; i++) {
+        arr[r[i]] = '*'
+      }
+      if (check(pp, arr)) {
+        left = mid + 1
+      } else {
+        right = mid
+      }
+    }
+    return left
+
+    /**
+     * 辅助函数 check 这里的 s 就是原函数中的子序列 p
+     */
+    function check(s, t) {
+      console.log(s, t)
+      let i = 0,
+        j = 0
+      while (j < t.length && i < s.length) {
+        //  找到子序列第一个后开始找第二个符不符合 j自动自增
+        if (s[i] === t[j]) {
+          i++
+        }
+        j++
+      }
+      // 判断当前是否符合子序列
+      return i === s.length
+    }
+  }
+  maximumRemovals('abbbbbcacb', 'ab', [3, 1, 0])
+
+  /**
+   * 802. 找到最终的安全状态
+   */
+  var eventualSafeNodes = function (graph) {
+    const ans = []
+    const visited = new Set()
+    const length = graph.length
+    const dfs = (i) => {
+      if (visited.has(i)) return false
+      visited.add(i)
+      for (const neighbor of graph[i]) {
+        if (!dfs(neighbor)) return false
+      }
+      graph[i] = []
+      visited.delete(i)
+      return true
+    }
+    for (let i = 0; i < length; i++) {
+      if (dfs(i)) ans.push(i)
+    }
+    return ans
+  }
+  // 输出最长升序字符串组
+  let words = ['abc', 'ab', 'x', 'xy', 'abcd']
+  let findLongWords = (words) => {
+    let len = words.length
+    dp = Array(len).fill(1)
+    words.sort()
+    for (let i = 0; i < len; i++) {
+      for (let j = i + 1; j < len; j++) {
+        let w = words[j]
+        if (w.slice(0, -1) === words[i]) {
+          dp[j] = Math.max(dp[j], dp[i] + 1)
+        }
+      }
+    }
+    return dp.reduce((pre, cur) => Math.max(pre, cur))
+  }
+  // console.log(findLongWords(words));
+  //设计一个随机抽样的系统，这个系统需要实时的从数据流中读取数据，并提供一个查询接口，这个接口需要从已读取的数据中等概率的选取K个数并返回。
+
+  const entries = [
+    {
+      province: '浙江',
+      city: '杭州',
+      name: '西湖',
+    },
+    {
+      province: '四川',
+      city: '成都',
+      name: '锦里',
+    },
+    {
+      province: '四川',
+      city: '成都',
+      name: '方所',
+    },
+    {
+      province: '四川',
+      city: '阿坝',
+      name: '九寨沟',
+    },
+  ]
+
+  const level = ['province', 'city', 'name']
+  function transform(list, level) {
+    const res = []
+    list.forEach( i => {
+
+    })
+    function pushItem(arr,obj,index){
+      const o = {
+        value: obj[level[index]],
+        children: []
+      }
+      const currentItem = arr.find(el => el.value === obj[level[index]])
+      if(currentItem){
+        newArr = currentItem.children
+      }else{
+        arr.push(o)
+        newArr = o.children
+      }
+      if(i === level.length - 1)delete o.children
+      i++
+      if(i < level.length){
+        // 递归层级遍历
+        pushItem(newArr,obj,i)
+      }
+    }
+  }
+  transform(entries, level);
 </script>

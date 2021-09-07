@@ -1,7 +1,7 @@
 # react 内置方法
 
 1.useEffect、useLayoutEffect
-useEffect 本次更新结束后 执行 callback
+useEffect 本次更新结束后 执行 callback.会有一闪而过的效果(触发 react 两次 render)
 useLayoutEffect 类似于 componentDidUpdate 执行,dom 更新完成后立即执行,阻塞浏览器绘制.会有闪一下效果.
 这两个钩子函数会以 effect 对象形式存入 fiber.updateQueue 链表中,在 fiber reconciler 协调渲染流程的过程中,effect 对象会被取出并执行.useLayoutEffect 在渲染前后调用.useEffect 与协调中优先级调度算法有关.
 effectHook 可以在 function 组件中执行副作用(side Effect)
@@ -34,7 +34,21 @@ effectHook 可以在 function 组件中执行副作用(side Effect)
         document.title = `You clicked ${count} times`;
       }, [count]);// 只有在 count 发生变化的时候才会执行这个 effect
     ```
+### effect 流程
+1. react diff后,进入 commit 阶段.把虚拟 dom 映射到真实 dom 上.
+2. commit 阶段前期,调用生命周期方法.class 组件 => getSnapshotBeforeUpdate,function,useEffect 的 create destroy 函数.
+3. 调度阶段,把使用了 useEffect 的组件产生的生命周期函数列入 react 自己维护的调度队列中,给予一个普通的优先级,让这些生命周期函数异步执行
+4.react 把虚拟 dom 设置到真实 dom 上,这个阶段主要调用函数 commitWork,针对不同的 fiber 节点调用不同的 dom 修改方法.遇到类组件 fiber 节点(因为没有真实 dom 结构),则会直接 return,去处理下一个节点.遇到了 hooks 后,同步调用上一次渲染时 useLayoutEffect create 函数产生的 destroy 函数
+5.注意一个节点在 commitWork 后,就已经把发生的变化映射到真实 dom 上了
+6.由于 js 线程和渲染线程互斥,js 还在运行,及时内存中真实 dom 已经发生了变化,浏览器也没有立刻渲染到屏幕上.
+7.此时进行收尾工作,同步执行对应的生命周期.componentDidMount、componentDidUpdate 以及 useLayoutEffect 的 create 函数都是在这个阶段同步执行
+8.对 react 来说,commit 阶段不可打断,会一次性的把所有需要 commit 节点全部 commit 完.react更新完毕,浏览器把发生变化的 dom 渲染的屏幕上.
+9.渲染完成后,浏览器通知 react 出于空现阶段,react 开始执行自己调度队列中的任务,此时才开始执行useEffect 产生的函数.
 
+
+
+
+## 其他 hooks
 2.useRef 跨渲染周期保存数据
 3.useReducer
 4.useCallback、useMemo
