@@ -455,10 +455,14 @@
   const f1 = curry(test)(1)(2)(3)
   console.log(f1)
   // pipe
+<<<<<<< Updated upstream
   const pipe =
     (...args) =>
     (x) =>
       args.reduce((v, fn) => fn(v), x)
+=======
+  const pipe = (...args) => (x) => args.reduce((v, fn) => fn(v), x)
+>>>>>>> Stashed changes
   //实现destructuringArray方法，达到如下效果
   function destructuringArray(array, formatter) {
     const parse = (str) => {
@@ -984,5 +988,41 @@
       this.dispatchEvent(new CustomEvent(type, { detail: data }))
     once = (type, callback) =>
       this.on(type, callback, { once: true, capture: true })
+  }
+  // react useState
+  function reactState() {
+    let index = 0
+    let currentStateList = []
+    const useState = (initialState) => {
+      currentStateList[index] =
+        currentStateList[currentStateList] || initialState
+      // const state = currentState || initialState
+      const setState = (newState) => {
+        currentStateList[index] = newState
+        render()
+      }
+      index++
+      return [currentStateList[index], setState]
+    }
+  }
+  // react useEffect
+  function reactUseEffect() {
+    let lastDepsList = []
+    let lastClearCallbacks = []
+    let index = 0
+    const useEffect = (callback, deps) => {
+      const lastDeps = lastDepsList[index]
+      //  首次渲染肯定触发 || deps不传,次次触发 || 正常比较值是否发生改变
+      const changed =
+        !lastDeps || !deps || deps.some((dep, i) => dep !== lastDeps[i])
+      if (changed) {
+        lastDepsList[index] = deps
+        if (lastClearCallbacks[index]) {
+          lastClearCallbacks[index]()
+        }
+        lastClearCallbacks[index] = callback()
+      }
+      index++
+    }
   }
 </script>
