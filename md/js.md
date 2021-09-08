@@ -485,3 +485,4 @@ function report(url,data){
 p.fn = obj.fn;   p.fn() //this 指向p
 
 ```
+
