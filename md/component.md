@@ -43,3 +43,5 @@ babel-import-import
 # question
 ## yarn 安装workspace 包需要添加--ignore-workspace-root-check
 ## onchange这个库可以基于 glob 模式监听文件改动后执行一个命令
+# 缺陷
+ignoreChange 不能做到文件的完全忽略,存在优先级问题

@@ -13,7 +13,8 @@ babel 本身不具备任何转换功能,他把转换的功能都分解到一个�
 @babel/generator 将转换好的ast重新生成新的代码.运行在浏览器中
 @babel-core 整合基本核心插件.将底层代码封装,并加入领带的其他功能.简化插件
 ## babel 工作原理
-
+## babel 不如 swc esbuild 原因
+语言本身的劣势,使用 js 写的 babel 无法使用多核 CPU 优化编译任务处理,相比 swc、esbuild 编译成二进制在 node 执行,是有劣势.
 ### 插件和预设的区别
 
 ```js

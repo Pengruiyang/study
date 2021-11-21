@@ -2,14 +2,14 @@
   ## 挂载阶段
   constructor 
   componentWillMount 废弃
-  static getDevicedStateFromProps
+  static getDerivedStateFromProps
   render
   componentDidMount (commit 阶段)
   ## 更新阶段
   componentWillReceiveProps(废弃)
-  static getDevicedStateFromProps
+  static getDerivedStateFromProps
   shouldComponentUpdate
-  compoentWillUpdate(废弃)
+  componentWillUpdate(废弃)
   render
   getSnapshotBeforeUpdate
   componentDidUpDate
@@ -214,6 +214,12 @@ setState 的异步整合,批量更新也是建立在钩子函数与合成事件�
    * **IO的瓶颈**: 发送网络请求
 # Suspense 及 useDeferredValue hook
   Suspense 让组件等待某个异步操作,知道异步操作结束即可渲染.而我们不必等到数据全部返回才开始渲染,实际上,我们是已发送网络请求就马上开始渲染.在渲染中发现读取的数据还没被获取完毕,该组件会出于一个挂起的状态.React会跳过这个组件,继续渲染dom树种其他组件.
+  ## componentDidCatch 到 Suspense
+  通过在渲染阶段 status = pending 抛出异常给 Susponse,渲染终止.
+  Susponse 会在内部 componentDidCatch 处理这个异步状态.当 status 已经是 resolve 状态,数据就正常返回了
+  接下来 Susponse 再次渲染组件.
+
+#
 # React16的架构
   * Scheduler[ˈskedʒuːlər] (调度器) ---- 调度任务的优先级,高优任务优先进入reconciler
   * Reconciler [ˈrekənsaɪlər] (协调器) ---- 负责找出变化的组件 
@@ -226,6 +232,7 @@ setState 的异步整合,批量更新也是建立在钩子函数与合成事件�
   2. 触发概率不稳定,受很多因素影响,比如我们的浏览器切换tab后,之前tab注册的requestIdleCallback触发的频率会变得很低.
 
   React实现了功能更加完善的requestIdleCallback polyfill.
+  ### 基于MessageChannel
   ## Reconciler 
   在React15中Reconciler是递归处理虚拟dom的.而在16中,更新工作从递归变成了可以中断的循环过程,每次循环都会调用 shouldYield 判断当前是否有剩余时间
   ```js
@@ -239,7 +246,11 @@ setState 的异步整合,批量更新也是建立在钩子函数与合成事件�
   整个Scheduler与Reconciler的工作都在内存中进行.只有当所有组件都完成Reconciler的工作,才会统一交给Renderer
   ## Renderer 
   Renderer根据Reconciler为标记虚拟dom打上标记,同步执行对应dom操作.
-
+  ## Concurrent Mode
+  是 react 新功能,帮助应用保持响应,根据用户的设备性能和网速进行适当的调整.
+  让应用保持响应,就是在运行中保证 CPU、IO.
+  ## isInputPending 
+  浏览器新 api,来平衡 js 的执行、页面渲染已经用户输入之间的优先级.
   ## 更新流程
   1. Scheduler: 接收到更新,查询是否存在其他高优先级更新需要执行.如果没有,更新当前操作,交给Reconciler
   2. Reconciler: 接收到更新,查询更新会造成哪些虚拟dom的变化.如果没有,将打了标记的虚拟dom交给Renderer
@@ -281,13 +292,89 @@ react 根据浏览器帧率性能,计算时间切片长度的大小,结合当前
 # 手写react
 ## React.createElement
   提取type、config、children 数组生成一个 ReactElement.
+  ```js
+    function createElement(type,props,...children){
+      props.children = children
+      return {type, props}
+    }
+    export default {createElement}
+  ```
 ## ReactDOM.render
 虚拟 DOM转换成为真实 DOM.
+```js
+  function render(vnode,container){
+    const node = initVNode(vnode)
+    container.appendChild(node)
+  }
+```
 ### createReactUnit
+创建 vdom,js.将 createElement 返回的结果转换成为 vdom.
 根据不同类型生成不同的单元.
 分为文本、原生标签、react 组件
 原生组件需要考虑到事件的绑定.
+转换 vdom 为真实 dom
 react 组件挂载当前生命周期,其中插入 render 方法,转成原生组件
+```js
+  export function InitVNode(vNode){
+    let {vType} = vNode
+    if(!vType){
+      // 没有 vType,是一个文本节点
+      return document.createTextNode(vNode)
+    }
+    if(vType === 1){
+      // 原生元素 
+      return createElement(vNode)
+    }else if(vType === 2){
+      // 类组件
+      return  createClassComp(vNode)
+    }else if(vType === 3){
+      return createFuncComp(vNode)
+    }
+    
+  }
+  function createElement(vNode){
+    const{type,props} = vNode
+    const node = document.createElement(type)
+    // 过滤 key children 等特殊的 props
+    const {key, children, ...rest} = props
+    Object.keys(rest).forEach( k => {
+      // 需要特殊处理的属性名 class 和 for
+      if(k === 'className'){
+        node.setAttribute('class',rest[k])
+      }else if( k === 'htmlFor'){
+
+      }else{
+
+      }
+    })
+    // 递归初始化子元素
+    children.forEach(c => {
+      if(Array.isArray(c)){
+        c.forEach(n => {
+          node.appendChild(initVNode(n))
+        })
+      }else{
+        node.appendChild(initVNode(c))
+      }
+      
+    })
+    return node
+  }
+  // 创建函数组件
+  function createFuncComp(vNode){
+    const {type,props} = vNode
+    const newNode = type(props)
+    return initVNode(newNode)
+  }
+  // 创建类组件
+  function createClassComp(vNode){
+    const {type} = vNode
+    const component = new type(vNode.props)
+    const newNode = component.render()
+    return initVNode(newNode)
+  }
+```
+
 
 # react常用工具函数
 ## cloneElement react-router 中 Switch 组价
@@ -351,3 +438,15 @@ handleClick=()=>{
 
 ## 跨层级传递 ref?
 通过 forwardRef ,improveHandle 转发 ref 的 current 实例.
+
+## 老版本 React 为什么要引入 React?
+本质上 jsx 是语法糖,需要被转换为 React.createElement
+
+# 调用 setState 之后发生了什么
+1. setState 的时候,react 会为当前节点创建一个 updateQueue 的更新队列
+2. 接着触发 reconciliation(协调器:对比)过程,过程中,使用 Fiber 的调度算法,开始生成新的 Fiber 树.Fiber 算法最大的特点是可以做到异步可中断执行.
+3. 然后 react Scheduler(调度器)根据优先级高低,先执行优先级高的节点,执行 doWork 方法.
+4. 在 doWork 方法中,React 会先执行一遍 updateQueue 中的方法,获取新的节点,对比新老节点,为老节点打上更新、插入、替换等 tags.
+5. 当前节点 doWork 完成后,会执行 performUnitOfWork 方法获取新的(优先级)节点.重复之前过程.
+6.当前所有节点 doWork 完成后,触发 commitRoot 方法,React 进入 commit 阶段.
+7.commit 阶段中,React 会根据之前为各个节点tag 一次性更新 dom.

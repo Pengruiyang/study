@@ -401,28 +401,57 @@
   const level = ['province', 'city', 'name']
   function transform(list, level) {
     const res = []
-    list.forEach( i => {
-
-    })
-    function pushItem(arr,obj,index){
+    list.forEach((i) => {})
+    function pushItem(arr, obj, index) {
       const o = {
         value: obj[level[index]],
-        children: []
+        children: [],
       }
-      const currentItem = arr.find(el => el.value === obj[level[index]])
-      if(currentItem){
+      const currentItem = arr.find((el) => el.value === obj[level[index]])
+      if (currentItem) {
         newArr = currentItem.children
-      }else{
+      } else {
         arr.push(o)
         newArr = o.children
       }
-      if(i === level.length - 1)delete o.children
+      if (i === level.length - 1) delete o.children
       i++
-      if(i < level.length){
+      if (i < level.length) {
         // 递归层级遍历
-        pushItem(newArr,obj,i)
+        pushItem(newArr, obj, i)
       }
     }
   }
-  transform(entries, level);
+  transform(entries, level)
+
+  /**
+   * 877. 石子游戏
+   * https://leetcode-cn.com/problems/stone-game/
+   */
+  /**
+   * 状态解法
+   * 先拿开头的石子 piles[i],这样后手只能拿区间 [i+1,j]的石子
+   */
+  dp[i][j] = piles[i] + -dp[i + 1][j]
+  /**
+   * 先拿结尾的石子 piles[j],这样后手只能拿区间 [i,j - 1]的石子
+   */
+  dp[i][j] = piles[j] + -dp[i][j - 1]
+  // 所以,在先手玩家 和 后手玩家选择了石子后,
+  dp[i][j] = Math.max(piles[i] - dp[i + 1][j], piles[j] - dp[i][j - 1])
+  // 所以,当 j > i 时,情况不存在
+
+  var stoneGame = function (piles) {
+    const len = piles.length
+    const dp = new Array(len).fill(0).map(() => new Array(len).fill(0))
+    for (let i = 0; i < len; i++) {
+      dp[i][i] = piles[i]
+    }
+    for (let i = len - 2; i >= 0; i--) {
+      for (let j = i + 1; j < len; j++) {
+        dp[i][j] = Math.max(piles[i] - dp[i + 1][j], piles[j] - dp[i][j - 1])
+      }
+    }
+    return dp[0][len - 1] > 0
+  }
 </script>

@@ -455,14 +455,7 @@
   const f1 = curry(test)(1)(2)(3)
   console.log(f1)
   // pipe
-<<<<<<< Updated upstream
-  const pipe =
-    (...args) =>
-    (x) =>
-      args.reduce((v, fn) => fn(v), x)
-=======
   const pipe = (...args) => (x) => args.reduce((v, fn) => fn(v), x)
->>>>>>> Stashed changes
   //实现destructuringArray方法，达到如下效果
   function destructuringArray(array, formatter) {
     const parse = (str) => {
@@ -1025,4 +1018,9 @@
       index++
     }
   }
+  let a = '/123/321/321123'
+  let reg = /^\/(.*?)([\/]\S+)/g
+  let b = a.replace(reg,'$2')
+  // let b = a.match(reg)
+  console.log(b,'bbbbb');
 </script>
