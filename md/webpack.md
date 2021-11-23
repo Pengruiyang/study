@@ -36,9 +36,6 @@ Compilation 对象是每一次构建的上下文对象,它包含了当次构件�
     b. HardSourceWebpackPlugin 
     c. 优化压缩时间 webpack4 中使用 terser-webpack-plugin 压缩代码 强烈建议开启
 
-  5.可以开启多进程提高构建速度,并发运行默认数量 os.cpus().length - 1 
-  6.优化搜索时间-缩小文件搜索范围 减少不必要的编译工作
-
   a.导入语句查找导入文件
   b.根据要导入文件后缀使用对应的 loader 处理文件 
 

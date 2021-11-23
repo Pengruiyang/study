@@ -471,6 +471,7 @@ function report(url,data){
 4. 减少层级过多的引用.
 
 # this 指向
+this 是在执行上下文创建时确定的一个执行过程中不可更改的变量.
 1. 全局作用与默认指向 window
 2. 函数独立调用指向 window
 3. 被嵌套函数独立调用时 this 指向 window

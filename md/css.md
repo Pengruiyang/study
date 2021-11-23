@@ -11,6 +11,20 @@ flexible: 通过 js 控制 viewport 能力,使用 rem 模拟 vw 特性. 控制 v
 #  align-items 和 align-content 的区别
 align-items 针对每一个 flex 子项起作用
 align-content 将每一行 flex 子项看成一个最小单位.在 flex 子项多行 flex 容器高度固定情况下生效.子项当行需要 flex 容器高度固定且设置了 flex-wrap:wrap
+# flex属性
+## 父元素上
+display: flex; 定义 一个 flex 容器
+flex-direction: row; 主轴方向
+flex-wrap:  换行
+justify-content: 在主轴(横轴)方向上对齐方式
+align-items: 在侧轴(纵轴)方向上对齐方式
+align-content 各行向弹性盒容器伸缩行的对齐方式
+## 子元素上
+flex-grow: 扩展比例,根据扩展比例分配剩余空间
+flex-shrink 收缩比例,根据收缩比例收缩空间
+flex-basis: 伸缩基准值 所有子元素基准值之和大于剩余空间,根据每项的基准值按比例伸缩剩余空间
+flex: 0 1 auto
+align-self: 纵轴对齐方式 可以覆盖父容器的 align-items
 # flex 主轴
 flex-direction: 主轴方向 row:横轴 column:纵轴
 # 清除浮动原理
