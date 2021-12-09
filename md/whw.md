@@ -5,7 +5,7 @@
   先看 dns 缓存中是否有当前域名信息 ip 地址和端口号  有的直接返回
   解析顺序是从 浏览器缓存、操作系统缓存、本地 dns 缓存逐级查找,
   从本地 DNS服务器、根 DNS、顶级 DNS 以及权威 DNS 层层递归查询.
-  没有的话从 13 个配置文件中查询 根域名开始 .com => .baidu.com => www.baodu.com
+  没有的话从 13 个配置文件中查询 根域名开始 .com => .baidu.com => www.baidu.com
   拿到对应的域名信息存入缓存中 https 端口默认 443 http 默认 80 
 
   如果是 https 请求还需要 tls/ssl

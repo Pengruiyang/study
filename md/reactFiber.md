@@ -201,7 +201,8 @@ componentWillReceiveProps 废弃
 static getDerivedStateFromProps
 shouldComponentUpdate
 componentWillUpdate 废弃
-render 2.提交阶段. 上一阶段计算出需要处理的一次执行.这个阶段不可打断必须同步执行
+render 
+2.提交阶段.commit 上一阶段计算出需要处理的一次执行.这个阶段不可打断必须同步执行
 getSnapshotBeforeUpdate
 componentDidMount
 componentDidUpdate
@@ -211,7 +212,8 @@ componentWillUnmount
 
 ## Fiber 架构
 
-1.react 使用 fiber 数据机构存放组件数的附加信息 2.第一次渲染执行 render,后面先 diff 再渲染
+1.react 使用 fiber 数据机构存放组件数的附加信息 
+2.第一次渲染执行 render,后面先 diff 再渲染
 3.fiber 渲染树的深度遍历优先, child > silibing > parent.silibing
 4,reconcilerChildren 根据 children 创建 filber 渲染树,并进行 diff,与 vue 不同的是,vue 考一些假设两端向中间.
 5.fiber 渲染树,按照优先级顺序,一层一层形成链表结构,rootFiber 在 render 中创建.
@@ -300,10 +302,10 @@ ReactDOM.unstable_create(rootEl).render(<App />)
 
 # Fiber 更新复用机制
 
-1. oldProps === newProps (render 返回结果实际上是 React.createElement 执行结果是一个全新的 props 引用,不会复合全等)
+1. oldProps === newProps (render 返回结果实际上是 React.createElement 执行结果是一个全新的 props 引用,不会符合全等)
 2. context value 没有变化 (指的是老版本的 context)
 3. workinProgress.type === current.type (更新前后 Fiber.type 没发生改变)
-4. !includesSomeLane(renderLanes, updateLanes) (党全面 Fiber 是否存在更新,如果存在那么更新的优先级是否和本次整跟 Fiber 树调度的优先级一致.如果一致代表组件需要更新,走 render 逻辑)
+4. !includesSomeLane(renderLanes, updateLanes) ( Fiber 是否存在更新,如果存在那么更新的优先级是否和本次整跟 Fiber 树调度的优先级一致.如果一致代表组件需要更新,走 render 逻辑)
 
 # 工作流程
 

@@ -112,11 +112,10 @@ Redux 是一个状态管理库,简化了单项数据流,实现了多组件通信
     middlewares.forEach(middleware => dispatch = middleware(store)(dispatch))
   ```
 # react router 
-  分为 react-router react-router-dom
-  ## react-router
-   提供 router 核心api,包括 Router Route Switch 没有 dom 操作的进行跳转的 api
-  ## react-router-dom
-  提供 BrowserRouter Link HashRoute
+分为 HashRouter 和 BrowserRouter 模式.
+hash 模式通过读写 hash 值,监听 hashChange 去渲染不同的组件.
+history 是通过 window.history 这个对象.监听 popState 去渲染不同组件.通过 pushState 完成 push 方法,改变地址后,执行监听函数.
+Router 的实现,通过 React.createContext 借助 history 对象的一个高阶组件.在这个组件中去监听 history 的 listen 方法,再重新触发组件更新,更新 history,location值.Route 通过 context 和 path 去匹配对应的组件.
 # react 代码分割路由动态加载
   1. 原理
   先判断installedChunks对象,用来缓存已加载的 chunk,是否已加载?
@@ -267,7 +266,7 @@ setState 的异步整合,批量更新也是建立在钩子函数与合成事件�
 1. 通过统一的事件处理函数.dispatchEvent 进行批量更新 batchUpdate.
 2. 执行事件对应的处理插件中 extractEvents,合成事件源对象,每次 react 会从事件源开始,从上遍历类型为 hostComponent 即 fiber 是 dom 类型的,判断 props中是否有当前事件如 onClick,最终形成一个事件执行队列,react 就用这个队列模拟 捕获 => 源 => 冒泡这一阶段.
 3. 最后通过 runEventsInBatch 执行事件队列,发现阻止冒泡,立刻 break 跳出循环,最后重置事件源,放回事件池中,完成整个流程.
-# react 17 的变化
+# react17 的变化
   1. 重构 JSX 转换逻辑 不需要引入import React from 'react',编译器会自动帮我们引入.
   2. 事件系统重构. 放弃使用 document 做事件的中心化管控.会挂载到 root 节点上. 取消事件池复用,为每一个合成事件创建新的对象.
   3. Lane模型(通过二进制数表示优先级)代替 expirationTime 模型(**通过时间长度描述优先级**).
@@ -450,3 +449,15 @@ handleClick=()=>{
 5. 当前节点 doWork 完成后,会执行 performUnitOfWork 方法获取新的(优先级)节点.重复之前过程.
 6.当前所有节点 doWork 完成后,触发 commitRoot 方法,React 进入 commit 阶段.
 7.commit 阶段中,React 会根据之前为各个节点tag 一次性更新 dom.
+
+
+# react 优化
+props 传递回调函数,可能会引发子组件的重复渲染.useCallback 包裹传递给子组件的回调函数.
+减少 render 次数,合理使用 Context
+组件懒加载, 配合使用 react.Suspense提升用户体验
+使用 useMemo 降低渲染计算量
+避免页面初始化时间过长,考虑优化
+减少 setState 的可能
+避免组件嵌套
+# react18
+## 新 hook useId()

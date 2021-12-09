@@ -1,8 +1,8 @@
 # react 内置方法
 
 1.useEffect、useLayoutEffect
-useEffect 本次更新结束后 执行 callback.会有一闪而过的效果(触发 react 两次 render)
-useLayoutEffect 类似于 componentDidUpdate 执行,dom 更新完成后立即执行,阻塞浏览器绘制.会有闪一下效果.
+useEffect 本次更新结束后 执行 callback.会有一闪而过的效果(触发 react 两次 render).是异步调用.
+useLayoutEffect: dom 更新完成后立即执行,会在浏览器进行任何绘制之前运行完成.阻塞浏览器绘制.即为同步调用.
 这两个钩子函数会以 effect 对象形式存入 fiber.updateQueue 链表中,在 fiber reconciler 协调渲染流程的过程中,effect 对象会被取出并执行.useLayoutEffect 在渲染前后调用.useEffect 与协调中优先级调度算法有关.
 effectHook 可以在 function 组件中执行副作用(side Effect)
 
@@ -67,7 +67,9 @@ effectHook 可以在 function 组件中执行副作用(side Effect)
 组件之间复用逻辑难
 复杂组件变得难以理解
 难用的类组件
-
+# useMemo 和 useCallback 的其波尔
+useMemo 缓存的第一个参数函数的返回值.如果依赖数组中的值发生改变,就会重新执行
+useCallback 则是缓存函数.
 # useContext 怎么优化?
 
 react 的更新是自上而下的,所以当 Context 更新时,所有子组件都会跟着更新.而 React.memo 仅检查 props 变更.如果函数组件被 React.memo 包裹,而其实现中拥有 useState 和 useContext 的 hook,当 context 改变是,他仍会重新渲染.useContext 可以击穿一切 memo
@@ -141,8 +143,7 @@ function mountState(initialState) {
 ### dispatchAction 无状态组件更新机制
 
 不论类组件调用 setState 还是函数组件 dispatchAction,都会产生一个 update 对象.记录此次更新的信息.
-然后将次 update 放入待更新的 pending 队列中,dispatch 第二步会判断当前函数组件的 fiber 对象是否处于
-渲染阶段,处于的话就不需要我们更新当前函数组件,更新当前 update expirationTime 即可.
+然后将次 update 放入待更新的 pending 队列中,dispatch 第二步会判断当前函数组件的 fiber 对象是否处于渲染阶段,处于的话就不需要我们更新当前函数组件,更新当前 update expirationTime 即可.
 处于没有更新阶段,通过 lastRenderedReducer 获取最新的 state 和上一次的 state,进行浅比较,相等就退出.
 
 ```js

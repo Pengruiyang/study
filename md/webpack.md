@@ -1,5 +1,5 @@
 # webpack 本质
-
+webpack 是基于事件流的插件集合,他的工作流程就是将各个插件串联起来.核心是 Tapable.Tapable 是一个类似于 EventEmitter 的库.控制钩子函数的发布和订阅.webpack 最核心的 Compiler 和 Compilation 
 # Compiler 和 Compilation
 
 Compiler 对象是一个全局单例,负责把控整个 webpack 打包的生命周期.包含了 webpack 环境所有的配置信息,包括 options,loaders,plugins 这些项,这个对象在 webpack 启动被实例化.
@@ -82,6 +82,9 @@ ModuleConCatenationPlugin: scope hoisting 分析模块依赖关系,打入一个�
 
 ### plugins 原理:
 在 Webpack 运行的生命周期中会广播出许多事件(**run、build-module、program**)，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
+插件必须求是一个函数或者一个包含 apply 方法的对象
+apply 方法接收一个 Compiler 对象,包含了这次构建的所有配置信息,通过这个对象注册钩子函数
+通过 Compiler.hooks.emit.tap注册钩子函数,钩子函数第一个参数为插件名称.第二个阐述 compilation 为此次打包的上下文
 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin 的实例，参数都通过构造函数传入
 
 ### plugins 和 loader 的区别
@@ -290,7 +293,7 @@ resolve: {
 tree-shaking 只针对 ESM 模范生效,对其他模块规范失效.
 5 会分析模块 export 和 import 依赖关系,去除未被使用模块.
 
-## 5. Module Federation
+## 5. Module Federation 模块联邦
 
 可以是 js 应用从另一个 js 应用中动态的加载代码,同时共享依赖.相当于 webpack 提供线上 runtime 环境,多个应用利用 cdn 共享组件,不需要本地 npm 包再构建了.
 const { ModuleFederationPlugin } = require("webpack").container;
