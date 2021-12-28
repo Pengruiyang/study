@@ -1,9 +1,9 @@
 # javascript 引擎是单线程运行的,即 JavaScript 引擎和页面渲染引擎在同一个渲染进程上.GUI 渲染和 JavaScript 执行互斥.
 
-同时只能做一件事情,name 一个任务长期霸占 CPU 就会导致后面的事情无法处理,出于卡死状态
+同时只能做一件事情,一个任务长期霸占 CPU 就会导致后面的事情无法处理,出于卡死状态
 3 个解决方向
 
-> a.优化每个人物,让他能有多快有多快,挤压 CPU 运算量
+> a.优化每个任务,让他能有多快有多快,挤压 CPU 运算量
 > b.快速响应用户,让用户感受不到卡顿,不阻塞用户交互
 > c.多 worker 进程
 > vue 选择的是一个,因为对 vue 而言,使用模板有了很大的优化空间,配合其响应式机制可以让 vue 精准的进行节点更新.而 react 选择的是让用户感受不到卡顿
@@ -215,9 +215,11 @@ componentWillUnmount
 1.react 使用 fiber 数据机构存放组件数的附加信息 
 2.第一次渲染执行 render,后面先 diff 再渲染
 3.fiber 渲染树的深度遍历优先, child > silibing > parent.silibing
-4,reconcilerChildren 根据 children 创建 filber 渲染树,并进行 diff,与 vue 不同的是,vue 考一些假设两端向中间.
+4,reconcilerChildren 根据 children 创建 fiber 渲染树,并进行 diff,与 vue 不同的是,vue 考一些假设两端向中间.
 5.fiber 渲染树,按照优先级顺序,一层一层形成链表结构,rootFiber 在 render 中创建.
-6.fiber 都执行完毕后进行 commint 阶段,commit 阶段不可打断,一次性更新完 dom.找到父节点,根据 fiber 对象上的 effectTag 做 对应的 dom 操作 7.优先级: 计算过期时间 8.数据结构
+6.fiber 都执行完毕后进行 commit 阶段,commit 阶段不可打断,一次性更新完 dom.找到父节点,根据 fiber 对象上的 effectTag 做 对应的 dom 操作 
+7.优先级: 计算过期时间 
+8.数据结构
 
 ```js
    {
