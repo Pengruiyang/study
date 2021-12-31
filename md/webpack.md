@@ -21,6 +21,7 @@ Compilation 对象是每一次构建的上下文对象,它包含了当次构件�
   将编译后的 Module 组合成为 Chunk 再转换成文件,输出
 
   1. 分析打包速度 
+    开启processbar-webpack-plugin,查看构建时长.
     通过 speed-measure-webpack-plugin 测量 webpack 构建期间各个阶段花费时间 .
     配置 BundleAnalyzer 分析打包文件结构.找出导致体积过大的原因.
   2. 分析影响打包速度环节.
@@ -39,14 +40,14 @@ Compilation 对象是每一次构建的上下文对象,它包含了当次构件�
   a.导入语句查找导入文件
   b.根据要导入文件后缀使用对应的 loader 处理文件 
 
-  1. 优化 Loader 配置通过 test、include、exclude 三个配置项命中 Loader 文件 
-  2. 优化 resolve.modules 配置优先查找当前目录的 node*modules,没有再往上级查找.指明当前路径第三方模块的绝对路径 
-  3. 优化 resolve.alias 配置 
-  4. 优化 resolve.extensions 配置 后缀查询 
-  5. 优化 resolve.mainFields 配置 (mainFields 会根据配置读取 es6/es5 语法代码) 
-  6. 优化 module.noParse 配置 忽略部分没有采用模块化的文件递归解析处理(jq.chartJs)
-  7. Tree shaking (webpack-Deep-shaking-Plugin)(purgecss-webpack-plugin) webpack 4.0 默认支持 .babelrc 配置 modules:false*
-  8. DLL DLLPlugin 进行分包,将第三方依赖提前打包.让DLL 与业务代码完全分离且每次只构建业务代码. (webpack 4 已经不推荐了)
+  1. thread-loader 开启多进程打包
+  2. 优化 Loader 配置通过 test、include、exclude 三个配置项命中 Loader 文件 
+  3. 优化 resolve.modules 配置优先查找当前目录的 node*modules,没有再往上级查找.指明当前路径第三方模块的绝对路径 
+  4. 优化 resolve.alias 配置 
+  5. 优化 resolve.extensions 配置 后缀查询 
+  6. 优化 resolve.mainFields 配置 (mainFields 会根据配置读取 es6/es5 语法代码) 
+  7. 优化 module.noParse 配置 忽略部分没有采用模块化的文件递归解析处理(jq.chartJs)
+  8. Tree shaking (webpack-Deep-shaking-Plugin)(purgecss-webpack-plugin) webpack 4.0 默认支持 .babelrc 配置 modules:false*
   9. 提取公共资源
   10. Scope hoisting module:production 默认开启 
   11. 动态 polyfill ,只返回用户需要的. 

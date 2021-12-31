@@ -193,9 +193,10 @@ pm2:启动你的 node 服务,根据你的电脑去启动相应的进程数,监�
 CommonJs 规范加载模块是同步的,nodeJs 是 commonJS 规范的主要实践者,模块文件一般已存在本地硬盘,加载比较快.输出的一个值的拷贝.运行时加载模块.加载的是 module.exports 这个对象.
 ES6 module 异步加载模块.ES6 的模块不是对象,import 命令会被 JavaScript 静态分析,在编译时就引入模块,而不是等到代码运行时加载.
 
+
 ## ES6 模块与 CommonJS 模块的差异
 
-1. CommonJS 模块输出的是一个值的拷贝,意味着一但输出一个值后,模块内部变化就影响不到这个值.ES Module 输出的是值的引用.
+1. CommonJS 模块输出的值是浅拷贝.ES Module 输出的是值的引用.
 2. CommonJS 模块是运行时加载,ES Module 模块是编译时输出接口.Es Module 是在编译时就会提前加载并解析模块
 3. CommonJs 是单个值导出，ES6 Module 可以导出多个
 4. CommonJs 是动态语法可以写在判断里，ES6 Module 静态语法只能写在顶层
@@ -475,3 +476,6 @@ js 源代码 => AST 抽象语法树 => 字节码 => 二进制文件
 
 ## HTTP 缓存
 当服务器返回 304 Not Modified 时,字节码保持着 warm run 或者 hot run.当返回 200 更新资源时,清除字节码缓存,恢复到 cold run 状态.
+
+# CJS转ESM
+

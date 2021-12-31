@@ -402,11 +402,13 @@ class EventEmitter {
 
 # js bridge 原理
 
-js bridge 充当中间这,让 js 和 Android 双向通信.Android 将事件注入到前端上 window 中.一种是 Android 的回调时间,一种是留给前端主动调用 Android 的事件,
+js bridge 充当中间这,让 js 和 Android 双向通信.Android 将事件注入到前端上 window 中.一种是 Android 的回调事件,一种是留给前端主动调用 Android 的事件,
 
 # IntersectionObserver
 
 异步观察目标元素与祖先元素或者根 root 可视区
+## 基于IntersectionObserver和MutationObserver实现埋点
+
 
 # 前端异常Error 监控
 ## try catch

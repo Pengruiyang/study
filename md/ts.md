@@ -147,8 +147,8 @@ infer 关键字常在条件类型中和 extends 关键词一起出现,表示将�
 ![-w540](media/16141488943910/16141509956943.jpg)
 
 # typeof 和 keyof
-keyof与Object.keys类似, 只取 interface 的键保存为联合类型.
-typeof获取一个变量或者对象的类型,可以获取类上面的静态属性和方法
+keyof与Object.keys类似, 将type/interface的最外层key保存为联合类型.
+typeo 根据一个已有变量或者对象,获取类上面的静态属性和方法
 ```ts
     function get<T extends object, K extends keyof T>(o: T, name: K): T[k] {
         return o[name] 
@@ -204,4 +204,8 @@ Test2 接口比 Test1 接口多一个 b 属性,Test1接口可以说是Test2接�
 # TS优势
 1. 静态输入: 编写代码阶段检测问题
 2. 自动完成和动态输入提升开发效率
-3. 
+
+# XOR的实现
+```ts
+
+```
