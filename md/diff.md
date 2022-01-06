@@ -117,7 +117,7 @@ key === d 在 oldFiber 存在
 oldIndex = d( abcd ).index 中
  oldIndex === 3  // oldFiber abcd 
  lastPlaceIndex === 0;
- oldIndex > lastPlaceIndex
+ oldIndex > lastPlaceIndex //仅在 oldIndex > lastPlaceIndex 才会改变 lPI 的值
  lastPlaceIndex = oldIndex
  d 节点位置不变
  继续剩下的 newChildren

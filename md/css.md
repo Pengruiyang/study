@@ -37,4 +37,13 @@ BFC: 一个独立的渲染区域,规定了内部布局,并且与外部毫不相�
   position（absolute，fixed） 
   fieldset元素
 
-
+# css 盒模型
+怪异盒模型 border-box weight height = content + padding + border
+标准盒模型 content-box
+# css margin 和 padding 百分比
+参考容器的宽度
+# 绝对居中方案
+1. position:absolute; left: 50% + -margin-top:200/2px;
+2. position:absolute; left: 50% + transform: translate(-50%,-50%)
+3. position:absolute;left/top/right/bottom: 0;margin:auto
+4. 父元素 flex.   align-items:center;justify-content:center;

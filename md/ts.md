@@ -204,8 +204,13 @@ Test2 接口比 Test1 接口多一个 b 属性,Test1接口可以说是Test2接�
 # TS优势
 1. 静态输入: 编写代码阶段检测问题
 2. 自动完成和动态输入提升开发效率
+3. 具有类型的系统,是 js 的超集
+4. 在组件及业务类型校验上支持很强
+5. 命令空间+接口申明更方便类型校验.防止代码不规范.(通过这个反推代码规范化)
+6. 
 
 # XOR的实现
 ```ts
-
+  type Without<T,U> = {[P in Exclude<keyof T, keyof U>]?: never}
+  type Xor<T,U> = Without<T,U> & U | Without<T,U> & T
 ```
