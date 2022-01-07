@@ -45,8 +45,8 @@ Compilation 对象是每一次构建的上下文对象,它包含了当次构件�
   3. 优化 resolve.modules 配置优先查找当前目录的 node*modules,没有再往上级查找.指明当前路径第三方模块的绝对路径 
   4. 优化 resolve.alias 配置 
   5. 优化 resolve.extensions 配置 后缀查询 
-  6. 优化 resolve.mainFields 配置 (mainFields 会根据配置读取 es6/es5 语法代码) 
-  7. 优化 module.noParse 配置 忽略部分没有采用模块化的文件递归解析处理(jq.chartJs)
+  6. 优化 resolve.mainFields 配置 (mainFields 针对第三方依赖优先才去 jsnext:main 中的 es6 模块化语法文件) 
+  7. 优化 module.noParse 配置 忽略部分没有采用模块化的文件递归解析处理( lodash.chartJs)
   8. Tree shaking (webpack-Deep-shaking-Plugin)(purgecss-webpack-plugin) webpack 4.0 默认支持 .babelrc 配置 modules:false*
   9. 提取公共资源
   10. Scope hoisting module:production 默认开启 

@@ -6,7 +6,10 @@
 4. 获取所有需要更新的包和版本号更新.
 
 
-# babel-plugin 开发思路
+# babel-plugin customName 功能 开发思路
 基于 babel-plugin-import 插件,在编译阶段将引用指向了模块所在的文件夹.并在文件夹中做出配置.
 针对 icon 这种有很多子组件,对子组件针对处理
+
+# 写过 tinypng plugin 源码并实现过
+创建 plugin 对象,这个对象必要要有 apply 方法去获取 webpack的 compiler 对象.这个对象是 webpack 的全局单例.负责 webpack 的整个生命周期.包含全部配置信息.基于 webpack 配置的 options 和提供给我们的钩子,emit 是输出 asset 到输出文件执行的钩子,tapPromise 的 promise 操作去监听插件名,在本次 构建 compilation 对象中.找出符合规则的图片.按照 tinypng 规定的 api 上传图片.同时基于spinner对 shell 语句进行文件状态的输出.然后等待 tiny-png 处理好了之后再下载文件.最后 chalk 输出文件前后打包大小区别压缩程度.
 # 想法可能比较新颖并愿意实践
