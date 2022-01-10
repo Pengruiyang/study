@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body></body>
+</html>
+<script typescript>
+  // 并发控制器
+  class Queue {
+    constructor() {
+      this._queue = []
+    }
+    push(value) {
+      return this._queue.push(value)
+    }
+    shift() {
+      return this._queue.shift()
+    }
+    isEmpty() {
+      return this._queue.length === 0
+    }
+  }
+
+  class DelayedTask {
+    constructor(resolve, fn, args) {
+      this.resolve = resolve
+      this.fn = fn
+      this.args = args
+    }
+  }
+  class TaskPool {
+    constructor(size) {
+      // 任务池工作状态
+      this.size = size
+      // 队列
+      this.queue = new Queue()
+    }
+    /**
+     * 将新任务放入队列中,触发任务池检测机制,如果当前任务池不满的话,则从队列中取出任务放到任务池中执行
+     */
+    addTask(fn, args) {
+      return new Promise((resolve) => {
+        this.queue.push(new DelayedTask(resolve, fn, args))
+        this.pullTask()
+      })
+    }
+    // 如果当前队列不为空,任务池不满,主动执行任务
+    pullTask() {
+      if (this.queue.isEmpty()) return
+      if (this.size === 0) return
+      this.size--
+      const { resolve, fn, args } = this.queue.shift()
+      resolve(this.runTask(fn, args))
+    }
+    // 执行当前任务,任务执行后更新状态,主动拉取任务执行
+    runTask(fn, args) {
+      const result = Promise.resolve(fn(...args))
+      result
+        .then(() => {
+          this.size++
+          this.pullTask()
+        })
+        .catch((err) => {
+          this.size++
+          this.pullTask()
+        })
+      return result
+    }
+  }
+
+  const taskList = [3000, 200, 1000, 1300, 800, 2000]
+
+  // 需要队列
+
+  const task = (timeout) =>
+    new Promise(
+      (resolve) =>
+        setTimeout(() => {
+          console.log(timeout)
+          resolve(timeout)
+        }, timeout)
+      // {
+      //   console.log(timeout)
+      //   return resolve(timeout)
+      // }
+    )
+  const cc = new TaskPool(2)
+  // async function startNoConcurrentControl() {
+  //   await Promise.all(taskList.map((item) => cc.addTask(task, [item])))
+  // }
+  async function start() {
+    console.time('aa')
+    await Promise.all(taskList.map((i) => cc.addTask(task, [i])))
+    console.timeEnd('aa')
+  }
+  start()
+
+  // Promise
+  function Promise1(func) {
+    this.fullfilled = false
+    this.rejected = false
+    this.pending = false
+    this.handles = []
+    this.errHandles = []
+    function resolve(...args) {
+      this.handles.forEach((handle) => handle(...args))
+    }
+    function reject(...args) {
+      this.errHandles.forEach((handle) => handle(...args))
+    }
+    func.call(this, resolve.bind(this), reject.bind(this))
+  }
+  Promise1.prototype.then = function (func) {
+    this.handles.push(func)
+    return this
+  }
+  Promise1.prototype.catch = function (func) {
+    this.errHandles.push(func)
+    return this
+  }
+  Promise1.resolve = function (value) {
+    if (value instanceof Promise) {
+      return value
+    }
+    return new Promise((resolve) => resolve(value))
+  }
+  Promise1.reject = function (reason) {
+    return new Promise((resolve, reject) => reject(reason))
+  }
+  Promise1.all = (promises) => {
+    return new Promise1((resolve, reject) => {
+      if(!promises || promises.length === 0) {
+        return resolve([])
+      }
+      let len = promises.length
+      let res = []
+      promises.forEach((promise, i) => {
+        Promise1.resolve(promise).then((r) => {
+          if (len === 1) {
+            resolve(res)
+          } else {
+            res[i] = r
+          }
+          len--
+        }, reject)
+      })
+    })
+  }
+  Promise1.race = (promises) => {
+    return new Promise1((resolve, reject) => {
+      promises.forEach((promise) => promise.then(resolve, reject))
+    })
+  }
+  Promise1.allSettled = function (promises) {
+    let result = []
+    return new Promise((resolve, reject) => {
+      promises.forEach((promise, i) => {
+        Promise.resolve(promise).then(
+          (val) => {
+            result.push({
+              status: FULFILLED,
+              value: val,
+            })
+            if (result.length === promises.length) {
+              resolve(result)
+            }
+          },
+          (err) => {
+            result.push({
+              status: REJECTED,
+              reason: err,
+            })
+            if (result.length === promises.length) {
+              resolve(result)
+            }
+          }
+        )
+      })
+    })
+  }
+
+  // 符合Promise A+ 规范
+  const PENDING = 'pending'
+  const FULFILLED = 'fulfilled'
+  const REJECTED = 'rejected'
+
+  // 继承
+  function initPrototype(Father, Child) {
+    // 复制父节点的原型对象
+    Child.prototype = Object.create(Father.prototype)
+    // 指向新建的子类
+    Child.prototype.constructor = Child
+  }
+
+  function A(name) {
+    this.name = name
+    this.list = [1, 2, 3]
+  }
+  function B(name, age) {
+    A.call(this, name)
+    this.age = age
+  }
+  initPrototype(A, B)
+
+  // new
+  function _new(fn, args) {
+    // 创建一个新对象,新对象原型属性指向构造函数的原型对象
+    let obj = Object.create(fn.prototype)
+    // 将属性和方法添加到新对象上,新对象绑定构造函数的this
+    let ret = fn.call(obj, ...args)
+    // 判断构造函数内部有没有返回值
+    return ret instanceof Object ? ret : obj
+  }
+
+  // bind
+  const myBind = (ctx, ...args) => {
+    return (...nextArgs) => {
+      this.call(ctx, ...args, ...nextArgs)
+    }
+  }
+  // instanceOf 右边prototype能在左边原型链上找到
+  function instanceOf(left, right) {
+    let proto = left.__proto__
+    while (true) {
+      if (proto === null) return false
+      if (proto === right.prototype) {
+        return true
+      }
+      proto = proto.__proto__
+    }
+  }
+  // create
+  Object.create2 = function (proto, propertyObject = undefined) {
+    if (typeof proto !== 'object' && typeof proto != 'function') {
+      throw new TypeError('Object prototype may only be an Object or null')
+    }
+    if (propertyObject === null) {
+      new TypeError('Cannot convert undefined or null to object')
+    }
+    function F() {}
+    F.prototype = proto
+    const obj = new F()
+    if (propertyObject != undefined) {
+      Object.defineProperties(obj, propertyObject)
+    }
+    if (proto === null) {
+      // 创建一个没有原型对象的对象 Object.create(null)
+      obj.__proto__ = null
+    }
+    return obj
+  }
+  // assign
+
+  Object.assign2 = function (target, ...source) {
+    if (target === null) {
+      throw new TypeError('Cannot convert undefined or null to object')
+    }
+    let ret = Object(target)
+    source.forEach(function (obj) {
+      if (obj != null) {
+        for (let key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            ret[key] = obj[key]
+          }
+        }
+      }
+    })
+    return ret
+  }
+  // curry
+  function curry(fn) {
+    const inner = (...args) => {
+      console.log(args)
+      if (fn.length === args.length) {
+        return fn.call(this, ...args)
+      }
+
+      return (...innerArgs) => inner.call(this, ...args, ...innerArgs)
+    }
+    return inner
+  }
+  // pipe
+  const pipe = (...args) => (x) => args.reduce((v, fn) => fn(v), x)
+
+  const isEqual = (oldData, newData) => {
+    const oldKeys = Object.keys(oldData)
+    const newKeys = Object.keys(newData)
+    if (oldKeys.length !== newKeys.length) {
+      return false
+    } else {
+      for (const key in oldData) {
+        if (!newData.hasOwnProperty(key)) return false
+        // 类型相同
+        if (typeof oldData[key] === typeof newData[key]) {
+          // 都是引用类型
+          if (typeof oldData[key] === 'object') {
+            if (!isEqual(oldData[key], newData[key])) {
+              return false
+            }
+          }
+          if (
+            typeof oldData[key] !== 'object' &&
+            oldData[key] !== newData[key]
+          ) {
+            return false
+          }
+        } else {
+          return false
+        }
+      }
+    }
+    return true
+  }
+  // console.log(isEqual({ a: 1, b: [1, 2], c: { d: 1 } }, { a: 1, b: [1, 2], c: { d: 1 } }), 'isEqual322');
+
+  // 合并有效数组
+  const merge = function (num1, m, num2, n) {
+    let len = m + n
+    while (m > 0 && n > 0) {
+      num1[--len] = num1[m - 1] > num2[n - 1] ? num1[--m] : num2[--n]
+    }
+    if (n > 0) {
+      num1.splice(0, n, ...num2.splice(0, n))
+    }
+  }
+  // 反转列表
+  var reverseList = function (head) {
+    let [prev, cur] = [null, head]
+    //  链表的交换需要扩展一个指针 即next
+    // cur 当前项
+    // prev 上一项
+    while (cur) {
+      [cur.next, prev, cur] = [prev, cur, cur.next]
+    }
+    return prev
+  }
+  // 求数组里面最大连续项的和
+  function getMaxSum(arr) {
+    let dp = Array(arr.length).fill(0)
+    let maxSum = 0
+    dp[0] = arr[0]
+    for (let i = 1; i < arr.length; i++) {
+      dp[i] = Math.max(arr[i], dp[i - 1] + arr[i])
+      if (dp[i] > maxSum) {
+        maxSum = dp[i]
+      }
+    }
+    return maxSum
+  }
+  // console.log(getMaxSum([1, -2, 3, 4, -1, 5]),'getMaxSum');
+
+  //求一个数组最大子项的和，要求这些子项在数组中的位置不是连续的。
+  var rob = function (nums) {
+    if (nums.length === 0) return 0
+    if (nums.length === 1) return nums[0]
+    let dp = Array(nums.length)
+    dp[0] = nums[0]
+    dp[1] = Math.max(dp[0], nums[1])
+    for (let i = 2; i < nums.length; i++) {
+      dp[i] = Math.max(dp[i - 1], dp[i - 2] + nums[i])
+    }
+    return dp[nums.length - 1]
+  } 
+  // 发布订阅模式
+  class EventEmitter {
+    constructor() {
+      this.events = {}
+    }
+    // 订阅事件方法
+    on(eventName, callback) {
+      if (!this.events[eventName]) {
+        this.events[eventName] = [callback]
+      } else {
+        this.events[eventName].push(callback)
+      }
+    }
+    // 触发事件
+    emit(eventName) {
+      this.events[eventName] && this.events[eventName].forEach((cb) => cb())
+    }
+    once(eventName, callback) {
+      let fn = () => {
+        cb()
+        this.remove(eventName, callback)
+      }
+      this.on(eventName, fn)
+    }
+    //
+    remove(eventName, calllback) {
+      if (this.events[eventName]) {
+        this.events[eventName] = this.events[eventName].filter(
+          (cb) => cb != calllback
+        )
+      }
+    }
+  }
+
+
+  // sleep 实现
+  function sleep(delay) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve()
+      }, delay * 1000)
+    })
+  }
+  // 模板字符串实现
+  const strModal = (str) => {
+    let reg = /\$\{(\w+)\}/g
+    str = str.replace(reg, function (x, y) {
+      return eval(y)
+    })
+    return str
+  }
+  let name = '长城软件',
+    age = 40
+  let str = 'hello~~${name}风风雨雨走过了${age}载'
+  // strModal(str
+
+
+
+  // 随机的取出 m 个 数
+
+  function getRandomArrayElements(arr, count) {
+    let newArr = arr.slice(0),
+      length = arr.length,
+      min = length - count,
+      temp,
+      index = 0
+    while (length-- > min) {
+      index = Math.floor((length + 1) * Math.random())
+      temp = newArr[index]
+      newArr[index] = newArr[length]
+      newArr[length] = temp
+    }
+    return newArr.slice(min)
+  }
+
+  var items = ['1', '2', '4', '5', '6', '7', '8', '9', '10']
+
+  // console.log(getRandomArrayElements(items, 4))
+
+// 手写快排
+var quickSort = function (arr, l, r) {
+  if (l >= r) return
+  let i = l,
+    j = r
+  while (i < j) {
+    while (i < j && arr[j] >= arr[l]) j--
+    while (i < j && arr[i] <= arr[l]) i++
+    swap(arr, i, j)
+  }
+  // 最后一步交换初始位置 和index位置 这样左边全部比他小,右边比他大
+  swap(arr, l, i)
+  // 二分然后排序
+  quickSort(arr, l, i - 1)
+  quickSort(arr, i + 1, r)
+}
+var swap = function (arr, i, j) {
+  // let temp = arr[i]
+  // arr[i] = arr[j]
+  // arr[j] = temp
+  ;[arr[j], arr[i]] = [arr[i], arr[j]]
+}
+  // 节流
+  function throttle(fn, time) {
+    let flag = true,
+      timer = null
+    return (...args) => {
+      if (!flag) return
+      flag = false
+      setTimeout(() => {
+        fn.apply(this, args)
+      }, time)
+    }
+  }
+  // 防抖
+  function debounce(fn, time) {
+    let timer = null
+    return (...args) => {
+      if (timer) clearTimeout(timer)
+      timer = setTimeout(() => {
+        fn.apply(this, args)
+      }, time)
+    }
+  }
+  //实现一个 useState
+  const createUseState = () => {
+    const state = [],
+      index = 0
+    return (initialValue) => {
+      state[index] = state[index] ?? initialValue
+      const currentIndex = index
+      const dispatch = (newState) => {
+        state[currentIndex] = newState
+        index = 0
+        render()
+      }
+      return [state[index++], dispatch]
+    }
+  }
+  // 千分位
+  var thousandSeparator = function (n) {
+    let reg = /(?!^)(?=(\d{3})+$)/g
+    return String(n).replace(reg, ',')
+  }
+  // console.log(thousandSeparator(123456789));
+
+  /**
+   * call方法
+   */
+  Function.prototype.call2 = function (context, ...args) {
+    var context = context || window
+    // 新建一个 Symbol 变量避免重复
+    const fn = Symbol()
+    context[fn] = this
+    var args = args ?? []
+    const result = args.length > 0 ? context[fn](...args) : context[fn]()
+
+    delete context[fn]
+    return result
+  }
+  /** deepClone */
+  function deepClone(obj, hash = new WeakMap()) {
+    if (obj instanceof RegExp) return new RegExp(obj)
+    if (obj instanceof Date) return new Date(obj)
+    if (obj === null || typeof obj !== 'object') return obj
+    // 处理循环引用的情况
+    if (hash.has(obj)) {
+      return hash.get(obj)
+    }
+    // new 一个相应对象
+    // obj 为 Array,相当于 new Array()
+    // obj 为 Object 相当于 new Object()
+    let counstr = new obj.constructor()
+    hash.set(obj, constr)
+    for (let key in obj) {
+      if (obj.hasOwnProperty) {
+        constr[key] = deepClone(obj[key], hash)
+      }
+    }
+    // 考虑Symbol 情况
+    let symbolObj = Object.getOwnPropertySymbols(obj)
+    for (let i = 0; i < symbolObj.length; i++) {
+      constr[symbolObj[i]] = deepClone(obj[symbolObj[i]], hash)
+    }
+
+    return constr
+  }
+  // flat
+  function flat(arr) {
+    return arr.reduce((pre, cur) => {
+      return pre.concat(Array.isArray(cur) ? flat(cur) : cur)
+    }, [])
+  }
+
+  function parseParam(url) {
+    // 将问号后字符串取出来
+    const paramStr = /.+\?(.+)$/.exec(url)[1]
+    const paramArr = paramStr.split('&')
+    let params = {}
+    paramArr.forEach((param) => {
+      // 处理有 value 参数的
+      if (/=/.test(param)) {
+        let [key, value] = param.split('=')
+        value = decodeURIComponent(value)
+        if (params.hasOwnProperty(key)) {
+          params[key] = [].concat(params[key], val)
+        } else {
+          params[key] = value
+        }
+      } else {
+        params[key] = true
+      }
+    })
+    return params
+  }
+
+  // promise 顺序执行
+  function runPromises(promiseCreators, initData) {
+    return promiseCreators.reduce(
+      (promise, next) => promise.then((data) => next(data)),
+      Promise.resolve(initData)
+    )
+  }
+
+  // react useState
+  function reactState() {
+    let index = 0
+    let currentStateList = []
+    const useState = (initialState) => {
+      currentStateList[index] =
+        currentStateList[currentStateList] || initialState
+      // const state = currentState || initialState
+      const setState = (newState) => {
+        currentStateList[index] = newState
+        render()
+      }
+      index++
+      return [currentStateList[index], setState]
+    }
+  }
+  // react useEffect
+  function reactUseEffect() {
+    let lastDepsList = []
+    let lastClearCallbacks = []
+    let index = 0
+    const useEffect = (callback, deps) => {
+      const lastDeps = lastDepsList[index]
+      //  首次渲染肯定触发 || deps不传,次次触发 || 正常比较值是否发生改变
+      const changed =
+        !lastDeps || !deps || deps.some((dep, i) => dep !== lastDeps[i])
+      if (changed) {
+        lastDepsList[index] = deps
+        if (lastClearCallbacks[index]) {
+          lastClearCallbacks[index]()
+        }
+        lastClearCallbacks[index] = callback()
+      }
+      index++
+    }
+  }
+    // 洋葱模型核心 compose
+    function compose(middlewares) {
+    return (ctx) => {
+      const dispatch = (i) => {
+        const middleware = middlewares[i]
+        if (i === middlewares.length) {
+          return
+        }
+        return middleware(ctx, () => dispatch(i + 1))
+      }
+      dispatch(0)
+    }
+  }
+  function applyMiddleware(...middlewares){
+    // 传入createStore
+    return (createStore) => {
+      // 返回一个增强版createStore
+      return (reducer,preloadedState,enhancer) => {
+        // 用原createStore先生成一个store,包含 getState / dispatch / subscribe / replaceReducer 四个Api
+        var store = createStore(reducer,preloadedState, enhancer)
+        var dispatch = store.dispatch
+        var chain = [] // 储存中间件
+        // 提供给中间件的入参
+        var middlewareAPI = {
+          getState: store.getState,
+          dispatch: (action) => dispatch(action)
+        }
+        // 给中间件装上API
+        chain = middlewares.map(middleware => middlewares(middlewareAPI))
+        // 串联所有中间件
+        dispatch = compose(...chain)(store.dispatch)
+        /** 
+         * 例如chain为[M3,M2,M1] 则compose是从右到左进行包裹的
+         * M1的dispatch 参数为 store.dispatch;M2的 dispatch 为 M1 的中间件处理逻辑,
+         * M3 的dispatch 为M2 的中间件逻辑处理.得到串联后的中间件链 M3(M2(M1(store.dispatch)))
+        */
+       return {
+         ...store,
+         dispatch // 新dispatch覆盖之前,调用dispatch就会触发中间件执行
+       }
+      }
+    }
+  }
+// 原生实现async awit
+function run(generator) {
+  return new Promise((resolve, reject) => {
+    let g = generator()
+    const next = (res) => {
+      let result
+      try {
+        result = g.next()
+      } catch (error) {
+        reject(error)
+      }
+      if (result.done) return result.value
+      result.value.then(next, (error) => reject(gen.throw(err).value))
+    }
+    next()
+  })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+  type Without<T,U> = {[P in Exclude<keyof T, keyof U>]?:never}
+  type Xor<T,U> = Without<T,U> & U | Without<T,U> & U
+</script>
