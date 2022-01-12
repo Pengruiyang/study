@@ -137,3 +137,6 @@ ondrop 拖动元素放置目标区域触发
 ondragend 完成拖动触发
 # 虚拟列表滚动过快导致的白屏问题
 使用requestAnimationFrame,通过系统决定调用的时机.保证每次页面更新的时候只执行一次.不会丢帧的情况发生
+
+# js 上传功能
+在input type 为 file, js onchange 事件下,能获取到 files 属性.将读取到的 file对象封装成 formData 对象.多个文件的话则需要循环 files 让formData 对象 append 进去.
