@@ -95,7 +95,8 @@
   // }
   async function start() {
     console.time('aa')
-    await Promise.all(taskList.map((i) => cc.addTask(task, [i])))
+    let cccc = await Promise.all(taskList.map((i) => cc.addTask(task, [i])))
+    console.log(cccc)
     console.timeEnd('aa')
   }
   start()
@@ -697,6 +698,6 @@ function run(generator) {
 
 
 
-  type Without<T,U> = {[P in Exclude<keyof T, keyof U>]?:never}
-  type Xor<T,U> = Without<T,U> & U | Without<T,U> & U
+  // type Without<T,U> = {[P in Exclude<keyof T, keyof U>]?:never}
+  // type Xor<T,U> = Without<T,U> & U | Without<T,U> & U
 </script>
