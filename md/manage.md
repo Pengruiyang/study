@@ -87,3 +87,23 @@ web原生组件，它有两个核心组成部分：CustomElement和ShadowDom。C
 渲染流程:
 1. 执行卸载生命周期函数,发送卸载事件,同时清理子应用的全局副作用函数.
 2. 监听元素被渲染,加载子应用的 html 并转换为 dom.递归查询所有静态资源并设置元素隔离.拦截所有动态创建的 script link 标签.将加载的 js 通过插件系统后放入沙箱处理.最终将格式化后的元素放入 micro-app 中,这个元素就是子应用.
+
+#shadowDom 的实现
+var oBox = document.querySelector('#Box');
+// 创建 shadow DOM
+var shadowRoot = oBox.createShadowRoot();
+shadowRoot.innerHTML = 'JavaScript';
+var template = document.querySelector('.Box-template');
+
+shadowRoot.appendChild(document.importNode(template.content,true));
+
+首先我们选取了一个id是Box的元素作为宿主对象（shadow host），然后使用createShadowRoot()方法给宿主对象增加了一个shadow root的新节点，影子根节点作为影子树的第一个节点，其他的节点都是它的子节点。
+
+我们使用一个模板标签来创建Shadow DOM中的元素，取代使用繁琐的原生方法。而templete中的标签作为一个插入点，
+
+在使用多个插入点时，由于每个定义的字段都需要特定的内容，所以我们使用select属性告诉  标签有选择性的插入内容。select属性使用 CSS 选择器来选取想要展示的内容。也就是说，会在影子宿主里寻找任何样式名称 html的元素。如果找到一个匹配的元素，其就会将这个元素渲染到shadow DOM中对应的标签中去。
+
+通过插入点，我们不必修改 content 内容的结构而改变渲染的顺序。因为内容存在于影子宿主中，而呈现的方式存在于影子根也就是 shadow DOM 中。
+
+通交换templete中的select值，我们得到了一组重排的数据。
+
