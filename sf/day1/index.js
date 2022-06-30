@@ -1633,7 +1633,7 @@ var containsNearbyAlmostDuplicate = function (nums, k, t) {
     if (buckets.has(id - 1) && Math.abs(num - buckets.get(id - 1)) <= t) {
       return true
     }
-    if (buckets.has(id + 1) && Math.abs(num - buckets.has(id + 1)) <= t) {
+    if (buckets.has(id + 1) && Math.abs(num - buckets.get(id + 1)) <= t) {
       return true
     }
     buckets.set(id, num)
@@ -1646,21 +1646,23 @@ var containsNearbyAlmostDuplicate = function (nums, k, t) {
 // 简单暴力法
 var containsNearbyAlmostDuplicate = function (nums, k, t) {
   for (let i = 0; i < nums.length; i++) {
-    for (let j = 0; j <= i + k; j++) {
+    for (let j = i + 1; j <= i + k && j < nums.length; j++) {
       if (Math.abs(num[j] - num[i]) <= t) return true
     }
   }
+  return false
 }
 /**
  * 剑指 Offer II 058. 日程表
  * https://leetcode.cn/problems/fi9suh/
  */
-var MyCalendar = function () {
+ var MyCalendar = function () {
   this.events = []
 }
+
 MyCalendar.prototype.findInertIndex = function (start) {
-  var left = 0,
-    right = this.events.length - 1
+ var left = 0;
+  var right = this.events.length - 1;
   while (left <= right) {
     let mid = left + Math.floor((right - left) / 2)
     // 如果插入的区间起始点刚好和当前区间起始点相同
@@ -1671,8 +1673,8 @@ MyCalendar.prototype.findInertIndex = function (start) {
     } else {
       right = mid - 1
     }
-    return left
   }
+    return left
 }
 MyCalendar.prototype.book = function (start, end) {
   let index = this.findInertIndex(start)
@@ -1684,7 +1686,7 @@ MyCalendar.prototype.book = function (start, end) {
     return false
   }
   // 把符合规则的添加进去
-  this.events.splice(index, 0, [start, end])
+  this.events.splice(index,0,[start,end])
   return true
 }
 
@@ -1746,7 +1748,7 @@ class MaxHeap {
   bubbleDown(index) {
     let lastIndex = this.size() - 1
     while (true) {
-      // 需要调整的节点的做左子节点和右子节点的索引
+      // 获得要调整的节点的左子节点和右子节点的索引
       const leftIndex = index * 2 + 1
       const rightIndex = index * 2 + 2
       let findIndex = index
@@ -2073,7 +2075,79 @@ MapSum.prototype.sum = function(prefix) {
 /**
  * 剑指 Offer II 067. 最大的异或
  * https://leetcode.cn/problems/ms70jA/
+ * 数组中元素都在[0, 2^{31})[0,2^31) 区间中,那么我们将每一个数表示为长度为31位的二进制数
+ * 我们需要找到最大的x,在枚举每一位时,先判断x的这一位是否能取到1.如果能,我们取这一位为1,否则我们取这一位为0
+ * 时间复杂度 O(nlogC).n是nums的长度,C是数组中元素范围. C < 2^31.枚举答案x的每一个二进制位的时间复杂度为O(logC)
+ * 每一次枚举的过程中,我们需要O(n)的时间进行判断,因此总时间复杂度为 O(nlogC)
+ *  空间复杂度 O(n)
  */
  var findMaximumXOR = function(nums) {
-
+  const HIGH_BIT = 30
+  let x = 0
+  for(let k = HIGH_BIT; k>=0; k--){
+    const seen = new Set()
+    // 将所有的 pre^k(a-j)放图哈希表中
+    for(const num of nums){
+      // 如果只想保留从最高位开始到第k个二进制位为止的部分
+      // 只需将其右移k位
+      seen.add(num >> k)
+    }
+    // 目前x包含从最高位开始到第k+1个二进制位为止的部分
+    // 我们将x的第k个二进制位置位1 即 x = x * 2 + 1
+    const xNext = x * 2 + 1
+    let found = false
+    // 枚举i
+    for(const num of nums){
+      // num / 2 ^ k
+      if(seen.has(xNext ^ (num >> k))){
+        found = true
+        break
+      }
+    }
+    if(found){
+      x = xNext
+    }else{
+      // 如果没有找到满足等式的a_i和a_j,那么x的第k个二进制位只能为0
+      // 即 x = x * 2
+      x = xNext - 1
+    }
+  }
+  return x
+};
+/**
+ * 剑指 Offer II 068. 查找插入位置
+ * https://leetcode.cn/problems/N6YdxV/
+ */
+var searchInsert = function(nums, target) {
+  if(!nums || !nums.length)return -1
+  let left = 0, right = nums.length - 1
+  while(left <= right){
+    let mid = left + Math.floor((right - left) / 2)
+    if(nums[mid] > target){
+      right = mid - 1
+    }else if (nums[mid] < target){
+      left = mid + 1
+    }
+    return mid
+  }
+  return left
+};
+/**
+ * 剑指 Offer II 069. 山峰数组的顶部
+ * https://leetcode.cn/problems/B1IidL/
+ */
+ var peakIndexInMountainArray = function(arr) {
+  let left = 1 , right = arr.length -1
+  while(left <= right){
+    let mid = left + Math.floor((right - left) / 2)
+    if(arr[mid] > arr[mid + 1] && arr[mid] > arr[mid - 1]){
+      return mid
+    }
+    if(arr[mid] > arr[mid - 1]){
+      left = mid + 1
+    }else{
+      right = mid - 1
+    }
+  }
+  return -1;
 };
