@@ -2151,3 +2151,45 @@ var searchInsert = function(nums, target) {
   }
   return -1;
 };
+
+/**
+ * 剑指 Offer II 070. 排序数组中只出现一次的数字
+ * https://leetcode.cn/problems/skFtm2/
+ * mid 为偶数的情况下，比较nums[mid] === nums[mid + 1]  mid + 1 = mid ^ 1
+ * mid 为奇数的情况下，比较nums[mid - 1] === nums[mid ] mid - 1 = mid ^ 1
+ */
+ var singleNonDuplicate = function(nums) {
+  let  left = 0, right = nums.length
+  while(left < right){
+    let mid = left + Math.floor((right - left) / 2)
+    // 由于异或特性，直接这样比较就行
+    if(nums[mid] === nums[mid ^ 1]){
+      left = mid + 1
+    }else {
+      right = mid
+    }
+  }
+  return nums[left]
+};
+/**
+ * 剑指 Offer II 071. 按权重生成随机数
+ * https://leetcode.cn/problems/cuyjEf/
+ */
+ var Solution = function(w) {
+  this.data = Array(w.length).fill(0)
+  w.reduce((pre,cur,index) => this.data[index] = pre + cur,0)
+  this.total = this.data[this.data.length -1]
+};
+
+/**
+ * @return {number}
+ */
+Solution.prototype.pickIndex = function() {
+  const x = Math.floor(Math.random() * this.total) + 1
+  const search = (x) => {
+    let left = 0, right = this.data.length - 1
+    while(left < right){
+      
+    }
+  }
+};
