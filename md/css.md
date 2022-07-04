@@ -1,6 +1,6 @@
 # 什么是盒模型,如何进行不同盒模型切换?
 标准盒模型 content-box width = content
-ie 盒模型 border-box width = content + padding
+ie 盒模型 border-box width = content + padding + border
 # 相邻兄弟选择器
   img + p
 # position 属性 区别

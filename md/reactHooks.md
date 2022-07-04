@@ -67,7 +67,7 @@ effectHook 可以在 function 组件中执行副作用(side Effect)
 组件之间复用逻辑难
 复杂组件变得难以理解
 难用的类组件
-# useMemo 和 useCallback 的其波尔
+# useMemo 和 useCallback 的区别
 useMemo 缓存的第一个参数函数的返回值.如果依赖数组中的值发生改变,就会重新执行
 useCallback 则是缓存函数.
 # useContext 怎么优化?

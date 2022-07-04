@@ -76,7 +76,7 @@ time slice 时间分片
 react16 之前 Reconcilation 是同步递归的去执行.递归其实很契合树形数据结构.但是这种方式不能随意中断\恢复\异步处理.
 所以需要改变 react 数据结构 模拟函数调用栈 之前递归处理的问题分解成增量的执行单元.
 目前结构是使用链表
-fiber 使用了双缓冲技术,像 redux nextListener 一样,在当前 currt tree 构建一颗 workInProgress 树,新的 fiber 树上节点有个 alternate 属性,创建时会优先查找,没有就新创建一个,这两棵树上的 fiber 保持互相引用,把当前 currt tree 指向 workInProgress tree,旧的树作为新的 fiber 树预留空间,达到复用实例的过程.
+fiber 使用了双缓存技术,像 redux nextListener 一样,在当前 currt tree 构建一颗 workInProgress 树,新的 fiber 树上节点有个 alternate 属性,创建时会优先查找,没有就新创建一个,这两棵树上的 fiber 保持互相引用,把当前 currt tree 指向 workInProgress tree,旧的树作为新的 fiber 树预留空间,达到复用实例的过程.
 
 currentFiber.alternate === workInProgressFiber
 workInProgressFiber.alternate === currentFiber;
@@ -93,7 +93,7 @@ type Fiber = {
   // 第一个子节点
   child: Fiber || null,
     // 指向下一个兄弟节点
-  sibiling: Fiber || null ,
+  sibling: Fiber || null ,
   // 子节点的唯一键
   key: null | string,
 }

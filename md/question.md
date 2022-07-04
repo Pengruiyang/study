@@ -14,7 +14,7 @@ Array.prototype.slice.call(objectLikeArray)
 # 兼容性问题
   1.样式兼容性  
   > a.reset.css 重置默认样式
-    b.webpack 中使用 postCss autoprefixer 给属性加上默认前端
+    b.webpack 中使用 postCss autoprefixer 给属性加上默认前缀
     c.部分针对功能单独写 (例如透明属性)
 
   2.交互兼容性

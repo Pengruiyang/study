@@ -14,7 +14,7 @@ babel 本身不具备任何转换功能,他把转换的功能都分解到一个�
 @babel-core 整合基本核心插件.将底层代码封装,并加入领带的其他功能.简化插件
 ## babel 工作原理
 ## babel 不如 swc esbuild 原因
-语言本身的劣势,使用 js 写的 babel 无法使用多核 CPU 优化编译任务处理,相比 swc、esbuild 编译成二进制在 node 执行,是有劣势.
+语言本身的劣势,使用 js 写的 babel 无法使用多核 CPU 优化编译任务处理,相比 swc（rust）、esbuild（go） 编译成二进制在 node 执行,是有劣势.
 ### 插件和预设的区别
 
 ```js
@@ -114,7 +114,6 @@ function importPlugin(opt) {
 const r = babel.transform(code, {
   plugins: [importPlugin({ libraryDir: 'lib' })],
 });
-console.log(r.code);
 ```
 
 ## env
@@ -158,7 +157,7 @@ var _ref = _asyncToGenerator3(function* (arg1, arg2) {
 
 将定义方法改成了引用,这样就不存在重复定义的问题了,也不存在代码重复
 babel-runtime:
-babel-plufin-transform-runtime 将 babel-runtime 作为依赖.
+babel-plugin-transform-runtime 将 babel-runtime 作为依赖.
 内部集成了:
 1.core-js:转换一些内置类(symbol、promise 等)和静态方法(Array.from 等).绝大部分转换在这里处理,自动引入.直接使用会污染全局命名空间和对象原型.
 2.regenerator: core-js 补漏,主要对 generator/yield 和 async/await 支持,有 generator/async 主动引入
@@ -183,7 +182,7 @@ module: {
              presets: [
                // 添加preset-react
                require.resolve('@babel/preset-react'),
-               [require.resovle('@babel/preset-env'),{modules: false}]
+               [require.resolve('@babel/preset-env'),{modules: false}]
              ],
              cacheDirectory:true
            }
@@ -204,7 +203,7 @@ module: {
 - AST 是一个定义者
 - = 是 Equal 等号的叫法有很多形式
 - is tree 是一个字符串
-- ;就是 Semicoion
+- ;就是 Semicolon
 
 ```js
  {
@@ -262,7 +261,7 @@ body 数组中存放的每一项都是一个对象,
 ---
 
 语法分析: _解析器_,将词法分析出来的数组转换成数的形式,同时验证语法.语法如果有错就抛出错误.
-改引擎使用了两个解析器: 预解析器和解析器
+该引擎使用了两个解析器: 预解析器和解析器
 ## webpack 中转换成 AST
 webpack 和 rollup 都是通过 acorn 模块把源代码转换成抽象语法树 AST
  <!-- acorn.parse -->

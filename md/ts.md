@@ -4,7 +4,7 @@
 输出是编译之后的 JS 文件和 d.ts 的声明文件. d.ts 的声明文件就是 ts 文件中的类型声明,这个类型声明就是你在 ts 文件中声明的类型和 Typescript 类型推导系统推导的类型.
 # Typescript 编译器工作机制
 * Typescript 文本首先会被解析为 token 流
-* token 流呗转换为 AST
+* token 流转换为 AST
 * binder 根据 AST 信息生成 Symbol(Typescript 中一个数据结构).
 * 当我们需要检查的时候,checker 会根据前面生成的 AST 和 Symbols 生成类型检查结果.
 * 当我们需要生成JS 文件的时候,emitter 同样会根据前面声称的 AST 和 symbols 生成 js 文件.
@@ -12,7 +12,8 @@
 # interface 和 type 不同
 
 interface: 接口
-type: 类型别名,不会产生类型 1.描述语法不同,
+type: 类型别名,不会产生类型 
+1.描述语法不同
 
 ```js
 interface Point {

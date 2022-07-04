@@ -272,6 +272,11 @@ setState 的异步整合,批量更新也是建立在钩子函数与合成事件�
   3. Lane模型(通过二进制数表示优先级)代替 expirationTime 模型(**通过时间长度描述优先级**).
   4. 优化useEffect,17 之前 useEffect 清理函数会在 commit 阶段执行.组件卸载时,react 会先执行清理函数,然后才更新屏幕,然后才更新屏幕,类似于 componentWillUnmount.
   而 17 之后,useEffect 清理函数会延迟到 commit 阶段完成才会执行,变成了异步执行,组件卸载时,会在屏幕更新后执行.
+# react18
+  1. 批量处理re-render 获取更好的性能（也可以通过flushSync跳过批量处理）
+  2. 类组件可以获取到最新的state。
+  3. 开放current Mode。react将状态更新分为两块，一块是紧急更新，一块是过渡性更新。为了保持兼容，所有更新默认都是紧急更新。startTransition可以开启过渡更新。useDeferredValue在useEffect中执行，相比startTransition滞后。 
+  4. 更加友好的ssr，不需要像之前那样，等待所有组件ready后renderToString后再一次性输出，可以持续不断的向客户端输出已经ready的html区块，客户端也可以让组件用Suspense包裹。在组件ready之前，只展示fallback的内容，实现分片渲染
 # 理解 React 中的 Transaction（事务） 机制
 Transaction 是创建一个黑盒,这个黑盒可以封装任何方法.将目标函数用 wrapper(一组 initalize 和 close 方法称为 wrapper)封装起来.同时需要用 Transaction 类暴露的 perform 方法执行他.如上注释所示,在 anyMethod 执行之前,perform 会先执行所有 wrapper 的 initialize 方法,执行完后,再执行 wrapper 中 close 方法.
 
@@ -462,4 +467,4 @@ props 传递回调函数,可能会引发子组件的重复渲染.useCallback 包
 # react18
 ## 新 hook useId()
 # 为什么使用链表数据结构不使用数组呢?
-数组元素个数固定,元素顺序是在数组中的下标位置.数组执行插入操作,需要将全部元素后羿一个位置.
+数组元素个数固定,元素顺序是在数组中的下标位置.数组执行插入操作,需要将全部元素后移一个位置.

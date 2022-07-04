@@ -14,7 +14,7 @@
 ## 异常的传播
 
 ##  window.onerror 
-js运营错误时触发,onerror 可以接受多个参数(message,source,lineno,colno,error)
+js运行错误时触发,onerror 可以接受多个参数(message,source,lineno,colno,error)
 ## window.addEventListener('error',e => {},true)
 比 window.error 先触发,不能阻止默认事件处理函数执行.但可以全局捕获资源加载异常的问题
 

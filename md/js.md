@@ -1,6 +1,6 @@
 # 数据类型
 
-Number、String、Boolean、null、undefined、synbol、BigInt 和 Object
+Number、String、Boolean、null、undefined、symbol、BigInt 和 Object
 
 # 小数精度问题
 

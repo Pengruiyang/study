@@ -1,5 +1,5 @@
 # tree diff
-DOM节点中跨层级移动操作比较少,react updateDepth对Virtual DOM进行层级控制.只会对同一父节点下所有子节点进行比较.当发现节点不存在,改节点及其子节点会被完全删除,不会进行进一步比较.这样只需要对树进行对比一次.
+DOM节点中跨层级移动操作比较少,react updateDepth对Virtual DOM进行层级控制.只会对同一父节点下所有子节点进行比较.当发现节点不存在,该节点及其子节点会被完全删除,不会进行进一步比较.这样只需要对树进行对比一次.
 跨节点操作时会删除再创建节点
 ```js
   updateChildren: function(nextNestedChildrenElements,transaction,context){
