@@ -368,3 +368,8 @@ Commitlint生成changlog提取commit信息
 ## 自动发布流程
 需要GITHUB_TOKEN和NPM_TOKEN,添加到项目Actions secrets中
 cd.yml 安装语义发办依赖
+
+# dependencies、devDependencies和peerDependencies
+dependencies: 生产环境使用的依赖
+devDependencies: 生产环境不需要使用的依赖
+peerDependencies: 用来避免核心依赖库被多次下载的问题,主系统和组件库可以公用依赖库

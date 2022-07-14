@@ -158,3 +158,8 @@ ondragend 完成拖动触发
 # 阻止事件捕获和冒泡
 adEventListener第三个参数是在捕获还是冒泡阶段触发.
 stopPropagation 和 stopImmediatePropagation 两个方法.前置这会阻止冒泡或者是捕获,后者还会阻止该元素其他事件发生
+
+# 取消一个请求
+1. XMLHttpRequest可以使用 abort()
+2. fetch 需要实例化一个 AbortController,请求时传入AbortController.signal将控制器与请求关联起来,然后调用controller.abort() 取消
+3. 

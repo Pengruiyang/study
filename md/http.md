@@ -163,9 +163,12 @@ HTTP 超文本传输协议,一个在计算机世界中两点间传输文字、�
   ## http 的报文请求有那几个部分
   请求行,请求体,数据体,状态行,响应头,响应正文
   ## 预检请求 
-  请求方法是 PUT 或 DELETE,或者 Content-type:application/json
-  会在正式通信前,进行一次预检请求
+  复杂请求进行一次预检请求
   查询服务器支持的 http 方法,和自定义的 header 属性有哪些
+  ### 简单请求
+  1. 请求方式是get/post/head
+  2. 请求头包含:Accept、Accept-Language、content-Language、content-type(值只能为text/plain、multipart/form-data、application/x-www-form-urlencoded)
+  满足上面条件的为简单请求,不满足就是复杂请求
   # http 协议头Content-Type和Accept的作用
   Content-Type:发送端发送的数据类型
   Accept:发送端（客户端）希望接受的数据类型
