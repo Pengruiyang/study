@@ -355,3 +355,16 @@ contenthash: 文件内容.在项目中，通常做法是把项目中css都抽离
 1. hash 计算方式位每次compilation编译的内容计算得到,没有改变的文件也会随着其他文件改变二改变
 2. chunkhash js中引入css,只要修改了css,js也会更着发生改变
 3. contenthash 发生a.css发生改变的时候,以来他的其他文件并没有重新生成新的hash之.需要使用webpackMd5Hash通过模块路径排序chunk的所有以来模块,将排序后的模块源代码拼接chunkhash/
+  
+# Eslint & Prettier & Husky & Commitlint
+用Prettier解决代码格式问题,用linters解决代码质量问题
+Hushky用来git hooks自动化校验
+Commitlint生成changlog提取commit信息
+# Github Actions
+实现代码合并或推送到主分支,dependabot机器人升级依赖操作,会自动触发测试和发布版本等一系列流程.
+在项目根目录创建.github/workflows文件夹,创建ci.yml和cd.yml文件
+写入需要监听的分支的push和pull_request动作.自动执行linter和tests任务
+推送代码,验证配置是否生效
+## 自动发布流程
+需要GITHUB_TOKEN和NPM_TOKEN,添加到项目Actions secrets中
+cd.yml 安装语义发办依赖

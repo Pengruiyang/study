@@ -87,7 +87,7 @@ gitlab 集成的工具,在仓库根目录下创建.gitlab-ci.yml 文件.配置 g
 mircroApp 类 webComponents + HTML entry
 web原生组件，它有两个核心组成部分：CustomElement和ShadowDom。CustomElement用于创建自定义标签，ShadowDom用于创建阴影DOM，阴影DOM具有天然的样式隔离和元素隔离属性。由于WebComponent是原生组件，它可以在任何框架中使用，理论上是实现微前端最优的方案。但WebComponent有一个无法解决的问题 - ShadowDom的兼容性非常不好，一些前端框架在ShadowDom环境下无法正常运行，尤其是react框架。
 通过设置 html 作为资源入口,远程加载 html.解析器 dom 结构从而获取 js、css 等静态资源来实现微前端的渲染.
-用 CUstomElement 结合自定义的 shadowDom 实现 webComponent 的功能.
+用 CustomElement 结合自定义的 shadowDom 实现 webComponent 的功能.
 渲染流程:
 1. 执行卸载生命周期函数,发送卸载事件,同时清理子应用的全局副作用函数.
 2. 监听元素被渲染,加载子应用的 html 并转换为 dom.递归查询所有静态资源并设置元素隔离.拦截所有动态创建的 script link 标签.将加载的 js 通过插件系统后放入沙箱处理.最终将格式化后的元素放入 micro-app 中,这个元素就是子应用.
@@ -111,3 +111,8 @@ shadowRoot.appendChild(document.importNode(template.content,true));
 
 通交换templete中的select值，我们得到了一组重排的数据。
 
+
+
+# 桌面端优化
+初期项目集成阶段,发现高频行情cpu占比150%的情况,发现是node层行情中心在热门股热门时间段交易量过大,导致频繁设置数据.在行情中心用了节流操作(300ms拉取一次买卖点数据).初期由于将部分业务组件的计算放在了store层,导致store层和render层会触发两次计算,cpu降回了80%.内部有很多频繁赋值的代码,且保留了引用导致外部列表检测到变化.内部使用computed进行很多值的获取,但是发现在部分简单计算的时候使用,都会重新计算立即求值.(缓存结果,惰性求值,computed依赖的值没有变化,但是他依赖值也是个computed内部值发生变化导致全部重新计算).
+根据热点图查看函数耗时进行优化.

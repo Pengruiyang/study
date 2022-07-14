@@ -150,3 +150,11 @@ ondragend 完成拖动触发
 2. webpack-bundle-analyzer 查看 boundle 模块大小.减小加载时长
 3. 去看 performance 模块.查看网页性能指标.首次有内容渲染、最大内容绘制时间、fps 是否正常
 4. 查看 performanceNavigationTiming 各个阶段的响应时间.确认加载卸载文档用时
+  
+# 修改node_modules中文件
+1. 通过webpack alias去替换链接
+2. 通过patch-package修改
+
+# 阻止事件捕获和冒泡
+adEventListener第三个参数是在捕获还是冒泡阶段触发.
+stopPropagation 和 stopImmediatePropagation 两个方法.前置这会阻止冒泡或者是捕获,后者还会阻止该元素其他事件发生

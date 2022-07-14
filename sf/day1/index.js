@@ -290,7 +290,7 @@ var pivotIndex = function (nums) {
  */
 var NumMatrix = function (matrix) {
   // 非空处理
-  if (!matrix || !matrix.length || !matrix[0]?.length) return
+  if (!matrix || !matrix.length || !matrix[0].length) return
   // 初始化前缀和计算
   this.sumArr = new Array(matrix.length + 1)
     .fill(0)
@@ -1656,13 +1656,13 @@ var containsNearbyAlmostDuplicate = function (nums, k, t) {
  * 剑指 Offer II 058. 日程表
  * https://leetcode.cn/problems/fi9suh/
  */
- var MyCalendar = function () {
+var MyCalendar = function () {
   this.events = []
 }
 
 MyCalendar.prototype.findInertIndex = function (start) {
- var left = 0;
-  var right = this.events.length - 1;
+  var left = 0
+  var right = this.events.length - 1
   while (left <= right) {
     let mid = left + Math.floor((right - left) / 2)
     // 如果插入的区间起始点刚好和当前区间起始点相同
@@ -1674,7 +1674,7 @@ MyCalendar.prototype.findInertIndex = function (start) {
       right = mid - 1
     }
   }
-    return left
+  return left
 }
 MyCalendar.prototype.book = function (start, end) {
   let index = this.findInertIndex(start)
@@ -1686,7 +1686,7 @@ MyCalendar.prototype.book = function (start, end) {
     return false
   }
   // 把符合规则的添加进去
-  this.events.splice(index,0,[start,end])
+  this.events.splice(index, 0, [start, end])
   return true
 }
 
@@ -2004,11 +2004,11 @@ MagicDictionary.prototype.search = function (searchWord) {
   for (let i = 0; i < this.dict.length; i++) {
     if (searchWord.length !== this.dict[i].length) continue
     let diff = 0
-    for(let j = 0; j< searchWord.length;j++){
-      if(diff > 1)break
-      if(searchWord[j] !== this.dict[i][j])diff++
+    for (let j = 0; j < searchWord.length; j++) {
+      if (diff > 1) break
+      if (searchWord[j] !== this.dict[i][j]) diff++
     }
-    if(diff === 1)return true
+    if (diff === 1) return true
   }
   return false
 }
@@ -2017,61 +2017,61 @@ MagicDictionary.prototype.search = function (searchWord) {
  * 剑指 Offer II 065. 最短的单词编码
  * @return {number}
  */
- var minimumLengthEncoding = function(words) {
+var minimumLengthEncoding = function (words) {
   const map = new Map()
-  for(let i = 0; i< words.length;i++){
+  for (let i = 0; i < words.length; i++) {
     let w = words[i]
-    if(map.has(w)){
+    if (map.has(w)) {
       continue
     }
-    map.set(w,1)
+    map.set(w, 1)
     // 把每个单词的子单词加进去
-    for(let j = 1; j< w.length;j++){
-      map.set(w.substr(j),0)
+    for (let j = 1; j < w.length; j++) {
+      map.set(w.substr(j), 0)
     }
   }
   let ans = 0
-  for(let [k,v] of map){
-    if(v === 1){
+  for (let [k, v] of map) {
+    if (v === 1) {
       ans += k.length + 1
     }
   }
   return ans
-};
+}
 /**
  * 剑指 Offer II 066. 单词之和
  * https://leetcode.cn/problems/z1R5dt/
  */
- var MapSum = function() {
+var MapSum = function () {
   this.obj = {}
 }
-MapSum.prototype.insert = function(key, val) {
+MapSum.prototype.insert = function (key, val) {
   this.obj[key] = val
 }
-MapSum.prototype.sum = function(prefix) {
+MapSum.prototype.sum = function (prefix) {
   let result = 0
   // prefix 存入前缀树
   let root = {}
   let cur = root
-  for(let s of prefix){
-    if(!cur[s]){
+  for (let s of prefix) {
+    if (!cur[s]) {
       cur[s] = {}
     }
     cur = cur[s]
   }
   cur.isPrefix = true
-  for(let key in this.obj){
-    let current = root;
-    for(let s of key){
-      if(!current[s]) break
+  for (let key in this.obj) {
+    let current = root
+    for (let s of key) {
+      if (!current[s]) break
       current = current[s]
     }
-    if(current.isPrefix){
+    if (current.isPrefix) {
       result += this.obj[key]
     }
   }
   return result
-};
+}
 /**
  * 剑指 Offer II 067. 最大的异或
  * https://leetcode.cn/problems/ms70jA/
@@ -2081,13 +2081,13 @@ MapSum.prototype.sum = function(prefix) {
  * 每一次枚举的过程中,我们需要O(n)的时间进行判断,因此总时间复杂度为 O(nlogC)
  *  空间复杂度 O(n)
  */
- var findMaximumXOR = function(nums) {
+var findMaximumXOR = function (nums) {
   const HIGH_BIT = 30
   let x = 0
-  for(let k = HIGH_BIT; k>=0; k--){
+  for (let k = HIGH_BIT; k >= 0; k--) {
     const seen = new Set()
     // 将所有的 pre^k(a-j)放图哈希表中
-    for(const num of nums){
+    for (const num of nums) {
       // 如果只想保留从最高位开始到第k个二进制位为止的部分
       // 只需将其右移k位
       seen.add(num >> k)
@@ -2097,60 +2097,62 @@ MapSum.prototype.sum = function(prefix) {
     const xNext = x * 2 + 1
     let found = false
     // 枚举i
-    for(const num of nums){
+    for (const num of nums) {
       // num / 2 ^ k
-      if(seen.has(xNext ^ (num >> k))){
+      if (seen.has(xNext ^ (num >> k))) {
         found = true
         break
       }
     }
-    if(found){
+    if (found) {
       x = xNext
-    }else{
+    } else {
       // 如果没有找到满足等式的a_i和a_j,那么x的第k个二进制位只能为0
       // 即 x = x * 2
       x = xNext - 1
     }
   }
   return x
-};
+}
 /**
  * 剑指 Offer II 068. 查找插入位置
  * https://leetcode.cn/problems/N6YdxV/
  */
-var searchInsert = function(nums, target) {
-  if(!nums || !nums.length)return -1
-  let left = 0, right = nums.length - 1
-  while(left <= right){
+var searchInsert = function (nums, target) {
+  if (!nums || !nums.length) return -1
+  let left = 0,
+    right = nums.length - 1
+  while (left <= right) {
     let mid = left + Math.floor((right - left) / 2)
-    if(nums[mid] > target){
+    if (nums[mid] > target) {
       right = mid - 1
-    }else if (nums[mid] < target){
+    } else if (nums[mid] < target) {
       left = mid + 1
     }
     return mid
   }
   return left
-};
+}
 /**
  * 剑指 Offer II 069. 山峰数组的顶部
  * https://leetcode.cn/problems/B1IidL/
  */
- var peakIndexInMountainArray = function(arr) {
-  let left = 1 , right = arr.length -1
-  while(left <= right){
+var peakIndexInMountainArray = function (arr) {
+  let left = 1,
+    right = arr.length - 1
+  while (left <= right) {
     let mid = left + Math.floor((right - left) / 2)
-    if(arr[mid] > arr[mid + 1] && arr[mid] > arr[mid - 1]){
+    if (arr[mid] > arr[mid + 1] && arr[mid] > arr[mid - 1]) {
       return mid
     }
-    if(arr[mid] > arr[mid - 1]){
+    if (arr[mid] > arr[mid - 1]) {
       left = mid + 1
-    }else{
+    } else {
       right = mid - 1
     }
   }
-  return -1;
-};
+  return -1
+}
 
 /**
  * 剑指 Offer II 070. 排序数组中只出现一次的数字
@@ -2158,38 +2160,951 @@ var searchInsert = function(nums, target) {
  * mid 为偶数的情况下，比较nums[mid] === nums[mid + 1]  mid + 1 = mid ^ 1
  * mid 为奇数的情况下，比较nums[mid - 1] === nums[mid ] mid - 1 = mid ^ 1
  */
- var singleNonDuplicate = function(nums) {
-  let  left = 0, right = nums.length
-  while(left < right){
+var singleNonDuplicate = function (nums) {
+  let left = 0,
+    right = nums.length
+  while (left < right) {
     let mid = left + Math.floor((right - left) / 2)
     // 由于异或特性，直接这样比较就行
-    if(nums[mid] === nums[mid ^ 1]){
+    if (nums[mid] === nums[mid ^ 1]) {
       left = mid + 1
-    }else {
+    } else {
       right = mid
     }
   }
   return nums[left]
-};
+}
 /**
  * 剑指 Offer II 071. 按权重生成随机数
  * https://leetcode.cn/problems/cuyjEf/
  */
- var Solution = function(w) {
+var Solution = function (w) {
   this.data = Array(w.length).fill(0)
-  w.reduce((pre,cur,index) => this.data[index] = pre + cur,0)
-  this.total = this.data[this.data.length -1]
-};
+  w.reduce((pre, cur, index) => (this.data[index] = pre + cur), 0)
+  this.total = this.data[this.data.length - 1]
+}
 
 /**
  * @return {number}
  */
-Solution.prototype.pickIndex = function() {
+Solution.prototype.pickIndex = function () {
   const x = Math.floor(Math.random() * this.total) + 1
   const search = (x) => {
-    let left = 0, right = this.data.length - 1
-    while(left < right){
-      
+    let left = 0,
+      right = this.data.length - 1
+    while (left < right) {
+      const mid = left + Math.floor((right - left) / 2)
+      if (this.data[mid] < x) {
+        left = mid + 1
+      } else {
+        right = mid
+      }
+    }
+    return left
+  }
+  return search(x)
+}
+/**
+ * 剑指 Offer II 072. 求平方根
+ * https://leetcode.cn/problems/jJ0w9p/
+ * 1. 整数x的平方根一定小于等于x
+ * 2. 除0之外所有的平方根都大于等于1
+ * 3. 整数x的平方根一定是在 1 - x之间， 取这个范围中间值mid，接着判断mid的平方是否小于或等于x，如果mid的平方小于x
+ * 4. 那么接着判断mid + 1的平方是否大于x，是的话，mid就是x的平方根
+ * 5. 如果mid和（mid+1）的平方都小于x,那么x的平方根比mid要打，开始搜索mid + 1 到x的范围
+ * 6. 如果mid的平方大于x，则x的平方根小于mid，从1 - （mid-1） 范围开始搜索
+ */
+var mySqrt = function (x) {
+  let left = 1,
+    right = x
+  while (left <= right) {
+    let mid = left + Math.floor((right - left) / 2)
+    // 判断mid的平方是否小于等于x （不写mid * mid 的原因是防止栈溢出）
+    if (mid <= x / mid) {
+      // mid + 1 > x 的情况
+      if (mid + 1 > x / (mid + 1)) {
+        return mid
+      }
+      // mid + 1 也小于x的平方根
+      left = mid + 1
+    } else {
+      right = mid - 1
     }
   }
+  return 0
+}
+/**
+ * 剑指 Offer II 073. 狒狒吃香蕉
+ *https://leetcode.cn/problems/nZZqjQ/
+ 时间复杂度: O(nlogm),n是piles的长度,m是piles中最大值.二分查找需要执行O(logm)轮
+ */
+var minEatingSpeed = function (piles, h) {
+  const canFinish = (piles, speed, h) => {
+    let time = 0
+    for (let pile of piles) {
+      time += Math.ceil(pile / speed)
+    }
+    return time <= h
+  }
+  // 左闭右开区间
+  let left = 1,
+    right = Math.max(...piles) + 1
+  while (left < right) {
+    let mid = left + Math.floor((right - left) / 2)
+    if (canFinish(piles, mid, h)) {
+      right = mid
+    } else {
+      left = mid + 1
+    }
+  }
+  return left
+}
+
+/**
+ * 剑指 Offer II 074. 合并区间
+ * https://leetcode.cn/problems/SsGoHC/
+ *  先将所有区间按照起始位置进行排序,比较相邻的区间位置观察他们是否重叠
+ * 如果有重叠就合并,没有就判断合并后的区间和下一个区间
+ * 时间复杂度: O(nlogn),n为区间的数量.一次排序的消耗,我们只需要一次线性扫描.所以复杂度为排序的O(nlogn)
+ * 空间复杂度 O(logn)
+ */
+var merge = function (intervals) {
+  if (!intervals || !intervals.length) return
+  intervals.sort((a, b) => a[0] - b[0])
+  let result = [],
+    current = 0
+  while (current < intervals.length) {
+    let cur = [...intervals[current]]
+    let next = current + 1
+    // 下一个区间开始时间应该小于等于当前区间开始时间
+    while (next < intervals.length && intervals[next][0] <= cur[1]) {
+      //结束时间取两个区间中结束时间更大的那个
+      cur[1] = Math.max(cur[1], intervals[next][1])
+      next++
+    }
+    result.push(cur)
+    current = next
+  }
+  return result
+}
+
+/**
+ * 剑指 Offer II 075. 数组相对排序
+ * https://leetcode.cn/problems/0H97ZC/
+ */
+var relativeSortArray = function (arr1, arr2) {
+  let obj = {}
+  for (let i of arr1) {
+    obj[i] = obj[i] ? ++obj[i] : 1
+  }
+  const res = []
+  for (let i of arr2) {
+    while (obj[i] > 0) {
+      res.push(i)
+      obj[i]--
+    }
+  }
+  // 数字会按照顺序排序,不需要处理
+  for (let i in obj) {
+    while (obj[i] > 0) {
+      res.push(i)
+      obj[i]--
+    }
+  }
+  return obj
+}
+/**
+ * 剑指 Offer II 076. 数组中的第 k 大的数字
+ * https://leetcode.cn/problems/xx4gT2/
+ * 利用快排
+ */
+var partition = (arr, startIndex, endIndex) => {
+  // 取第一个元素作为基准元素
+  let pivot = arr[startIndex]
+  // 设置一个mark指针指向数组起始位置
+  let mark = startIndex
+  for (let i = startIndex + 1; i <= endIndex; i++) {
+    if (arr[i] < pivot) {
+      mark++
+      ;[arr[mark], arr[i]] = [arr[i], arr[mark]]
+    }
+  }
+  arr[startIndex] = arr[mark]
+  arr[mark] = pivot
+  return mark
+}
+var findKthLargest = function (nums, k) {
+  let targetIndex = nums.length - k
+  let start = 0,
+    end = nums.length - 1
+  let index = partition(nums, start, end)
+  while (index !== targetIndex) {
+    if (index > targetIndex) {
+      end = index - 1
+    } else {
+      start = index + 1
+    }
+    index = partition(nums, start, end)
+  }
+  return nums[index]
+}
+/**
+ * 剑指 Offer II 077. 链表排序
+ * https://leetcode.cn/problems/7WHec2/
+ */
+// 自顶向下归并排序
+// 利用快慢指针 时间复杂度O(nlogn)n是链表的长度 空间复杂度O(logn)n是链表的长度
+var sortList = function (head) {
+  const merge = (head1, head2) => {
+    const dummyNode = new ListNode(0)
+    let temp = dummyNode,
+      temp1 = head1,
+      temp2 = head2
+    while (temp1 !== null && temp2 !== null) {
+      if (temp1.val < temp2.val) {
+        temp.next = temp1
+        temp1 = temp1.next
+      } else {
+        temp.next = temp2
+        temp2 = temp2.next
+      }
+      temp = temp.next
+    }
+    if (temp1 !== null) {
+      temp.next = temp1
+    }
+    if (temp2 !== null) {
+      temp.next = temp2
+    }
+    return dummyNode.next
+  }
+  const toSortList = (head, tail) => {
+    if (!head) return head
+    if (head.next === tail) {
+      head.next = null
+      return head
+    }
+    let slow = head,
+      fast = head
+    while (fast !== tail) {
+      slow = slow.next
+      fast = fast.next
+      if (fast !== tail) {
+        fast = fast.next
+      }
+    }
+    const mid = slow
+    return merge(toSortList(head, mid), toSortList(mid, tail))
+  }
+  return toSortList(head, null)
+}
+
+/**
+ * https://leetcode.cn/problems/vvXgSW/
+ * 剑指 Offer II 078. 合并排序链表
+ * 时间复杂度 O(nlogn)
+ * 递归调用栈的深度为O(logn),空间复杂度 O(logn)
+ */
+var mergeKLists = function (lists) {
+  if (!lists.length) return lists
+  const merge = (head1, head2) => {
+    const dummyNode = new ListNode(0)
+    let temp = dummyNode,
+      temp1 = head1,
+      temp2 = head2
+    while (temp1 !== null && temp2 !== null) {
+      if (temp1.val < temp2.val) {
+        temp.next = temp1
+        temp1 = temp1.next
+      } else {
+        temp.next = temp2
+        temp2 = temp2.next
+      }
+      temp = temp.next
+    }
+    if (temp1 !== null) {
+      temp.next = temp1
+    }
+    if (temp2 !== null) {
+      temp.next = temp2
+    }
+    return dummyNode.next
+  }
+  const mergeList = (lists, start, end) => {
+    if (start + 1 == end) {
+      return lists[start]
+    }
+    // 将链表分为前k/2个和后k/2个链表,进行合并排序
+    let mid = Math.floor((end + start) / 2)
+    let head1 = mergeKLists(lists, start, mid)
+    let head2 = mergeKLists(lists, mid, end)
+    return merge(head1, head2)
+  }
+  return mergeList(lists, 0, lists.length)
+}
+/**
+ * https://leetcode.cn/problems/TVdhkn/
+ * 剑指 Offer II 079. 所有子集
+ * 时间复杂度 O(n * 2 ^ n)
+ * 空间复杂度 O(n)
+ */
+// 思路: 逐个考察数字,每个数都选或者不选.等到递归结束后,把集合加入解集
+var subsets = function (nums) {
+  const res = []
+  const dfs = (index, list) => {
+    // 指针越界
+    if (index == nums.length) {
+      res.push([...list])
+      // 结束当前递归
+      return
+    }
+    // 选择当前这个数
+    list.push(nums[index])
+    // 基于该选择，继续往下递归，考察下一个数
+    dfs(index + 1, list)
+    // 上面递归结束,撤销该选择
+    list.pop()
+    // 不选这个数,继续向下递归,考察下一个数
+    dfs(index + 1, list)
+  }
+  dfs(0, [])
+  return res
+}
+// 思路执行子递归之前,加入解集
+var subsets = (nums) => {
+  const res = []
+  const dfs = (index, list) => {
+    // 调用子递归之前,加入解集
+    res.push([...list])
+    // 枚举所有可选的数
+    for (let i = index; i < nums.length; i++) {
+      list.push(nums[i])
+      // 回溯,基于选的这个数,继续递归,传入的是i + 1,不是index + 1
+      dfs(i + 1, list)
+      // 撤销选择
+      list.pop()
+    }
+  }
+  dfs(0, [])
+  return res
+}
+
+/**
+ * 剑指 Offer II 080. 含有 k 个元素的组合
+ * https://leetcode.cn/problems/uUsW3B/
+ * 时间复杂度 O(Cn取k * k)
+ */
+var combine = function (n, k) {
+  let res = []
+  if (k <= 0 || n <= 0) return res
+  let track = []
+  /**
+   *
+   * @param {*} start 是枚举的选择的起点
+   * @param {*} track 是当前构建的路径
+   */
+  const backtrack = (start, track) => {
+    if (k === track.length) {
+      return res.push([...track])
+    }
+    for (let i = start; i <= n; i++) {
+      track.push(i)
+      backtrack(i + 1, track)
+      track.pop()
+    }
+  }
+  backtrack(1, track)
+  return res
+}
+
+/**
+ * 剑指 Offer II 081. 允许重复选择元素的组合
+ * https://leetcode.cn/problems/Ygoe9J/
+ * candidates中的元素可以复用多次,那么只需要元素在递归回溯的时候start不递增就行了
+ */
+var combinationSum = function (candidates, target) {
+  let res = [],
+    track = []
+  const backtrack = (start, sum) => {
+    if (sum === target) {
+      return res.push(track.slice())
+    }
+    if (sum > target) return
+    for (let i = start; i < candidates.length; i++) {
+      track.push(candidates[i])
+      sum += candidates[i]
+      backtrack(i, sum)
+      // 回溯撤销选择当前i
+      track.pop()
+      sum -= candidates[i]
+    }
+  }
+  backtrack(0, 0)
+  return res
+}
+
+/**
+ * 剑指 Offer II 082. 含有重复元素集合的组合
+ * https://leetcode.cn/problems/4sjJUc/
+ * 1. 给定的数组可能有重复的元素,先排序,重复数字相邻,方便去重
+ * 2. for枚举选项时,需要避免重复选项
+ * 3. 当前选择数字不能和下一个选择数字重复,给子递归传递i+1
+ */
+var combinationSum2 = function (candidates, target) {
+  let res = [],
+    track = []
+  const backtrack = (start, sum) => {
+    if (target === sum) {
+      return res.push([...track])
+    }
+    if (sum > target) return
+    for (let i = start; i < candidates.length; i++) {
+      // 当前元素和上一个元素相同且上一个元素在索引选择范围内的话,当前元素不加入
+      if (i - 1 >= start && candidates[i - 1] === candidates[i]) continue
+      track.push(candidates[i])
+      sum += candidates[i]
+      backtrack(i + 1, sum)
+      track.pop()
+      sum -= candidates[i]
+    }
+  }
+  candidates.sort((a, b) => a - b)
+  backtrack(0, 0)
+  return res
+}
+/**
+ * https://leetcode.cn/problems/VvJkup/
+ * 剑指 Offer II 083. 没有重复元素集合的全排列
+ */
+var permute = function (nums) {
+  const res = [],
+    track = []
+  const used = new Array(nums.length).fill(false)
+  const backtrack = () => {
+    if (track.length === nums.length) {
+      return res.push([...track])
+    }
+    for (let i = 0; i < nums.length; i++) {
+      if (used[i]) continue
+      track.push(nums[i])
+      used[i] = true
+      backtrack()
+      track.pop()
+      used[i] = false
+    }
+  }
+  backtrack()
+  return res
+}
+
+/**
+ * 剑指 Offer II 084. 含有重复元素集合的全排列
+ * https://leetcode.cn/problems/7p8L0Z/
+ */
+var permuteUnique = function (nums) {
+  let res = [],
+    track = []
+  let used = Array(nums.length).fill(false)
+  const backtrack = (start, track) => {
+    if (start === nums.length) {
+      return res.push([...track])
+    }
+    for (let i = 0; i < nums.length; i++) {
+      if (used[i] || (i > 0 && nums[i - 1] === nums[i] && !used[i - 1])) {
+        continue
+      }
+      track.push(nums[i])
+      used[i] = true
+      backtrack(start + 1, track)
+      track.pop()
+      used[i] = false
+    }
+  }
+  nums.sort((a, b) => a - b)
+  backtrack(0, track)
+  return res
+}
+
+/**
+ * 剑指 Offer II 085. 生成匹配的括号
+ * https://leetcode.cn/problems/IDBivT/comments/
+ */
+var generateParenthesis = function (n) {
+  const res = []
+  if (n <= 0) return res
+  const dfs = (path, open, close) => {
+    // 左边括号数量>总括号  || 右边括号>左边括号
+    if (open > n || close > open) return
+    if (path.length === n * 2) {
+      res.push(path)
+      return
+    }
+    dfs(path + '(', open + 1, close)
+    dfs(path + ')', open, close + 1)
+  }
+  dfs('', 0, 0)
+  return res
+}
+
+/**
+ * https://leetcode.cn/problems/M99OJA/
+ * 剑指 Offer II 086. 分割回文子字符串
+ * 时间复杂度： O(n*2^n)n是字符串s的长度。最坏的情况下n个完全相同的字符。划分方案数为2*（n-1） = O(2^n),每一种划分方法需要O（n）的时间求出对应的划分结果。
+ * 空间复杂度：o（n^2）
+ */
+var partition = function (s) {
+  const n = s.length
+  const f = new Array(n).fill(0).map(() => new Array(n).fill(true))
+  let ret = [],
+    ans = []
+  for (let i = n - 1; i >= 0; i--) {
+    for (let j = i + 1; j < n; j++) {
+      f[i][j] = s[i] === s[j] && f[i + 1][j - 1]
+    }
+  }
+  const dfs = (i) => {
+    if (i === n) {
+      ret.push([...ans])
+      return
+    }
+    for (let j = i; j < n; j++) {
+      if (f[i][j]) {
+        ans.push(s.slice(i, j + 1))
+        dfs(j + 1)
+        ans.pop()
+      }
+    }
+  }
+  dfs(0)
+  return ret
+}
+
+/**
+ * 剑指 Offer II 087. 复原 IP
+ * https://leetcode.cn/problems/0on3uN/
+ * 时间复杂度O(3^SEG_COUNT×∣s∣)。IP地址每一段位数不会超过3，因此递归每一层，只会深入到下一层的3种情况。递归本身复杂度O(3^4).复原一种符合要求的Ip地址需要O（|s|）的时间。S是字符串长度
+ * 空间复杂度 O(SEG_COUNT)
+ */
+var restoreIpAddresses = function (s) {
+  const SEG_COUNT = 4
+  const segments = new Array(SEG_COUNT)
+  const ans = []
+  const dfs = (s, segId, segStart) => {
+    // 如果能找到4端ip地址并且遍历完字符串，那么就是一种答案
+    if (segId === SEG_COUNT) {
+      if (segStart === s.length) {
+        ans.push(segments.join('.'))
+      }
+      return
+    }
+    // 没有找到4段ip地址就遍历完了字符串,提前回溯
+    if (segStart === s.length) {
+      return
+    }
+    // 不能出现0开头的数字，如果当前数字为0，当前地址只能为0
+    if (Number(s[segStart]) === 0) {
+      segments[segId] = 0
+      dfs(s, segId + 1, segStart + 1)
+    }
+    // 一般情况下枚举每一种可能性并递归
+    let addr = 0
+    for (let segEnd = segStart; segEnd < s.length; segEnd++) {
+      addr = addr * 10 + Number(s[segEnd])
+      if (addr > 0 && addr <= 255) {
+        segments[segId] = addr
+        dfs(s, segId + 1, segEnd + 1)
+      } else {
+        break
+      }
+    }
+  }
+  dfs(s, 0, 0)
+  return ans
+}
+/**
+ * 剑指 Offer II 088. 爬楼梯的最少成本
+ * https://leetcode.cn/problems/GzCJIP/
+ *  dp[i] = Math.min( dp[i-1] + cost(i-1), dp[i-2] + cost(i-2));
+ */
+var minCostClimbingStairs = function (cost) {
+  const dp = new Array(cost.length + 1)
+  dp[0] = dp[1] = 0
+  for (let i = 2; i <= cost.length; i++) {
+    // 到达下标i需要花费的体力
+    dp[i] = Math.min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2])
+  }
+  return dp[cost.length]
+}
+/**
+ * 剑指 Offer II 089. 房屋偷盗
+ * https://leetcode.cn/problems/Gu0c2T/
+ */
+var rob = function (nums) {
+  const n = nums.length
+  if (n === 1) return nums[0]
+  const dp = new Array(n).fill(-1)
+  dp[0] = nums[0]
+  dp[1] = Math.max(nums[0], nums[1])
+  for (let i = 2; i < n; i++) {
+    dp[i] = Math.max(dp[i - 1], dp[i - 2] + nums[i])
+  }
+  return dp[n - 1]
+  // let prevMax = 0, currMax = 0
+  // for(let i = 0; i< n;i++){
+  //   const tmpMax = Math.max(currMax,prevMax + n[i])
+  //   prevMax = currMax
+  //   currMax = tmpMax
+  // }
+  // return currMax
+}
+/**
+ * 剑指 Offer II 090. 环形房屋偷盗
+ * https://leetcode.cn/problems/PzWKhm/
+ * 两种情况：第一间偷最后一间不偷，和第一间不偷最后一间偷
+ */
+var rob = function (nums) {
+  const n = nums.length
+  if (n === 1) return nums[0]
+  if (n === 2) return Math.max(nums[0], nums[1])
+  const robRange = (nums, start, end) => {
+    let prevMax = 0,
+      currMax = 0
+    for (let i = start; i <= end; i++) {
+      const temp = Math.max(currMax, prevMax + nums[i])
+      prevMax = currMax
+      currMax = temp
+    }
+    return currMax
+  }
+  return Math.max(robRange(nums, 0, n - 2), robRange(nums, 1, n - 1))
+}
+/**
+ * https://leetcode.cn/problems/JEj789/
+ * 剑指 Offer II 091. 粉刷房子
+ * 当前最小花费由当前刷红、刷蓝、刷绿中最小花费决定
+ * 当前刷红，那么上一次只能刷蓝或绿，由此类推
+ */
+
+var minCost = function (costs) {
+  let color1 = 0,
+    color2 = 0,
+    color3 = 0
+  for (const [r, g, b] of costs) {
+    ;[color1, color2, color3] = [
+      Math.min(color2, color3) + r,
+      Math.min(color1, color3) + g,
+      Math.min(color1, color2) + b,
+    ]
+  }
+  return Math.min(color1, color2, color3)
+}
+// 动态规划
+var minCost = function (costs) {
+  // const dp = new Array(costs.length).fill(0).map(() => [0,0,0])
+  // dp[0] = costs[0]
+  // for(let i = 1;i <costs.length;i++){
+  //   dp[i][0] = Math.min(dp[i - 1][1],dp[i - 1][2]) + costs[i][0]
+  //   dp[i][1] = Math.min(dp[i-1][0],dp[i-1][2]) + costs[i][1]
+  //   dp[i][2] = Math.min(dp[i-1][0],dp[i-1][1]) + costs[i][2]
+  // }
+  // return Math.min(...dp[dp.length - 1])
+
+  // 状态压缩
+  let dp = costs[0]
+  let next = [0, 0, 0]
+  for (let i = 1; i < costs.length; i++) {
+    next[0] = Math.min(dp[1], dp[2]) + costs[i][0]
+    next[1] = Math.min(dp[0], dp[2]) + costs[i][1]
+    next[2] = Math.min(dp[1], dp[0]) + costs[i][2]
+    dp = next.slice()
+  }
+  return Math.min(...dp)
+}
+/**
+ * 剑指 Offer II 092. 翻转字符
+ * https://leetcode.cn/problems/cyJERH/
+ */
+var minFlipsMonoIncr = function (s) {
+  let one = 0,
+    dp = 0
+  for (let i = 0; i < s.length; i++) {
+    let c = s.charAt(i)
+    if (c == '0') {
+      // 当前为0，判断需要反转的是1 还是反转的0
+      dp = Math.min(one, dp + 1)
+    } else {
+      // 记录为1的数量
+      one++
+    }
+  }
+  return dp
+}
+/**
+ * 剑指 Offer II 093. 最长斐波那契数列
+ * https://leetcode.cn/problems/Q91FMA/
+ * 每个斐波那契数列都可以由最后两位数字精准定位
+ * 定义定位数组为dp[][]，对于 arr = [1,2,3,4,5,6,7,8] ，dp[2][3]表示数列[1,2,3]、dp[3][5]表示数列[1,2,3,5]、dp[5][8]表示数列[1,2,3,5,8]；
+ * dp元素的值，代表他所定位的数列的长度
+ * 斐波那契子数列 最下长度3
+ */
+var lenLongestFibSubseq = function (arr) {
+  let n = arr.length,
+    max = 0
+  let dp = new Array(n).fill(0).map(() => new Array(n).fill(0))
+  for (let i = 2; i < n; i++) {
+    let j = 0,
+      k = i - 1
+    while (j < k) {
+      if (arr[j] + arr[k] == arr[i]) {
+        if (dp[j][k] === 0) {
+          dp[k][i] = 3
+        } else {
+          dp[k][i] = dp[j][k] + 1
+        }
+        max = Math.max(max, dp[k][i])
+        j++, k--
+      } else if (arr[j] + arr[k] < arr[i]) {
+        j++
+      } else {
+        k--
+      }
+    }
+  }
+  return max
+}
+/**
+ * 剑指 Offer II 094. 最少回文分割
+ * https://leetcode.cn/problems/omKAoA/
+ */
+var minCut = function (s) {
+  const n = s.length
+  // 保存整个字符串的回文情况
+  const isPal = new Array(n).fill(0).map(() => new Array(n).fill(false))
+  for (let i = n - 1; i >= 0; i--) {
+    for (let j = i; j < n; j++) {
+      if (s[i] === s[j] && (j - i <= 1 || isPal[i + 1][j - 1])) {
+        isPal[i][j] = true
+      }
+    }
+  }
+  // dp[i]: 范围是【0，i】的回文子串，最少分割次数
+  // 初始化最大值情况为每个 字符都分割
+  const dp = new Array(n).fill(0).map((_, i) => i)
+  for (let i = 1; i < n; i++) {
+    // 判断是不是回文子串
+    if (isPal[0][i]) {
+      dp[i] = 0
+      continue
+    }
+    /**
+     * 对长度[0,i]的子串进行分割，分割点为j
+     * 如果分割后区间[j+1,i]是回文子串。那么dp[i] = dp[j] + 1
+     *
+     */
+    for (let j = 0; j < i; j++) {
+      if (isPal[j + 1][i]) {
+        dp[i] = Math.min(dp[i], dp[j] + 1)
+      }
+    }
+  }
+  return dp[n - 1]
+}
+
+/**
+ * 剑指 Offer II 095. 最长公共子序列
+ * https://leetcode.cn/problems/qJnOS7/
+ * 对于f(i,j)，如果有s1[i] === s2[j]
+ * 那么相当于在s1[0,i-1]和s2[0,j-1]后面添加一个公共字符f(i,j) = f(i-1,j-1)+1
+ * 如果s1[i]！== s2[j],那么这两个字符就不能出现在s1[0,i]和s2[0,j]的公共子序列中
+ * 此时s1[0,i]和s2[0,j]的最长公共子序列是（s1[0,i-1] s2[0,j]） 和（s1[0,i] s2[0,j-1]）中的较大值
+ * f(i,j) = f(i - 1，j-1) + 1
+ * f(i,j) = max(f(i,j-1),f(i-1,j))
+ * 会出现f(i,-1) = f(-1,j) = 0
+ */
+var longestCommonSubsequence = function (text1, text2) {
+  let n1 = text1.length,
+    n2 = text2.length
+  let dp = Array(n1 + 1)
+    .fill(0)
+    .map(() => Array(n2 + 1).fill(0))
+  for (let i = 0; i < n1; i++) {
+    for (let j = 0; j < n2; j++) {
+      if (text1[i] === text2[j]) {
+        dp[i + 1][j + 1] = dp[i][j] + 1
+      } else {
+        dp[i + 1][j + 1] = Math.max(dp[i][j + 1], dp[i + 1][j])
+      }
+    }
+  }
+  return dp[n1][n2]
+}
+
+/**
+ * 剑指 Offer II 096. 字符串交织
+ * https://leetcode.cn/problems/IY6buf/
+ * f(i,j) = (s3[i+j+1] == s1[i]&f(i-1,j) || s2[j] && f(i,j-1) )
+ * f(-1,-1)表示两个空的字符串是否可以交织为一个空的字符串，成立就f(-1,-1) = true
+ * 时间复杂度：O(n^2) 空间复杂度O(n^2) 
+ */
+var isInterleave = function (s1, s2, s3) {
+  let n1 = s1.length,
+    n2 = s2.length,
+    n3 = s3.length
+  if (n1 + n2 !== n3) return false
+  let dp = new Array(n1 + 1).fill(0).map(() => new Array(n2 + 1).fill(false))
+  dp[0][0] = true
+
+  for (let i = 0; i <= n1; i++) {
+    for (let j = 0; j <= n2; j++) {
+      let p = i + j - 1
+      if (i > 0) {
+        dp[i][j] = dp[i][j] || (dp[i - 1][j] &&  s1.charAt(i - 1) == s3.charAt(p))
+      }
+      if (j > 0) {
+        dp[i][j] = dp[i][j] || (dp[i][j - 1] &&  s2.charAt(j - 1) == s3.charAt(p))
+      }
+    }
+  }
+  return dp[n1][n2]
+}
+/**
+ * 剑指 Offer II 097. 子序列的数目
+ * https://leetcode.cn/problems/21dk04/
+ * 1. 要求s子序列中t的个数。立刻定义dp[i][j]。字符串s_i中t_j的个数。
+ * 2. dp[0][j]表示s_0中t_j的个数.s_0是空字符串时,只有就j=0时才有dp[0][j] = 1,其他时候都为0
+ * dp[i][0]表示s_i中t_0的个数.t_0为空字符串,dp[i][0] = 1
+ * 3. dp[i][j]显然要从dp[i-1][?]递推过来,思考和dp[i-1][j]、dp[i-1][j-1]的关系
+ * 考查的是s_i的第i个字符和t_j的第j个字符的关系
+ * 若s[i]!=t[j],那么s_i中所有t_j的子序列,必不包含s[i].即和s[i-1]中t[j]中数量相等
+ * dp[i][j] = dp[i-1][j]
+ * 若s[i]=t[j].假定s_i中所有t_j子序列中,包含s[i]的有a个,不包含的有b个.s_i中包含s[i]的子序列个数相当于s_i-1中t_j-1的个数
+ * 不包含s[i]的个数为之前s[i]!=t[j]的情况
+ * a = dp[i-1][j-1]
+ * b= dp[i-1][j]
+ * dp[i][j]=a+b = dp[i-1][j]+dp[i-1][j-1]
+ */
+ var numDistinct = function(s, t) {
+  let n1 = s.length,n2 = t.length
+  if(n1 < n2)return 0
+  let dp = Array(n1+1).fill(0).map(()=>Array(n2+1).fill(0))
+  // dp[i][0]的情况
+  for(let i = 0;i<=n1;i++){
+    dp[i][0] = 1
+  }
+  for(let i = 1;i<=n1;i++){
+    for(let j = 1; j<= n2;j++){
+      console.log(s[i-1] == t[j-1],'s[i-1] == t[j-1]')
+      dp[i][j] = dp[i-1][j] + (s[i-1] == t[j-1] ? dp[i-1][j-1] : 0)
+    }
+  }
+  return dp[n1][n2]
 };
+/**
+ * 剑指 Offer II 098. 路径的数目
+ * https://leetcode.cn/problems/2AoeFn/
+ * 边界dp[0][0]=1 dp[i][0] = 1 dp[0][j] = 1
+ * dp[i][j] = dp[i-1][j]+dp[i][j-1]
+ */
+ var uniquePaths = function(m, n) {
+    const dp = Array(m).fill(0).map(_ => Array(n).fill(1))
+    for(let i = 1; i<m;i++){
+      for(let j = 1; j< n;j++){
+        dp[i][j] = dp[i-1][j] + dp[i][j-1]
+      }
+    }
+    return dp[m-1][n-1]
+};
+var uniquePaths = function(m, n) {
+  const dp = Array(m).fill(1)
+  for(let i = 1;i <n;i++){
+    for(let j = 1;j <m;j++){
+      dp[j] += dp[j-1]
+    }
+  }
+  return dp[m-1]
+}
+// 数学组合法
+var uniquePaths = function(m, n) {
+  let ans = 1
+  for(let x = n,y=1; y < m; x++,y++){
+    ans = ans * x / y
+  }
+  return ans
+}
+/**
+ * 剑指 Offer II 099. 最小路径之和
+ * https://leetcode.cn/problems/0i0mDW/
+ */
+ var minPathSum = function(grid) {
+  let m = grid.length,n = grid[0].length
+  let dp = Array(m).fill(0).map(_=>Array(n).fill(0))
+  dp[0][0] = grid[0][0]
+  for(let i =0;i<m;i++){
+    for(let j = 0; j< n;j++){
+      if(i ==0 && j !==0){
+        dp[i][j] = dp[i][j-1]+ grid[i][j]
+      }else if( j == 0 && i !== 0){
+        dp[i][j] = dp[i - 1][j]+ grid[i][j]
+      }else if(i!==0 && j!==0){
+        dp[i][j] = grid[i][j] + Math.min(dp[i-1][j],dp[i][j-1])
+      }
+    }
+  }
+  return dp[m-1][n-1]
+};
+//滚动背包 状态空间压缩
+var minPathSum = function(grid) {
+  let m = grid.length,n = grid[0].length
+  // dp[i]表示从(0,0)到达第i-1行的  最短路径
+  const dp = new Array(n).fill(0)
+  dp[0] = grid[0][0]
+  for(let i = 0;i<m;i++){
+    for(let j = 0;j<n;j++){
+      if(i==0 && j !==0){
+        dp[j] = grid[i][j] + dp[j-1]
+      }else if(j ==0 && i!==0){
+        dp[j] = grid[i][j] + dp[j]
+      }else if(i!==0 && j!==0){
+        dp[j] = grid[i][j] + Math.min(dp[j],dp[j-1])
+      }
+    }
+  }
+  return dp[n-1]
+}
+/**
+ * 剑指 Offer II 100. 三角形中最小路径之和
+ * https://leetcode.cn/problems/IlPe0q/
+ * 1.
+ */
+ var minimumTotal = function(triangle) {
+  const n = triangle.length
+  const dp = Array(n).fill(0)
+  dp[0][0] = triangle[0][0]
+  for(let i = 1; i < n;i++){
+    for(let j = 0; j <= i;j++){
+      if(j === 0){
+        dp[i][j] = dp[i-1][j] + triangle[i][j]
+      }else if( j === i){
+        dp[i][j] = dp[i-1][j-1] + triangle[i][j]
+      }else{
+        dp[i][j] = Math.min(dp[i-1][j],dp[i-1][j-1]) + triangle[i][j]
+      }
+    }
+  }
+  return Math.min(...dp[n-1])
+};
+var minimumTotal = function(triangle) {
+  const n = triangle.length
+  let dp = triangle[n-1]
+  //从后往前递归 
+  
+  for(let i = n - 2;i>=0;i++){
+    let next = []
+    for(let j = 0; j <=i;j++){
+      let temp = Math.min(dp[j],dp[j+1]) + triangle[i][j]
+      next.push(temp)
+    }
+    dp = next
+  }
+  return dp[0]
+}
