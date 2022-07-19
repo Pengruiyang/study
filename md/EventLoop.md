@@ -3,7 +3,9 @@
   1. 在重新渲染前调用
   2. 很可能在宏任务之后不调用
   因为 raF 是官方推荐用去做流畅动画所使用的api,如果在渲染之后更改 dom,就只能等到下一轮渲染机会才能去绘制.相当于浏览器在渲染之前给你最后一个机会改变 dom 属性.
-
+### requestIdleCallback
+浏览器提供给我们的空闲调度算法.让我们把一些计算量大却有没那么紧急的任务放到空闲时间去执行.不影响浏览器中优先级较高的任务.
+回调中 deadline 字段 timeRemaining 计算剩余时间,第二个字段{timeout:500}防止任务被饿死,强制执行 rIC函数
 ### 宏任务之间不一定伴随着浏览器的绘制 
   ```js
     setTimeout(() => {
@@ -39,9 +41,7 @@
     rAF
 
   ```
-### requestIdleCallback
-浏览器提供给我们的空闲调度算法.让我们把一些计算量大却有没那么紧急的任务放到空闲时间去执行.不影响浏览器中优先级较高的任务.
-回调中 deadline 字段 timeRemaining 计算剩余时间,第二个字段{timeout:500}防止任务被饿死,强制执行 rIC函数
+
 
 ## 浏览器和node环境中事件循环
     task： setTimeOut、setInterval、script、I/O操作 UI渲染 网络请求 文件读写 setImmediate（）的回调 requestAnimationFrame 

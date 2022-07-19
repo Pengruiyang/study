@@ -162,4 +162,17 @@ stopPropagation 和 stopImmediatePropagation 两个方法.前置这会阻止冒�
 # 取消一个请求
 1. XMLHttpRequest可以使用 abort()
 2. fetch 需要实例化一个 AbortController,请求时传入AbortController.signal将控制器与请求关联起来,然后调用controller.abort() 取消
-3. 
+
+# 发布流程
+1. 版本更新
+2. 生成changlog
+3. 推送到git仓库
+4. 组件库打包
+5. 发布至npm更新
+6. 打tag并推送至git
+   
+# 大文件上传
+1. 对文件做切片
+2. 通知服务器合并切片
+3. 控制多个请求并发量
+4. 断点续传
