@@ -1,15 +1,12 @@
 # 生命周期
   ## 挂载阶段
   constructor 
-  componentWillMount **废弃**
   static getDerivedStateFromProps(纯函数)
   render(纯函数)
   componentDidMount (commit 阶段)
   ## 更新阶段
-  componentWillReceiveProps(废弃)
   static getDerivedStateFromProps
   shouldComponentUpdate
-  componentWillUpdate(废弃)
   render
   getSnapshotBeforeUpdate
   componentDidUpDate

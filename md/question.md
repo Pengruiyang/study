@@ -172,10 +172,12 @@ stopPropagation 和 stopImmediatePropagation 两个方法.前置这会阻止冒�
 6. 打tag并推送至git
    
 # 大文件上传
-1. 对文件做切片
+1. 对文件做切片.文件file是blob对象的子类,包含一个方法slice将文件拆分.上传切片formDate,等待所有处理完再获取合并
 2. 通知服务器合并切片
 3. 控制多个请求并发量
 4. 断点续传
 
 # rollup输出的六种格式
 iife 自执行函数、CommonJS、AMD、UMD、SystemJS、ESM
+# npm run xxx做了什么
+去项目的package.json中查找scripts对应的xxx,然后执行这条命令.而npm在安装这个依赖时,会在node_modules/.bin/目录创建好可执行的命令. .bin/目录下是一个个软连接,启动脚本.在库源代码中package.json中,用于安装时创建软连指向bin中地址
