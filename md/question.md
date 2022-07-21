@@ -176,3 +176,6 @@ stopPropagation 和 stopImmediatePropagation 两个方法.前置这会阻止冒�
 2. 通知服务器合并切片
 3. 控制多个请求并发量
 4. 断点续传
+
+# rollup输出的六种格式
+iife 自执行函数、CommonJS、AMD、UMD、SystemJS、ESM

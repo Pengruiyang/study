@@ -373,3 +373,7 @@ cd.yml 安装语义发办依赖
 dependencies: 生产环境使用的依赖
 devDependencies: 生产环境不需要使用的依赖
 peerDependencies: 用来避免核心依赖库被多次下载的问题,主系统和组件库可以公用依赖库
+# 什么场景下使用什么库
+1. 构建工具中引入(esm)
+2. 页面中引入(umd)
+3. nodejs 中使用(cjs)
