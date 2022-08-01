@@ -186,3 +186,9 @@ function mountEffect(create, deps) {
 
 }
 ```
+## forwardRef 场景和原理
+函数组件没有实例,使用 ref 会报错,props 不能传递 ref
+返回一个组件内部$$typeof 是 REACT_FORWARD_REF_TYPE.
+ref的更新在 renderWithHooks 中.
+let children = Component(props,refOrContext)
+Component 就是 forwardRef 中 Cild 对象的 render 属性.执行渲染的方法.

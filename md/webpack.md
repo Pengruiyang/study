@@ -377,3 +377,7 @@ peerDependencies: 用来避免核心依赖库被多次下载的问题,主系统�
 1. 构建工具中引入(esm)
 2. 页面中引入(umd)
 3. nodejs 中使用(cjs)
+
+# package-lock.json
+在 npm 更改 node_modules 目录树或者 package.json 时自动生成,准确的描述了当前项目 npm 包的依赖树,随后的安装中灰根据 package-lock.json 来安装,保证是同一个依赖树.不考虑这个过程中是否有某个依赖有小版本更新.
+注意:cnpm 的时候,不会生成 package-lock.json 文件,也不会根据 lock 包安装依赖包,还是会使用 package 来安装.

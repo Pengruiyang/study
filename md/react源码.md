@@ -1,3 +1,4 @@
+
 # render 阶段入口
 
 render 阶段开始于 performSyncWorkOnRoot 或 performConcurrentWorkOnRoot 方法的调用.
@@ -16,7 +17,8 @@ function workLoopConcurrent() {
 ```
 
 shouldYield 用来判断当前浏览器帧有没有空闲时间.对于 concurrent 模式来说,如果没有空闲时间就会退出当前循环.Fiber 通过深度遍历策略完成对整棵 workInProgress Fiber Tree 的创建.
-performUnitOfWork
+performUnitOfWork 方法会创建下一个 Fiber 节点并赋值给 workInProgress,
+并将 workInProgress 与已创建的 Fiber 节点链接起来构成 Fiber 树
 
 ```ts
 function performUnitOfWork(unitOfWork: Fiber): void {
@@ -55,6 +57,13 @@ function performUnitOfWork(unitOfWork: Fiber): void {
 ## 递归完成
 
 当 completeUnitOfWork 中 workInProgress 为 null,表示已经完成遍历创建整颗 workInProgress 树了.至此,render 阶段工作全部完成.在 performSyncWorkOnRoot 函数中 fiberRootNode 被传递给 commitRoot 方法,开启 commit 阶段工作流程.
+# commit 阶段(render 的工作流程)
+1. before mutation 阶段(执行DOM 操作前) 变量赋值,状态重做的功能.赋值 firstEffect,根节点没有 effectTag
+2. mutation 阶段(执行 dom 操作)
+3. layout 阶段(执行 dom 操作后)
+
+
+
 
 # setState 实现
 

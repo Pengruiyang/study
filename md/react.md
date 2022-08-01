@@ -292,7 +292,7 @@ Transaction 是创建一个黑盒,这个黑盒可以封装任何方法.将目标
 react 根据浏览器帧率性能,计算时间切片长度的大小,结合当前时间计算出一个切片到期时间.每次执行函数workLoopConcurrent 时,查询切片时间是否过期,到期 就结束循环,让出主线程控制权.
 # 手写react
 ## React.createElement
-  提取type、config、children 数组生成一个 ReactElement.
+  提取type、config、children 数组生成一个 ReactElement(通过属性$$typeof 标记).
   ```js
     function createElement(type,props,...children){
       props.children = children
@@ -374,8 +374,9 @@ react 组件挂载当前生命周期,其中插入 render 方法,转成原生组�
     const newNode = component.render()
     return initVNode(newNode)
   }
-```
 
+```
+// 函数组件和类组件无法通过引用类型区分,react 通过实例原型上的 isReactComponent 判断是否类组件
 
 # react常用工具函数
 ## cloneElement react-router 中 Switch 组价
