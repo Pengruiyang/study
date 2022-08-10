@@ -14,7 +14,7 @@
 
 # 跨域解决方案
 1、 通过jsonp跨域
-2、 document.domain + iframe跨域
+2、 document.domain + iframe跨域(只能二级域名相同的情况下比如 a.test.com 和 b.test.com )
 3、 location.hash + iframe
 4、 window.name + iframe跨域
 5、 postMessage跨域

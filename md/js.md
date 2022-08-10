@@ -450,6 +450,8 @@ function report(url,data){
 2. 拦截 URL_Schema 请求
 3.拦截 prompt alert confirm
 
+# 内存管理
+
 # js内存泄漏
 1. 意外的全局变量
 2. dom 清空时,还存在引用(包括绑定事件)
