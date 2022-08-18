@@ -381,3 +381,11 @@ peerDependencies: 用来避免核心依赖库被多次下载的问题,主系统�
 # package-lock.json
 在 npm 更改 node_modules 目录树或者 package.json 时自动生成,准确的描述了当前项目 npm 包的依赖树,随后的安装中灰根据 package-lock.json 来安装,保证是同一个依赖树.不考虑这个过程中是否有某个依赖有小版本更新.
 注意:cnpm 的时候,不会生成 package-lock.json 文件,也不会根据 lock 包安装依赖包,还是会使用 package 来安装.
+
+# 什么是模块联邦
+和webpack强绑定的一个东西,本质上是plugin.基于webpack上的tapable去实现的.以前实现微前端通过qiankun、single-spa,他们都是作为一个整体的输出,会根据路由的匹配,植入一个根root,通过沙箱去隔离js、css.每一次切换他的资源无法共享,且需要重新加载.而模块联邦能做什么呢,在打包阶段确定好应用需要导出的东西给到宿主,宿主像import组件一样去import他.他们之间三方依赖可以做到共享.一次加载不需要重复请求.
+和qiankun使用场景不一样,如果页面需要按照模块化配置展示,qiankun很难实现
+# webpack 如何加载chunk的
+webpack-jsonp,动态插入一个标签.有一个module-map的,一个k-v结构的对象 .把所有模块注册在上面,需要哪个模块就会指向他.
+## 为什么通过jsonp加载chunk
+jsonp相当于自己实现了一套类似common js,模拟es module,会考虑浏览器兼容性.也支持import,需要单独配置.

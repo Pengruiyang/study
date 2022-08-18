@@ -291,6 +291,8 @@ Node 在解析 JS 模块时,会先按文本读取内容,然后将模块内容进
 ```
 
 参数中 module 是当前模块 module 实例,exports 是 module.exports 别名,最终被 require 的时候输出 module.exports 的值.require 最终调用的也是 Module._load 方法.**filename,**dirname 则分别是当前模块在系统中的绝对路径和当前文件夹路径.
+#### VM模块
+vm的特点就是不收环境影响,也可以说他就是一个沙箱环境.在nodejs中全局变量是在多个模块下共享的,所以尽量不要在global中定义属性.所以 vm.runInThisContext可以访问global全局变量,但是访问不到自定义变量.vm.runInNewContext两个都访问不到,他存在于一个全新的执行上下文.
 ### require 模块加载机制
 1. 先计算模块路径
 2. 如果模块在缓存里面,去除缓存
