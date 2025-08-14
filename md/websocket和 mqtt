@@ -1,0 +1,45 @@
+
+1. 在无人机项目中使用了 webSocket 和 MQTT.
+## 角色定位​
+    · webSocket
+        传输层协议: 基于 TCP 的全双工通信协议(ws 或 wss)
+        前端场景: 适用于实时性要求高的场景(聊天、实时数据面板)
+        API: 直接使用浏览器原生 API,手动处理连接状态、心跳、重连
+    · MQTT
+        应用层协议: 基于发布/订阅模型(轻量级,专为 loT 优化) 
+        前端场景: 适合设备状态同步(如无人机控制、传感器数据推送)
+        库依赖: 内置心跳 QoS 机制
+
+### 应用层协议和传输层协议的区别
+    传输层协议: 解决数据如何可靠传输  对前端而言只关心链接是否通畅(TCP/UDP 端口)
+    应用层协议: 结局数据如何被理解  对前端而言需要处理数据格式和业务逻辑(JSON/HTTP 头)
+
+## 典型协议对比
+    传输层协议(前端黑盒)
+    TCP: 保证数据顺序和可靠性(webSocket 底层依赖 TCP) 前端无感知,浏览器/OS 自动处理丢包重传
+    UDP: 无连接可能丢包,前端智能通过 API 间接控制
+
+    应用层协议(前端白盒)
+    HTTP/HTTPS: 必须处理请求头/响应头、状态码、Cookie 等,需要手动封装 fetch/axios 请求
+    MQTT: 需要理解 Topic、QoS 等业务概念,调用 publish()/subscribe()
+
+## 前端开发的体现
+    传输层
+    ```
+        const ws = new WebSocket('wss://...')
+    ```
+
+    应用层
+    ```
+        fetch('/api',{
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({foo: 'bar'})
+        })
+
+        // MQTT 需要的业务语义
+        client.publish('topic',JSON.stringify({value: 42}),{qos: 1})
+    ```
+
+## 为什么前端需要关心这个
+1. 性能优化 TCP 对头阻塞问题,就明白 HTTP/2 为什么要引入多路复用
+2. MQTT 在浏览器中依赖 WebSocket 作为传输层(MQTT over WebSocket),结合使用
